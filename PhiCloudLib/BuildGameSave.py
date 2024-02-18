@@ -3,11 +3,11 @@ from ByteReader import *
 
 
 class BuildGameKey:
-    """构建gameKey"""
+    """构建gameKey喵"""
 
     def __init__(self, data: dict):
-        """构建gameKey\n
-        data：解析后的字典数据"""
+        """构建gameKey喵\n
+        data：解析后的字典数据喵"""
         Writer = ByteWriter()
         lanotaReadKeys = data.pop('lanotaReadKeys')
         camelliaReadKey = data.pop('camelliaReadKey')
@@ -30,11 +30,11 @@ class BuildGameKey:
 
 
 class BuildGameProgress:
-    """构建gameProgress"""
+    """构建gameProgress喵"""
 
     def __init__(self, data: dict):
-        """构建gameProgress\n
-        data：解析之后的字典数据"""
+        """构建gameProgress喵\n
+        data：解析之后的字典数据喵"""
         Writer = ByteWriter()
         tem: list = getBits(0)
         tem[0] = data['isFirstRun']
@@ -67,19 +67,19 @@ class BuildGameProgress:
         self.buildData: bytes = Writer.getData()
 
         if len(self.buildData) != 20:
-            print(f'[Warn]gameProgress数据大小为：{len(self.buildData)}')
-            print(f'[Warn]gameProgress数据大小不正确！应为：20！')
+            print(f'[Warn]gameProgress数据大小喵：{len(self.buildData)}')
+            print(f'[Warn]gameProgress数据大小不正确喵！应为：20喵！')
 
     def getData(self):
         return self.buildData
 
 
 class BuildGameRecord:
-    """构建gameRecord"""
+    """构建gameRecord喵"""
 
     def __init__(self, data: dict):
-        """解析gameRecord\n
-        data：解析后的字典数据"""
+        """解析gameRecord喵\n
+        data：解析后的字典数据喵"""
         diff_list: dict = {
             'EZ': 0,
             'HD': 1,
@@ -112,11 +112,11 @@ class BuildGameRecord:
 
 
 class BuildGameSettings:
-    """构建settings"""
+    """构建settings喵"""
 
     def __init__(self, data: dict):
-        """构建settings\n
-        data：解析后的字典数据"""
+        """构建settings喵\n
+        data：解析后的字典数据喵"""
         Writer = ByteWriter()
         tem: list = getBits(0)
         tem[0] = data['chordSupport']
@@ -138,11 +138,11 @@ class BuildGameSettings:
 
 
 class BuildGameUser:
-    """构建user"""
+    """构建user喵"""
 
     def __init__(self, data: dict):
-        """构建user\n
-        data：解析后的字典数据"""
+        """构建user喵\n
+        data：解析后的字典数据喵"""
         Writer = ByteWriter()
         Writer.writeByte(data['showPlayerId'])
         Writer.writeString(data['selfIntro'])
