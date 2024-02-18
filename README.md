@@ -17,6 +17,8 @@
 [![Phi-CloudAction-pyinstaller_v1.0](https://img.shields.io/badge/Lasest--release-Phi--CloudAction--pyinstaller__v1.0-green?style=for-the-badge&logo=Github)](https://github.com/wms26/Phi-CloudAction-python/releases/download/v1.0-kawaii/Phi-CloudAction-pyinstaller_v1.0.kawaii.exe)
 </div>
 
+# 开学了喵，本项目将会保持极低频率的更新喵（
+
 ## 声明喵：
 
 本项目仅作为学习参考用喵，请勿用作违法用途喵！(虽然我也想不到能做什么违法的事情就是了喵)
