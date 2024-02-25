@@ -1,0 +1,1 @@
+pyinstaller --clean --upx-dir ./upx-4.2.2-win64 -i ./ico/icons.ico --version-file=version.txt -F  main.py
