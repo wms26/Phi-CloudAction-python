@@ -17,7 +17,7 @@ print(getPlayerId(sessionToken))  # 获取玩家昵称喵
 summary = getSummary(sessionToken)  # 获取summary喵
 print(summary)
 
-save = getSave(summary['url'])  # 获取存档数据喵
+save = getSave(summary['url'], summary['checksum'])  # 获取存档数据喵
 
 # 读取并解密然后解析存档数据喵
 gameKey = ParseGameKey(decrypt(readGameSave(save, 'gameKey'))).getData()

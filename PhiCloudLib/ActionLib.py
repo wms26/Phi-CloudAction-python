@@ -1,8 +1,8 @@
 # 萌新写的代码喵，可能不是很好喵，但是已经尽可能注释了喵，希望各位大佬谅解喵=v=
 # ----------------------- 导包区喵 -----------------------
+from zipfile import ZipFile, ZIP_DEFLATED
 from copy import deepcopy
 from io import BytesIO
-from zipfile import ZipFile
 from re import match
 
 
@@ -54,11 +54,11 @@ def readDifficulty(path: str):
     return difficulty_list  # 返回解析出来的各歌曲难度列表喵
 
 
-def readGameSave(save_data: bytes, filename: str):
+def readGameSave(saveData: bytes, filename: str):
     """读取存档压缩文件中的filename文件喵\n
     save_data：存档压缩文件数据喵\n
     filename：要读取的文件名喵"""
-    with ZipFile(BytesIO(save_data)) as f:  # 打开存档文件喵(其实存档是个压缩包哦喵！)
+    with ZipFile(BytesIO(saveData)) as f:  # 打开存档文件喵(其实存档是个压缩包哦喵！)
         with f.open(filename) as saveFile:  # 打开存档中对应的文件喵
             print(f'[Info]"{filename}"文件的版本号文件头喵:', saveFile.read(1))
             saveFile.seek(0)
@@ -85,3 +85,14 @@ def getB19(records: dict):
     b19 = [max(filter(lambda x: x["score"] == 1000000, all_record), key=lambda x: x["difficulty"])]  # 脑子爆烧唔(抄过来的喵)
     b19.extend(all_record[:19])  # 将全部记录列表中取前19个拼接到b19列表中喵，准确来说是b20喵(?)
     return b19  # 返回b19喵(准确来说应该得叫b20喵)
+
+
+def zipGameSave(gameKey: bytes, gameProgress: bytes, gameRecord: bytes, settings: bytes, user: bytes):
+    with BytesIO() as f:
+        with ZipFile(f, 'a', compression=ZIP_DEFLATED) as saveFile:
+            saveFile.writestr('gameKey', file_headers['gameKey'] + gameKey)
+            saveFile.writestr('gameProgress', file_headers['gameProgress'] + gameProgress)
+            saveFile.writestr('gameRecord', file_headers['gameRecord'] + gameRecord)
+            saveFile.writestr('settings', file_headers['settings'] + settings)
+            saveFile.writestr('user', file_headers['user'] + user)
+        return f.getvalue()

@@ -55,11 +55,14 @@ class ParseGameProgress:
         for i in range(5):
             self.money.append(Reader.getVarInt())
 
-        self.unlockFlagOfSpasmodic = Reader.getByte()  # Spasmodic解锁喵
-        self.unlockFlagOfIgallta = Reader.getByte()  # Igallta解锁喵
-        self.unlockFlagOfRrharil = Reader.getByte()  # Rrhar'il解锁喵
-        self.flagOfSongRecordKey = Reader.getByte()  # 部分歌曲的AT解锁喵
-        self.randomVersionUnlocked = Reader.getByte()  # Random切片解锁喵
+        self.unlockFlagOfSpasmodic = getBits(Reader.getByte())[:-5]  # Spasmodic解锁喵
+        self.unlockFlagOfIgallta = getBits(Reader.getByte())[:-5]  # Igallta解锁喵
+        self.unlockFlagOfRrharil = getBits(Reader.getByte())[:-5]  # Rrhar'il解锁喵
+
+        # (倒霉蛋,船,Shadow,心之所向,inferior,DESTRUCTION 3,2,1,Distorted Fate)
+        self.flagOfSongRecordKey = getBits(Reader.getByte())  # 部分歌曲IN达到S喵
+
+        self.randomVersionUnlocked = getBits(Reader.getByte())[:-2]  # Random切片解锁喵
         tem: list = getBits(Reader.getByte())  # 鸽游用一个字节表示了下面3个数据喵（
         self.chapter8UnlockBegin = tem[0]  # 第八章入场喵
         self.chapter8UnlockSecondPhase = tem[1]  # 第八章第二阶段喵
@@ -116,12 +119,17 @@ class ParseGameRecord:
                 if getBit(unlock, level):  # 判断当前难度是否解锁喵
                     score: int = Reader.getInt()  # 读取分数喵
                     acc: float = Reader.getFloat()  # 读取acc喵
+                    try:
+                        difficulty = diff[songName][level]
+                    except KeyError:
+                        difficulty = 0
+                        print(f'[Warn]歌曲{songName}的{diff_list[level]}定数不存在喵！')
                     song_diff = {
-                        'difficulty': diff[songName][level],  # 定数喵
+                        'difficulty': difficulty,  # 定数喵
                         'score': score,  # 分数喵
                         'acc': acc,  # 正如其名喵，就是ACC喵
                         'fc': getBit(fc, level),  # 是否喵Full Combo(FC)
-                        'rks': (((acc - 55) / 45) ** 2) * diff[songName][level]  # 单曲rks喵
+                        'rks': (((acc - 55) / 45) ** 2) * difficulty  # 单曲rks喵
                     }
                     song[diff_list[level]] = song_diff  # 按难度存储进单首歌的成绩数据中喵
 

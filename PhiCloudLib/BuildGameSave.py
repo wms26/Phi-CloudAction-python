@@ -1,6 +1,10 @@
-from ByteWriter import *
-from ByteReader import *
+# 萌新写的代码喵，可能不是很好喵，但是已经尽可能注释了喵，希望各位大佬谅解喵=v=
+# ----------------------- 导包区喵 -----------------------
+from PhiCloudLib.ByteWriter import *
+from PhiCloudLib.ByteReader import *
 
+
+# ---------------------- 定义赋值区喵 ----------------------
 
 class BuildGameKey:
     """构建gameKey喵"""
@@ -51,11 +55,11 @@ class BuildGameProgress:
         for i in money:
             Writer.writeVarInt(i)
 
-        Writer.writeByte(data['unlockFlagOfSpasmodic'])
-        Writer.writeByte(data['unlockFlagOfIgallta'])
-        Writer.writeByte(data['unlockFlagOfRrharil'])
-        Writer.writeByte(data['flagOfSongRecordKey'])
-        Writer.writeByte(data['randomVersionUnlocked'])
+        Writer.writeByte(setBits(data['unlockFlagOfSpasmodic'] + [0, 0, 0, 0, 0]))
+        Writer.writeByte(setBits(data['unlockFlagOfIgallta'] + [0, 0, 0, 0, 0]))
+        Writer.writeByte(setBits(data['unlockFlagOfRrharil'] + [0, 0, 0, 0, 0]))
+        Writer.writeByte(setBits(data['flagOfSongRecordKey']))
+        Writer.writeByte(setBits(data['randomVersionUnlocked'] + [0, 0]))
 
         tem: list = getBits(0)
         tem[0] = data['chapter8UnlockBegin']
