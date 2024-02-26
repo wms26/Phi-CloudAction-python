@@ -1,14 +1,14 @@
 # 萌新写的代码喵，可能不是很好喵，但是已经尽可能注释了喵，希望各位大佬谅解喵=v=
 # ----------------------- 导包区喵 -----------------------
-from PhiCloudLib.CloudAction import getPlayerId, getSummary, getSave
-from PhiCloudLib.AES import decrypt
 from PhiCloudLib.ParseGameSave import ParseGameKey, ParseGameProgress, ParseGameRecord, ParseGameSettings, ParseGameUser
 from PhiCloudLib.ActionLib import readGameSave, readDifficulty, getB19
+from PhiCloudLib.CloudAction import getPlayerId, getSummary, getSave
+from PhiCloudLib.AES import decrypt
 import json
 
 # ---------------------- 定义赋值区喵 ----------------------
 
-sessionToken = 'm8xc5b7khmvsyp0nhqyin4llb'
+sessionToken = ''
 
 # ----------------------- 运行区喵 -----------------------
 

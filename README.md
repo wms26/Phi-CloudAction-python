@@ -29,7 +29,7 @@
 
 ## 环境准备喵！
 
-1. 编写本项目时使用的是 **python3.9.13** 的喵，不能完全保证其他版本会不会出现问题喵，建议使用 **python>=3.9** 来运行喵~
+1. 编写本项目时使用的是 **python3.11.8** 的喵，不能完全保证其他版本会不会出现问题喵，建议使用 **python>=3.9** 来运行喵~(最近换成3.11.8滴喵！)
 
 2. 注意在使用本项目前要先安装`PhiCloudLib/requirement.txt`中的模块喵
 
@@ -39,12 +39,12 @@
 
 ## 使用喵！
 
-### 安装pycryptodome库喵：
+### 安装pycryptodome库和requests库喵：
 
 直接运行喵：(用`pip`也可以的亚子喵(?))
 
 ```
-pip3 install pycryptodome
+pip3 install pycryptodome requests
 ```
 
 或者如果想要一点仪式感也可以运行喵：
@@ -59,18 +59,21 @@ pip3 install -r PhiCloudLib/requirement.txt
 
 ## 未来计划功能喵！
 
-- [ ] **存档获取喵[CloudAction]**(已模块化喵)(注释较为完整喵)
-    - [x] 通过sessionToken获取云存档喵
-    - [x] 防呆措施喵(bushi)
+- [x] **存档获取喵[CloudAction]**(已模块化喵)(注释较为完整喵)
+  - [x] 通过sessionToken获取云存档喵
+  - [x] 防呆措施喵(bushi)
+  - [x] 下载存档时进行md5校验喵
 
 
 - [x] **存档解析喵[ParseGameSave]**(已模块化喵)(注释较为完整喵)
-  - [x] 解析输出所有内容
+  - [x] 解析输出所有内容喵
 
 
 - [ ] **其他喵：**
     - [x] 获取本地SessionToken喵(点[**这里**](https://github.com/wms26/Phi-CloudAction-python/releases/tag/GST_v1.0)来下载喵)
-    - [ ] 将各功能模块化喵(更方便使用喵，但是这可能得到以后才能真正完成喵)
+    - [x] 获取summary和玩家昵称喵
+    - [x] 计算b19喵！
+    - [x] 将各功能模块化喵(更方便使用喵)
 
 ## 喵喵喵~
 
