@@ -11,7 +11,7 @@ from time import sleep
 
 # ---------------------- 定义赋值区喵 ----------------------
 
-global_headers = {  # 全局的请求头喵(理论上没有什么用了，在CloudLib已经重写了)
+global_headers = {  # 全局的请求头喵(理论上没有什么用了喵，在CloudLib已经重写了喵)
     'X-LC-Id': 'rAK3FfdieFob2Nn8Am',
     'X-LC-Key': 'Qr9AEqtuoSVS3zeD6iVbM4ZC0AtkJcQ89tywVyi0',
     'User-Agent': 'LeanCloud-CSharp-SDK/1.0.3',
@@ -64,7 +64,7 @@ def getSave(url: str, checksum: str):
         sleep(5)
     savemd5 = md5()  # 创建一个md5对象喵，用来计算md5校验值喵
     savemd5.update(saveData)  # 将存档数据更新进去喵
-    if checksum != savemd5.hexdigest():  # 对比校验值喵，不正确则输出警告并等待
+    if checksum != savemd5.hexdigest():  # 对比校验值喵，不正确则输出警告并等待喵
         print(f'[Warn]严重警告喵！！！存档校验不通过喵！')
         print(f'[Warn]将延迟5秒钟喵！！！')
         sleep(5)
@@ -74,106 +74,107 @@ def getSave(url: str, checksum: str):
 def refreshSessionToken(sessionToken: str):
     """刷新sessionToken喵\n
     注意喵：原先的sessionToken将失效喵！\n
-    (其实具体什么时候能够真正刷新目前尚未实验所以并不清楚)\n
-    (根据以前的实验结果表明需要到每周一才会生效)"""
+    (其实具体什么时候能够真正刷新目前尚未实验所以并不清楚喵)\n
+    (根据以前的实验结果表明需要到每周一才会生效喵)"""
     if check_sessionToken(sessionToken):
         pigeon_req = PigeonCloud(sessionToken)
 
-        objectId = pigeon_req.UserInfo()['objectId']  # 获取玩家的objectId
+        objectId = pigeon_req.UserInfo()[1]['objectId']  # 获取玩家的objectId喵
 
-        response = pigeon_req.RefreshSessionToken(objectId)  # 发送刷新sessionToken请求
-        return response.json()['sessionToken']  # 获取新sessionToken
+        response = pigeon_req.RefreshSessionToken(objectId)[1]  # 发送刷新sessionToken请求喵
+        return response['sessionToken']  # 获取新sessionToken喵
 
 
-def uploadSave(sessionToken: str, saveData: bytes):  # 一坨*，不想改这么快了
-    """上传存档至云端\n
-    sessionToken：正如其名不用多说了吧\n
-    saveData：存档的压缩数据"""
+def uploadSave(sessionToken: str, saveData: bytes):  # 一坨*喵！不想改这么快了喵
+    """上传存档至云端喵\n
+    sessionToken：正如其名不用多说了吧喵\n
+    saveData：存档压缩包数据喵"""
     if check_sessionToken(sessionToken):
         pigeon_req = PigeonCloud(sessionToken)
 
         # 请求存档信息喵
-        response = pigeon_req.SaveInfo()
-        print('\n请求URL：' + response[0])
-        print('返回数据:', response[1])
+        URL, response = pigeon_req.SaveInfo()
+        print('\n请求URL喵:', URL)
+        print('返回数据喵:', response)
 
-        # 更改summary的版本号，方便云存档同步
-        print('现summary:', response[1]['results'][0]['summary'])
-        summary = bytearray(b64decode(response[1]['results'][0]['summary']))  # base64解码summary数据喵
-        summary[7] = 81  # 修改版本号，方便后期存档云同步喵
+        # 更改summary的版本号喵，方便云存档同步喵
+        print('现summary喵:', response['results'][0]['summary'])
+        summary = bytearray(b64decode(response['results'][0]['summary']))  # base64解码summary数据喵
+        summary[7] = 81  # 修改版本号喵，方便后期存档云同步喵
         summary = b64encode(summary)  # 把summary数据编码回去喵
-        print('新summary:', summary)
+        print('新summary喵:', summary)
 
-        objectId = response[1]['results'][0]['objectId']  # 获取objectId
-        userObjectId = response[1]['results'][0]['user']['objectId']  # 获取user的ObjectId
+        objectId = response['results'][0]['objectId']  # 获取objectId喵
+        userObjectId = response['results'][0]['user']['objectId']  # 获取user的ObjectId喵
         print('objectId:', objectId)
         print('userObjectId:', userObjectId)
 
-        # 计算存档的md5校验值
-        md5hash = md5()  # 创建一个md5对象，用于后续计算存档数据md5校验值
-        md5hash.update(saveData)  # 将存档数据更新到md5对象内
-        checksum = md5hash.hexdigest()  # 计算md5校验值
-        print('校验值saveChecksum:', checksum)
+        # 计算存档的md5校验值喵
+        md5hash = md5()  # 创建一个md5对象喵，用于后续计算存档数据md5校验值喵
+        md5hash.update(saveData)  # 将存档数据更新到md5对象内喵
+        checksum = md5hash.hexdigest()  # 计算md5校验值喵
+        print('校验值saveChecksum喵:', checksum)
 
         # 请求fileToken喵
-        response = pigeon_req.FileTokens(userObjectId, len(saveData), checksum)
-        print('\n请求URL：' + response[0])
-        print('返回数据:', response[1])
-        tokenKey = b64encode(response[1]['key'].encode()).decode('utf-8')  # 获取key
-        newObjectId = response[1]['objectId']  # 获取新的objectId
-        authorization = "UpToken " + response[1]['token']  # 获取上传用的token
+        URL, response = pigeon_req.FileTokens(userObjectId, len(saveData), checksum)
+        print('\n请求URL喵:', URL)
+        print('返回数据喵:', response)
+        tokenKey = b64encode(response['key'].encode()).decode('utf-8')  # 获取key喵
+        newObjectId = response['objectId']  # 获取新的objectId喵
+        authorization = "UpToken " + response['token']  # 获取上传用的token喵
         print('tokenKey:', tokenKey)
         print('newObjectId:', newObjectId)
         print('authorization:', authorization)
 
-        pigeon_req.Authorization(authorization)  # 将authorization传入，后续请求要用
+        pigeon_req.Authorization(authorization)  # 将authorization传入喵，后续请求要用喵
 
-        # 获取uploadId
-        response = pigeon_req.Uploads(tokenKey)
-        print('\n请求URL：' + response[0])
-        print('返回数据:', response[1])
-        uploadId = response[1]['uploadId']  # 获取上传用ID
+        # 获取uploadId喵
+        URL, response = pigeon_req.Uploads(tokenKey)
+        print('\n请求URL喵:', URL)
+        print('返回数据喵:', response)
+        uploadId = response['uploadId']  # 获取上传用ID喵
         print('uploadId:', uploadId)
 
-        # 获取etag
-        response = pigeon_req.Uploads1(tokenKey, uploadId, saveData)
-        print('\n请求URL：' + response[0])
-        print('返回数据:', response[1])
-        etag = response[1]['etag']  # 获取etag
+        # 获取etag喵
+        URL, response = pigeon_req.Uploads1(tokenKey, uploadId, saveData)
+        print('\n请求URL喵:', URL)
+        print('返回数据喵:', response)
+        etag = response['etag']  # 获取etag喵
         print('etag:', etag)
 
-        # 把etag请求上去(我也不知道有什么用)
-        response = pigeon_req.Uploads_Id(tokenKey, uploadId, etag)
-        print('\n请求URL：' + response[0])
-        print('返回数据:', response[1])
+        # 把etag请求上去喵(我也不知道有什么用喵)
+        URL, response = pigeon_req.Uploads_Id(tokenKey, uploadId, etag)
+        print('\n请求URL喵:', URL)
+        print('返回数据喵:', response)
 
-        # 发送fileCallback请求
-        response = pigeon_req.FileCallback(tokenKey)
-        print('\n请求URL：' + response[0])
-        print('返回数据:', response[1])
+        # 发送fileCallback请求喵
+        URL, response = pigeon_req.FileCallback(tokenKey)
+        print('\n请求URL喵:', URL)
+        print('返回数据喵:', response)
 
-        # 上传summary
-        response = pigeon_req.UploadSummary(objectId, summary.decode(),
-                                            datetime.utcnow().isoformat(timespec='milliseconds') + 'Z', newObjectId,
-                                            userObjectId)
-        print('\n请求URL：' + response[0])
-        print('返回数据:', response[1])
+        # 上传summary喵
+        URL, response = pigeon_req.UploadSummary(objectId, summary.decode(),
+                                                 datetime.utcnow().isoformat(timespec='milliseconds') + 'Z',
+                                                 newObjectId, userObjectId)
+        print('\n请求URL喵:', URL)
+        print('返回数据喵:', response)
 
-        # 删除旧存档
-        response = pigeon_req.DeleteSave(objectId)
-        print('\n请求URL：' + response[0])
-        print('返回数据:', response[1])
+        # 删除旧存档喵
+        URL, response = pigeon_req.DeleteSave(objectId)
+        print('\n请求URL喵:', URL)
+        print('返回数据喵:', response)
 
 
 def uploadSummary(sessionToken: str, summarys: dict):
-    """上传summary(从上传存档里面独立出来的)\n
-    sessionToken：正如其名不用多说了吧\n
-    summarys：要上传的summary\n
-    (注意这个只能用来看，没有任何实际用处，同步之后就没用了)"""
+    """上传summary喵(从上传存档里面独立出来的喵)\n
+    sessionToken：正如其名不用多说了吧喵\n
+    summarys：要上传的summary喵\n
+    (注意这个只能用来看喵，没有任何实际用处喵，同步之后就没用了喵)"""
     if check_sessionToken(sessionToken):
         pigeon_req = PigeonCloud(sessionToken)
 
-        avatar_data = summarys['avatar'].encode()
+        # 将解析过的summary构建回去喵
+        avatar_data = summarys['avatar'].encode()  # 对头像名称进行编码
         summary = bytearray()
         summary.extend(pack('=B', summarys['saveVersion']))
         summary.extend(pack('=H', summarys['challenge']))
@@ -187,24 +188,24 @@ def uploadSummary(sessionToken: str, summarys: dict):
 
         summary = b64encode(summary).decode()  # 把summary数据编码回去喵
 
-        response = pigeon_req.SaveInfo()  # 请求存档信息喵
-        print(response[0])
-        print('返回数据:', response[1])
-        objectId = response[1]['results'][0]['objectId']  # 获取objectId
-        userObjectId = response[1]['results'][0]['user']['objectId']  # 获取user的ObjectId
-        checksum = response[1]['results'][0]['gameFile']['metaData']['_checksum']
-        saveSize = response[1]['results'][0]['gameFile']['metaData']['size']
-        fileId = response[1]['results'][0]['gameFile']['objectId']
+        URL, response = pigeon_req.SaveInfo()  # 请求存档信息喵
+        print('\n请求URL：' + URL)
+        print('返回数据:', response)
+        objectId = response['results'][0]['objectId']  # 获取objectId
+        userObjectId = response['results'][0]['user']['objectId']  # 获取user的ObjectId
+        checksum = response['results'][0]['gameFile']['metaData']['_checksum']  # 存档的md5校验值
+        saveSize = response['results'][0]['gameFile']['metaData']['size']  # 存档的大小
+        fileId = response['results'][0]['gameFile']['objectId']  # 存档的objectId
         print('objectId:', objectId)
         print('userObjectId:', userObjectId)
         print('checksum:', checksum)
         print('saveSize:', saveSize)
 
-        print('现summary:', response[1]['results'][0]['summary'])
+        print('现summary:', response['results'][0]['summary'])
         print('新summary:', summary)
 
-        response = pigeon_req.UploadSummary(objectId, summary,
-                                            datetime.utcnow().isoformat(timespec='milliseconds') + 'Z', fileId,
-                                            userObjectId)
-        print('\n' + response[0])
-        print('返回数据:', response[1])
+        URL, response = pigeon_req.UploadSummary(objectId, summary,
+                                                 datetime.utcnow().isoformat(timespec='milliseconds') + 'Z', fileId,
+                                                 userObjectId)
+        print('\n' + URL)
+        print('返回数据:', response)

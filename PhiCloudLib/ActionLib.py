@@ -43,7 +43,7 @@ def readDifficulty(path: str):
     with open(path, encoding="UTF-8") as f:  # 打开难度列表文件喵
         lines = f.readlines()  # 解析所有行喵，输出一个列表喵
 
-    for line in lines:  # 遍历所有行
+    for line in lines:  # 遍历所有行喵
         line = line[:-1].split("\t")  # 将该行最后的\n截取掉喵，并以\t为分隔符解析为一个列表喵
         diff = []  # 用来存储单首歌的难度信息喵
 
