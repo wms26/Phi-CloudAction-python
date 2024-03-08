@@ -1,6 +1,8 @@
 # 萌新写的代码喵，可能不是很好喵，但是已经尽可能注释了喵，希望各位大佬谅解喵=v=
 # ----------------------- 导包区喵 -----------------------
+from PhiCloudLib.AES import decrypt, encrypt
 from zipfile import ZipFile, ZIP_DEFLATED
+from sys import exit as exti  # emm我也不知道为啥要这样子做（
 from copy import deepcopy
 from io import BytesIO
 from re import match
@@ -10,7 +12,7 @@ from re import match
 
 def Temporary_files(string, mode: str, filetype: str):  # 这个是测试debug用的喵，不用多管喵（
     with open('./awa.' + filetype, mode) as f:  # 算是写个临时文件用来debug数据处理情况喵
-        f.write(string)
+        f.write(string)  # 写入文件
 
 
 file_headers = {  # 存档中各文件的版本号文件头喵
@@ -23,15 +25,23 @@ file_headers = {  # 存档中各文件的版本号文件头喵
 
 
 def check_sessionToken(sessionToken: str):
+    """检查sessionToken格式是否正确喵\n
+    sessionToken：正如其名喵"""
     if sessionToken == '' or sessionToken is None:
         print('[Error]sessionToken为空喵！')
-        return False
+        # return False
+        exti()
+
     elif len(sessionToken) != 25:
         print(f'[Error]sessionToken长度错误喵！当前为{len(sessionToken)}位喵，应为25位喵！')
-        return False
+        # return False
+        exti()
+
     elif not match(r'^[0-9a-z]{25}$', sessionToken):
         print(f'[Error]sessionToken不合法喵！应只有数字与小写字母喵！')
-        return False
+        # return False
+        exti()
+
     else:
         return True
 
@@ -54,16 +64,16 @@ def readDifficulty(path: str):
     return difficulty_list  # 返回解析出来的各歌曲难度列表喵
 
 
-def readGameSave(saveData: bytes, filename: str):
+def unzipSave(saveData: bytes, filename: str):
     """读取存档压缩文件中的filename文件喵\n
     save_data：存档压缩文件数据喵\n
     filename：要读取的文件名喵"""
     with ZipFile(BytesIO(saveData)) as f:  # 打开存档文件喵(其实存档是个压缩包哦喵！)
         with f.open(filename) as saveFile:  # 打开存档中对应的文件喵
-            print(f'[Info]"{filename}"文件的版本号文件头喵:', saveFile.read(1))
-            saveFile.seek(0)
+            file_header = saveFile.read(1)  # 读取当前文件的文件头喵
+            print(f'[Info]"{filename}"文件的版本号文件头喵:', file_header)
 
-            if saveFile.read(1) != file_headers[filename]:  # 从file_headers取当前文件对应的文件头喵，之后判断文件头喵
+            if file_header != file_headers[filename]:  # 从file_headers取当前文件对应的文件头喵，之后判断文件头喵
                 raise Exception('版本号不正确喵，可能协议已更新喵。文件头应为:', file_headers[filename])
 
             return saveFile.read()  # 如果文件头正确喵，则返回当前读取的存档文件数据喵
@@ -79,20 +89,58 @@ def getB19(records: dict):
     for song in record.items():  # 遍历所有歌曲记录喵
         for song_record in song[1].items():  # 遍历每首歌的所有难度记录喵
             song_record[1]['name'] = song[0]  # 取歌名添加进原数据中喵
+            song_record[1]['level'] = song_record[0]  # 将难度等级添加进原数据中喵
             all_record.append(song_record[1])  # 添加到全部记录列表中喵
 
     all_record.sort(key=lambda x: x["rks"], reverse=True)  # 对全部记录以rks为准进行排序
-    b19 = [max(filter(lambda x: x["score"] == 1000000, all_record), key=lambda x: x["difficulty"])]  # 脑子爆烧唔(抄过来的喵)
+    try:
+        b19 = [max(filter(lambda x: x["score"] == 1000000, all_record), key=lambda x: x["difficulty"])]  # 脑子爆烧唔(抄过来的喵)
+    except ValueError:  # 如果找不到AP曲子就返回全部记录列表的前19个
+        print('[Warn]好家伙喵，居然一首AP曲子都没有喵！')
+        return all_record[:19]
     b19.extend(all_record[:19])  # 将全部记录列表中取前19个拼接到b19列表中喵，准确来说是b20喵(?)
     return b19  # 返回b19喵(准确来说应该得叫b20喵)
 
 
-def zipGameSave(gameKey: bytes, gameProgress: bytes, gameRecord: bytes, settings: bytes, user: bytes):
-    with BytesIO() as f:
-        with ZipFile(f, 'a', compression=ZIP_DEFLATED) as saveFile:
-            saveFile.writestr('gameKey', file_headers['gameKey'] + gameKey)
-            saveFile.writestr('gameProgress', file_headers['gameProgress'] + gameProgress)
-            saveFile.writestr('gameRecord', file_headers['gameRecord'] + gameRecord)
-            saveFile.writestr('settings', file_headers['settings'] + settings)
-            saveFile.writestr('user', file_headers['user'] + user)
-        return f.getvalue()
+def readGameSave(saveData: bytes, saveDict: dict):
+    """读取存档压缩包中所有文件喵\n
+    saveData：存档压缩包数据喵\n
+    saveDict：存档数据字典喵"""
+    saveDict['user']: bytes = unzipSave(saveData, 'user')
+    saveDict['progress']: bytes = unzipSave(saveData, 'gameProgress')
+    saveDict['setting']: bytes = unzipSave(saveData, 'settings')
+    saveDict['record']: bytes = unzipSave(saveData, 'gameRecord')
+    saveDict['key']: bytes = unzipSave(saveData, 'gameKey')
+
+
+def decryptGameSave(saveDict: dict):
+    """解密存档数据字典中的所有文件的数据喵\n
+    saveDict：存档数据字典喵"""
+    saveDict['user']: bytes = decrypt(saveDict['user'])
+    saveDict['progress']: bytes = decrypt(saveDict['progress'])
+    saveDict['setting']: bytes = decrypt(saveDict['setting'])
+    saveDict['record']: bytes = decrypt(saveDict['record'])
+    saveDict['key']: bytes = decrypt(saveDict['key'])
+
+
+def encryptGameSave(saveDict: dict):
+    """加密存档数据字典中的所有文件的数据喵\n
+    saveDict：存档数据字典喵"""
+    saveDict['user']: bytes = encrypt(saveDict['user'])
+    saveDict['progress']: bytes = encrypt(saveDict['progress'])
+    saveDict['setting']: bytes = encrypt(saveDict['setting'])
+    saveDict['record']: bytes = encrypt(saveDict['record'])
+    saveDict['key']: bytes = encrypt(saveDict['key'])
+
+
+def zipGameSave(saveDict: dict):
+    """将存档数据字典中的所有文件数据加密后压缩成存档压缩包中喵\n
+    saveDict：存档数据字典喵"""
+    with BytesIO() as f:  # 创建一个内存中的文件对象喵
+        with ZipFile(f, 'a', compression=ZIP_DEFLATED) as saveFile:  # 创建一个压缩包文件喵
+            saveFile.writestr('gameKey', file_headers['gameKey'] + saveDict['key'])
+            saveFile.writestr('gameProgress', file_headers['gameProgress'] + saveDict['progress'])
+            saveFile.writestr('gameRecord', file_headers['gameRecord'] + saveDict['record'])
+            saveFile.writestr('settings', file_headers['settings'] + saveDict['setting'])
+            saveFile.writestr('user', file_headers['user'] + saveDict['user'])
+        return f.getvalue()  # 返回压缩包数据喵

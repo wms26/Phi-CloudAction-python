@@ -1,11 +1,11 @@
 from PhiCloudLib.ParseGameSave import ParseGameKey, ParseGameProgress, ParseGameRecord, ParseGameSettings, ParseGameUser
-from PhiCloudLib.ActionLib import readGameSave, readDifficulty, getB19
+from PhiCloudLib.ActionLib import unzipSave, readDifficulty, getB19, readGameSave, decryptGameSave
 from PhiCloudLib.CloudAction import getPlayerId, getSummary, getSave
 from PhiCloudLib.AES import decrypt
 from argparse import ArgumentParser
 from json import dumps
 
-args_main = ArgumentParser(description='Phi-CloudAction-python v1.0',
+args_main = ArgumentParser(description='Phi-CloudAction-python v1.2.3',
                            usage='[-h] [-s sessionToken] [-p] [-m] [-e] [-r] [-t] [-u] [-g] [-b19] [-o output]',
                            add_help=False)
 args_tree = args_main.add_argument_group(title='参数用法喵')
@@ -32,7 +32,8 @@ if args.summary:
             file.write(dumps(summary, ensure_ascii=False, indent=4))
 if args.progress:
     summary = getSummary(args.session)
-    progress = ParseGameProgress(decrypt(readGameSave(getSave(summary['url'], summary['checksum']), 'gameProgress'))).getData()
+    progress = {'progress': decrypt(unzipSave(getSave(summary['url'], summary['checksum']), 'gameProgress'))}
+    ParseGameProgress(progress)
     if args.output == '' or args.output is None:
         print(progress)
     else:
@@ -41,7 +42,8 @@ if args.progress:
 if args.record:
     difficulty = readDifficulty('./difficulty.tsv')
     summary = getSummary(args.session)
-    record = ParseGameRecord(decrypt(readGameSave(getSave(summary['url'], summary['checksum']), 'gameRecord')), difficulty).getData()
+    record = {'record': decrypt(unzipSave(getSave(summary['url'], summary['checksum']), 'gameRecord'))}
+    ParseGameRecord(difficulty, record)
     if args.output == '' or args.output is None:
         print(record)
     else:
@@ -49,7 +51,8 @@ if args.record:
             file.write(dumps(record, ensure_ascii=False, indent=4))
 if args.settings:
     summary = getSummary(args.session)
-    settings = (ParseGameSettings(decrypt(readGameSave(getSave(summary['url'], summary['checksum']), 'settings'))).getData())
+    settings = {'setting': decrypt(unzipSave(getSave(summary['url'], summary['checksum']), 'settings'))}
+    ParseGameSettings(settings)
     if args.output == '' or args.output is None:
         print(settings)
     else:
@@ -57,7 +60,8 @@ if args.settings:
             file.write(dumps(settings, ensure_ascii=False, indent=4))
 if args.user:
     summary = getSummary(args.session)
-    user = ParseGameUser(decrypt(readGameSave(getSave(summary['url'], summary['checksum']), 'user'))).getData()
+    user = {'user': decrypt(unzipSave(getSave(summary['url'], summary['checksum']), 'user'))}
+    ParseGameUser(user)
     if args.output == '' or args.output is None:
         print(user)
     else:
@@ -67,13 +71,14 @@ if args.getSave:
     difficulty = readDifficulty('./difficulty.tsv')
     summary = getSummary(args.session)
     save = getSave(summary['url'], summary['checksum'])
-    saveData = {
-        'user': ParseGameUser(decrypt(readGameSave(save, 'user'))).getData(),
-        'setting': ParseGameSettings(decrypt(readGameSave(save, 'settings'))).getData(),
-        'progress': ParseGameProgress(decrypt(readGameSave(save, 'gameProgress'))).getData(),
-        'record': ParseGameRecord(decrypt(readGameSave(save, 'gameRecord')), difficulty).getData(),
-        'key': ParseGameKey(decrypt(readGameSave(save, 'gameKey'))).getData()
-    }
+    saveData = {}
+    readGameSave(save, saveData)
+    decryptGameSave(saveData)
+    ParseGameUser(saveData)
+    ParseGameProgress(saveData)
+    ParseGameSettings(saveData)
+    ParseGameRecord(difficulty, saveData)
+    ParseGameKey(saveData)
     if args.output == '' or args.output is None:
         print(saveData)
     else:
@@ -82,7 +87,9 @@ if args.getSave:
 if args.getB19:
     difficulty = readDifficulty('./difficulty.tsv')
     summary = getSummary(args.session)
-    b19 = getB19(ParseGameRecord(decrypt(readGameSave(getSave(summary['url'], summary['checksum']), 'gameRecord')), difficulty).getData())
+    record = {'record': decrypt(unzipSave(getSave(summary['url'], summary['checksum']), 'gameRecord'))}
+    ParseGameRecord(difficulty, record)
+    b19 = getB19(record['record'])
     if args.output == '' or args.output is None:
         print(b19)
     else:

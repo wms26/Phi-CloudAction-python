@@ -59,28 +59,29 @@ def getSave(url: str, checksum: str):
     response = get(url, headers=global_headers)  # 请求存档文件喵
     saveData = response.content  # 获取存档数据喵
     if len(saveData) <= 30:
-        print(f'[Warn]严重警告喵！！！存档大小不足30字节喵！当前大小喵：{len(saveData)}')
+        print(f'[Warn]严重警告喵！！！获取到的云存档大小不足30字节喵！当前大小喵：{len(saveData)}')
+        print('[Warn]可能云存档已丢失喵！！！请重新将本地存档同步至云端喵！')
         print('[Warn]将延迟5秒钟喵！！！')
         sleep(5)
     savemd5 = md5()  # 创建一个md5对象喵，用来计算md5校验值喵
     savemd5.update(saveData)  # 将存档数据更新进去喵
     if checksum != savemd5.hexdigest():  # 对比校验值喵，不正确则输出警告并等待喵
-        print(f'[Warn]严重警告喵！！！存档校验不通过喵！')
-        print(f'[Warn]将延迟5秒钟喵！！！')
+        print('[Warn]严重警告喵！！！存档校验不通过喵！')
+        print('[Warn]这可能是因为不正确地上传存档导致的喵！')
+        print('[Warn]将延迟5秒钟喵！！！')
         sleep(5)
     return saveData  # 读取存档数据喵
 
 
 def refreshSessionToken(sessionToken: str):
     """刷新sessionToken喵\n
+    sessionToken：正如其名不用多说了吧喵\n
     注意喵：原先的sessionToken将失效喵！\n
     (其实具体什么时候能够真正刷新目前尚未实验所以并不清楚喵)\n
     (根据以前的实验结果表明需要到每周一才会生效喵)"""
     if check_sessionToken(sessionToken):
         pigeon_req = PigeonCloud(sessionToken)
-
         objectId = pigeon_req.UserInfo()[1]['objectId']  # 获取玩家的objectId喵
-
         response = pigeon_req.RefreshSessionToken(objectId)[1]  # 发送刷新sessionToken请求喵
         return response['sessionToken']  # 获取新sessionToken喵
 
@@ -135,7 +136,7 @@ def uploadSave(sessionToken: str, saveData: bytes):  # 一坨*喵！不想改这
         uploadId = response['uploadId']  # 获取上传用ID喵
         print('uploadId:', uploadId)
 
-        # 获取etag喵
+        # 获取etag并上传存档喵
         URL, response = pigeon_req.Uploads1(tokenKey, uploadId, saveData)
         print('\n请求URL喵:', URL)
         print('返回数据喵:', response)
@@ -175,7 +176,7 @@ def uploadSummary(sessionToken: str, summarys: dict):
 
         # 将解析过的summary构建回去喵
         avatar_data = summarys['avatar'].encode()  # 对头像名称进行编码
-        summary = bytearray()
+        summary = bytearray()  # 创建一个空的summary数据喵
         summary.extend(pack('=B', summarys['saveVersion']))
         summary.extend(pack('=H', summarys['challenge']))
         summary.extend(pack('=f', summarys['rks']))
@@ -204,6 +205,7 @@ def uploadSummary(sessionToken: str, summarys: dict):
         print('现summary:', response['results'][0]['summary'])
         print('新summary:', summary)
 
+        # 上传summary喵
         URL, response = pigeon_req.UploadSummary(objectId, summary,
                                                  datetime.utcnow().isoformat(timespec='milliseconds') + 'Z', fileId,
                                                  userObjectId)

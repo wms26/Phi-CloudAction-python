@@ -46,8 +46,8 @@ class ByteWriter:
     def writeVarInt(self, var_int: int):
         """写入一个2字节或1字节的变长整数喵"""
         if var_int > 127:  # 如果大于127喵，则写入两个字节喵
-            self.writeByte((var_int & 0b01111111) | 0b10000000)  # 脑子爆烧唔
-            self.writeByte(var_int >> 7)  # 脑子爆烧唔
+            self.writeByte((var_int & 0b01111111) | 0b10000000)
+            self.writeByte(var_int >> 7)
         else:
             self.writeByte(var_int)  # 写入一个字节喵
 

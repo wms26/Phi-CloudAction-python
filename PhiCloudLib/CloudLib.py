@@ -6,6 +6,8 @@ from json import dumps
 
 # ---------------------- 定义赋值区喵 ----------------------
 
+# 注意！这是用于云存档操作的各种api请求，非必要请勿修改！
+
 class PigeonCloud:
     def __init__(self, sessionToken: str):
         self.pigeon_headers = {
