@@ -88,7 +88,11 @@ def ParseGameRecord(diff: dict, saveDict: dict):
                 acc: float = Reader.getFloat()  # 读取acc喵
                 try:
                     difficulty: float = diff[songName][level]
-                    rks: float = (((acc - 55) / 45) ** 2) * difficulty  # 计算单曲rks
+                    rks: float = (((acc - 55) / 45) ** 2) * difficulty
+
+                    # from decimal import Decimal, getcontext  # 备用的计算方式喵，虽然感觉没有什么用喵
+                    # getcontext().prec = 30  # 设置Decimal上下文的小数精度为8位喵
+                    # rks = float(format(((Decimal(acc) - Decimal('55')) / Decimal('45')) ** 2 * Decimal(difficulty), '.15f'))  # 计算单曲rks喵
                 except KeyError:
                     difficulty: float = 0
                     rks: float = 0
@@ -101,7 +105,7 @@ def ParseGameRecord(diff: dict, saveDict: dict):
                     'difficulty': difficulty,  # 定数喵
                     'score': score,  # 分数喵
                     'acc': acc,  # 正如其名喵，就是ACC喵
-                    'fc': getBit(fc, level),  # 是否喵Full Combo(FC)
+                    'fc': getBit(fc, level),  # 是否Full Combo喵(FC)
                     'rks': rks  # 单曲rks喵
                 }
 

@@ -24,23 +24,26 @@ file_headers = {  # 存档中各文件的版本号文件头喵
 }
 
 
-def check_sessionToken(sessionToken: str):
+def check_sessionToken(sessionToken: str, doExti=True):
     """检查sessionToken格式是否正确喵\n
     sessionToken：正如其名喵"""
     if sessionToken == '' or sessionToken is None:
         print('[Error]sessionToken为空喵！')
-        # return False
-        exti()
+        if doExti:
+            exti()
+        return False
 
     elif len(sessionToken) != 25:
         print(f'[Error]sessionToken长度错误喵！当前为{len(sessionToken)}位喵，应为25位喵！')
-        # return False
-        exti()
+        if doExti:
+            exti()
+        return False
 
     elif not match(r'^[0-9a-z]{25}$', sessionToken):
         print(f'[Error]sessionToken不合法喵！应只有数字与小写字母喵！')
-        # return False
-        exti()
+        if doExti:
+            exti()
+        return False
 
     else:
         return True
