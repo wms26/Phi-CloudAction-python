@@ -6,12 +6,26 @@ from PhiCloudLib.ByteReader import ByteReader, getBit, getBits
 # ---------------------- 定义赋值区喵 ----------------------
 
 
-def ParseGameKey(saveDict: dict):
+def ParseGameKey(saveDict: dict | bytes):
     """解析gameKey喵\n
-    saveDict：存档的字典数据喵"""
-    Reader = ByteReader(saveDict.copy()['key'])  # 将data数据传给ByteReader来进行后续字节读取操作喵
+    saveDict：存档的字典数据喵\n
+    (如果传入了字节类型数据则会返回解析后字典数据喵)"""
+
+    # 将data数据传给ByteReader来进行后续字节读取操作喵
+    if type(saveDict) is dict:
+        Reader = ByteReader(saveDict.copy()['key'])
+        all_keys = saveDict['key'] = {}  # 用来存储解析出来的数据喵
+
+    elif type(saveDict) is bytes:
+        Reader = ByteReader(saveDict)
+        all_keys = {}  # 用来存储解析出来的数据喵
+
+    else:
+        print(f'[Warn]解析key时传入的数据类型不正确！应为dict或bytes！但传入了"{type(saveDict)}"类型')
+        Reader = ByteReader(saveDict)
+        all_keys = {}  # 用来存储解析出来的数据喵
+
     keySum: int = Reader.getVarInt()  # 总共key的数量，决定循环多少次喵
-    all_keys = saveDict['key'] = {}  # 用来存储解析出来的数据喵
 
     for _ in range(keySum):  # 循环keySum次喵
         name: str = Reader.getString()  # key的昵称喵
@@ -27,12 +41,29 @@ def ParseGameKey(saveDict: dict):
     all_keys['lanotaReadKeys'] = Reader.getByte()  # 读取Lanota收藏品喵(解锁倒霉蛋和船的AT喵)
     all_keys['camelliaReadKey'] = Reader.getByte()  # 读取极星卫破译收藏品喵(解锁S.A.T.E.L.L.I.T.E.的AT喵)
 
+    if type(saveDict) is bytes:
+        return all_keys
 
-def ParseGameProgress(saveDict: dict):
+
+def ParseGameProgress(saveDict: dict | bytes):
     """解析gameProgress喵\n
-    saveDict：存档的字典数据喵"""
-    Reader = ByteReader(saveDict.copy()['progress'])  # 将data数据传给ByteReader来进行后续字节读取操作喵
-    all_progress = saveDict['progress'] = {}
+    saveDict：存档的字典数据喵\n
+    (如果传入了字节类型数据则会返回解析后字典数据喵)"""
+
+    # 将data数据传给ByteReader来进行后续字节读取操作喵
+    if type(saveDict) is dict:
+        Reader = ByteReader(saveDict.copy()['progress'])
+        all_progress = saveDict['progress'] = {}  # 用来存储解析出来的数据喵
+
+    elif type(saveDict) is bytes:
+        Reader = ByteReader(saveDict)
+        all_progress = {}  # 用来存储解析出来的数据喵
+
+    else:
+        print(f'[Warn]解析key时传入的数据类型不正确！应为dict或bytes！但传入了"{type(saveDict)}"类型')
+        Reader = ByteReader(saveDict)
+        all_progress = {}  # 用来存储解析出来的数据喵
+
     tem: list = getBits(Reader.getByte())  # 鸽游用一个字节表示了下面4个数据喵（
     all_progress['isFirstRun']: int = tem[0]  # 首次运行喵
     all_progress['legacyChapterFinished']: int = tem[1]  # 过去的章节已完成喵
@@ -64,14 +95,32 @@ def ParseGameProgress(saveDict: dict):
     if Reader.remaining() > 0 or Reader.remaining() < 0:
         print(f'[Warn]警告喵，gameProgress文件尚未读取完毕喵！剩余字节喵：{Reader.remaining()}')
 
+    if type(saveDict) is bytes:
+        return all_progress
 
-def ParseGameRecord(diff: dict, saveDict: dict):
+
+def ParseGameRecord(saveDict: dict | bytes, diff: dict):
     """解析gameRecord喵\n
     diff：各歌曲难度字典列表喵(可以通过readDifficulty()获取喵)\n
-    saveDict：存档的字典数据喵"""
+    saveDict：存档的字典数据喵\n
+    (如果传入了字节类型数据则会返回解析后字典数据喵)"""
+
     diff_list: tuple = ('EZ', 'HD', 'IN', 'AT', 'Legacy')
-    Reader = ByteReader(saveDict.copy()['record'])  # 将data数据传给ByteReader来进行后续字节读取操作喵
-    all_record = saveDict['record'] = {}
+
+    # 将data数据传给ByteReader来进行后续字节读取操作喵
+    if type(saveDict) is dict:
+        Reader = ByteReader(saveDict.copy()['record'])
+        all_record = saveDict['record'] = {}  # 用来存储解析出来的数据喵
+
+    elif type(saveDict) is bytes:
+        Reader = ByteReader(saveDict)
+        all_record = {}  # 用来存储解析出来的数据喵
+
+    else:
+        print(f'[Warn]解析record时传入的数据类型不正确！应为dict或bytes！但传入了"{type(saveDict)}"类型')
+        Reader = ByteReader(saveDict)
+        all_record = {}  # 用来存储解析出来的数据喵
+
     songSum: int = Reader.getVarInt()  # 总歌曲数目喵
 
     for num in range(songSum):
@@ -116,12 +165,29 @@ def ParseGameRecord(diff: dict, saveDict: dict):
     if Reader.remaining() > 0 or Reader.remaining() < 0:
         print(f'[Warn]警告喵，gameRecord文件尚未读取完毕喵！剩余字节喵：{Reader.remaining()}')
 
+    if type(saveDict) is bytes:
+        return all_record
 
-def ParseGameSettings(saveDict: dict):
+
+def ParseGameSettings(saveDict: dict | bytes):
     """解析settings喵\n
-    saveDict：存档的字典数据喵"""
-    Reader = ByteReader(saveDict.copy()['setting'])  # 将data数据传给ByteReader来进行后续字节读取操作喵
-    all_settings = saveDict['setting'] = {}
+    saveDict：存档的字典数据喵\n
+    (如果传入了字节类型数据则会返回解析后字典数据喵)"""
+
+    # 将data数据传给ByteReader来进行后续字节读取操作喵
+    if type(saveDict) is dict:
+        Reader = ByteReader(saveDict.copy()['setting'])
+        all_settings = saveDict['setting'] = {}  # 用来存储解析出来的数据喵
+
+    elif type(saveDict) is bytes:
+        Reader = ByteReader(saveDict)
+        all_settings = {}  # 用来存储解析出来的数据喵
+
+    else:
+        print(f'[Warn]解析setting时传入的数据类型不正确！应为dict或bytes！但传入了"{type(saveDict)}"类型')
+        Reader = ByteReader(saveDict)
+        all_settings = {}  # 用来存储解析出来的数据喵
+
     tem: list = getBits(Reader.getByte())  # 鸽游用一个字节表示了下面4个数据喵（
     all_settings['chordSupport']: int = tem[0]  # 多押辅助喵
     all_settings['fcAPIndicator']: int = tem[1]  # 开启FC/AP指示器喵
@@ -138,12 +204,29 @@ def ParseGameSettings(saveDict: dict):
     if Reader.remaining() > 0 or Reader.remaining() < 0:
         print(f'[Warn]警告喵，settings文件尚未读取完毕喵！剩余字节喵：{Reader.remaining()}')
 
+    if type(saveDict) is bytes:
+        return all_settings
 
-def ParseGameUser(saveDict: dict):
+
+def ParseGameUser(saveDict: dict | bytes):
     """解析user喵\n
-    saveDict：存档的字典数据喵"""
-    Reader = ByteReader(saveDict.copy()['user'])
-    all_user = saveDict['user'] = {}
+    saveDict：存档的字典数据喵\n
+    (如果传入了字节类型数据则会返回解析后字典数据喵)"""
+
+    # 将data数据传给ByteReader来进行后续字节读取操作喵
+    if type(saveDict) is dict:
+        Reader = ByteReader(saveDict.copy()['user'])
+        all_user = saveDict['user'] = {}  # 用来存储解析出来的数据喵
+
+    elif type(saveDict) is bytes:
+        Reader = ByteReader(saveDict)
+        all_user = {}  # 用来存储解析出来的数据喵
+
+    else:
+        print(f'[Warn]解析user时传入的数据类型不正确！应为dict或bytes！但传入了"{type(saveDict)}"类型')
+        Reader = ByteReader(saveDict)
+        all_user = {}  # 用来存储解析出来的数据喵
+
     all_user['showPlayerId']: int = Reader.getByte()  # 右上角展示用户id喵
     all_user['selfIntro']: str = Reader.getString()  # 自我介绍喵
     all_user['avatar']: str = Reader.getString()  # 头像喵
@@ -151,3 +234,6 @@ def ParseGameUser(saveDict: dict):
 
     if Reader.remaining() > 0 or Reader.remaining() < 0:
         print(f'[Warn]警告喵，user文件尚未读取完毕喵！剩余字节喵：{Reader.remaining()}')
+
+    if type(saveDict) is bytes:
+        return all_user

@@ -24,7 +24,7 @@ decryptGameSave(saveDict)
 ParseGameUser(saveDict)
 ParseGameProgress(saveDict)
 ParseGameSettings(saveDict)
-ParseGameRecord(difficulty, saveDict)
+ParseGameRecord(saveDict, difficulty)
 ParseGameKey(saveDict)
 
 # 写出解析后所有的存档数据喵

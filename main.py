@@ -43,7 +43,7 @@ if args.record:
     difficulty = readDifficulty('./difficulty.tsv')
     summary = getSummary(args.session)
     record = {'record': decrypt(unzipSave(getSave(summary['url'], summary['checksum']), 'gameRecord'))}
-    ParseGameRecord(difficulty, record)
+    ParseGameRecord(record, difficulty)
     if args.output == '' or args.output is None:
         print(record)
     else:
@@ -77,7 +77,7 @@ if args.getSave:
     ParseGameUser(saveData)
     ParseGameProgress(saveData)
     ParseGameSettings(saveData)
-    ParseGameRecord(difficulty, saveData)
+    ParseGameRecord(saveData, difficulty)
     ParseGameKey(saveData)
     if args.output == '' or args.output is None:
         print(saveData)

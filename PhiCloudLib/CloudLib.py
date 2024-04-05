@@ -43,7 +43,7 @@ class PigeonCloud:
     def RefreshSessionToken(self, objectId: str):
         """https://rak3ffdi.cloud.tds1.tapapis.cn/1.1/users/[objectId]/refreshSessionToken"""
         URL = f'https://rak3ffdi.cloud.tds1.tapapis.cn/1.1/users/{objectId}/refreshSessionToken'
-        return URL, get(URL, headers=self.pigeon_headers).json()
+        return URL, put(URL, headers=self.pigeon_headers).json()
 
     def FileTokens(self, userObjectId: str, saveSize: [int, str], checksum: str):
         """https://rak3ffdi.cloud.tds1.tapapis.cn/1.1/fileTokens \n

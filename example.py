@@ -27,12 +27,12 @@ decryptGameSave(saveDict)
 ParseGameUser(saveDict)
 ParseGameProgress(saveDict)
 ParseGameSettings(saveDict)
-ParseGameRecord(difficulty, saveDict)
+ParseGameRecord(saveDict, difficulty)
 ParseGameKey(saveDict)
 
 # 写出解析后所有的存档数据喵
-with open('./PhigrosSave.json', 'w', encoding='utf-8') as savefile:
-    savefile.write(dumps(saveDict, ensure_ascii=False, indent=4))
+# with open('./PhigrosSave.json', 'w', encoding='utf-8') as savefile:
+#     savefile.write(dumps(saveDict, ensure_ascii=False, indent=4))
 
 b19 = getB19(saveDict['record'])  # 获取b19喵(准确来说是b20喵(?))
 rks = 0  # 定义一个rks用于后续计算喵
@@ -43,7 +43,7 @@ print(f'根据b19计算玩家的rks喵：{rks / 20}')  # 输出玩家rks喵
 
 # 其他功能）↓
 
-# refreshSessionToken(sessionToken)  # 刷新sessionToken喵(注意此功能尚未经过测试喵，仅限理论可用喵)
+# refreshSessionToken(sessionToken)  # 刷新sessionToken喵(注意此功能尚未经过大量测试喵，刷新是即时的喵，旧token会立即失效喵)
 
 # summary['challenge'] = 566  # 将课题分改为彩色(5)66分）
 # uploadSummary(sessionToken, summary)  # 上传summary）

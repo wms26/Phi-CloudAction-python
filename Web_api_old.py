@@ -5,17 +5,20 @@ from os.path import exists
 from re import match
 from traceback import format_exc
 
+from Crypto.Cipher import PKCS1_OAEP
+from Crypto.PublicKey import RSA
 from flask import Flask, request, jsonify, send_from_directory
 
 from PhiCloudLib.ActionLib import check_sessionToken, readDifficulty, readGameSave, decryptGameSave, unzipSave, decrypt, \
     getB19
 from PhiCloudLib.ByteReader import ByteReader
-from PhiCloudLib.CloudAction import getPlayerId, getSummary, getSave, refreshSessionToken
+from PhiCloudLib.CloudAction import getPlayerId, getSummary, getSave
 from PhiCloudLib.ParseGameSave import ParseGameUser, ParseGameProgress, ParseGameSettings, ParseGameKey, ParseGameRecord
 
 app = Flask(__name__)
 
-reqData_encrypt = False  # 用于声明请求的数据是否使用本喵自己搓的“特殊混淆处理”
+# 存储IP和对应的RSA私钥
+ip_keyList = {}
 
 
 def out_ErrorLog(req=None, *args):  # 输出错误日志
@@ -32,10 +35,15 @@ def out_ErrorLog(req=None, *args):  # 输出错误日志
             f.write(f'请求头：\n')
             for key, value in req_headers.items():
                 f.write(f'{key}: {value}\n')
-
             if req.method == 'POST':
                 f.write(f'请求数据：{req.data.decode()}\n')
-
+                if req.remote_addr in ip_keyList:
+                    try:
+                        decrypt_data = par_data(rsa_decrypt(req.data, req.remote_addr))
+                    except Exception as e:
+                        decrypt_data = f'解密失败："{e}"'
+                    f.write(f'RSA私钥：{repr(ip_keyList[req.remote_addr])}\n')
+                    f.write(f'解密后请求数据：{repr(decrypt_data)}\n')
             elif req.method == 'GET':
                 f.write(f'请求参数：{req.args}\n')
 
@@ -47,18 +55,22 @@ def out_ErrorLog(req=None, *args):  # 输出错误日志
         f.write('\n')
 
 
+def gen_RSAKey():  # 生成RSA公私钥
+    key = RSA.generate(2048)
+    return key.export_key().decode(), key.publickey().export_key().decode()
+
+
 def check_req(req):  # 检查请求合法性
     if req.method == 'POST':
-        if reqData_encrypt:
-            try:  # 检查token是否正确
-                req_data = par_data(par_base64(req.data.decode()).encode())
-            except Exception:
-                trace_info = format_exc()
-                print(trace_info)
-                return 3, 'Invalid token in request'
+        if req.remote_addr not in ip_keyList:  # 判断当前IP是否获取过key
+            return 1, 'Key not found'
 
-        else:
-            req_data = req.data.decode()
+        try:  # 检查token是否正确
+            req_data = par_data(rsa_decrypt(req.data, req.remote_addr))
+        except Exception:
+            trace_info = format_exc()
+            print(trace_info)
+            return 3, 'Invalid token in request'
 
         if not req_data:  # 检查请求数据是否为空
             return 2, 'Missing request data'
@@ -88,7 +100,17 @@ def check_req(req):  # 检查请求合法性
         return 9, 'Invalid request method'
 
 
-def par_base64(data: str | bytes):
+def rsa_decrypt(data, ip):  # rsa解密数据
+    try:
+        rsa = PKCS1_OAEP.new(RSA.import_key(ip_keyList[ip]))
+        decrypt_data = rsa.decrypt(b64decode(data))
+    except Exception as e:
+        print(e)
+        return None
+    return decrypt_data
+
+
+def par_base64(data: str):
     # 解码特殊的base64
     if data is not None and match(r'^[0-9]', data):
         num: int = int(data[0])
@@ -121,6 +143,26 @@ def par_data(data: bytes):
         return None
 
 
+# 用于生成RSA公私钥并与请求IP绑定
+@app.route('/api/bind_key', methods=['GET', 'POST'])
+def bind_key():
+    try:
+        private_key, public_key = gen_RSAKey()  # 生成RSA公私钥
+        ip_keyList[request.remote_addr] = private_key  # 将RSA私钥与请求IP绑定
+        if request.method == 'POST':
+            return jsonify(code=0, massage=b64encode(public_key.encode()).decode()), 200
+
+        elif request.method == 'GET':
+            return public_key, 200
+
+    except Exception:
+        trace_info = format_exc()
+        print(trace_info)
+        # print(e)
+        out_ErrorLog(request, trace_info)
+        return jsonify(code=10, massage='Server error'), 500
+
+
 # 获取playerId
 @app.route('/api/getPlayerId', methods=['GET', 'POST'])
 def api_getPlayerId():
@@ -142,7 +184,7 @@ def api_getPlayerId():
         else:
             return jsonify(code=9, massage='Invalid request method'), 403
 
-    except Exception as e:
+    except Exception:
         trace_info = format_exc()
         print(trace_info)
         # print(e)
@@ -171,7 +213,7 @@ def api_getSummary():
         else:
             return jsonify(code=9, massage='Invalid request method'), 403
 
-    except Exception as e:
+    except Exception:
         trace_info = format_exc()
         print(trace_info)
         # print(e)
@@ -228,7 +270,7 @@ def api_getSave():
         else:
             return jsonify(code=9, massage='Invalid request method'), 403
 
-    except Exception as e:
+    except Exception:
         trace_info = format_exc()
         print(trace_info)
         # print(e)
@@ -277,7 +319,7 @@ def api_getB19():
         else:
             return jsonify(code=9, massage='Invalid request method'), 403
 
-    except Exception as e:
+    except Exception:
         trace_info = format_exc()
         print(trace_info)
         # print(e)
@@ -323,36 +365,7 @@ def api_getMoney():
         else:
             return jsonify(code=9, massage='Invalid request method'), 403
 
-    except Exception as e:
-        trace_info = format_exc()
-        print(trace_info)
-        # print(e)
-        out_ErrorLog(request, trace_info)
-        return jsonify(code=10, massage='Server error'), 500
-
-
-# 刷新sessionToken
-@app.route('/api/refreshToken', methods=['GET', 'POST'])
-def api_refreshToken():
-    try:
-        if request.method == 'POST':  # 如果为POST请求
-            check = check_req(request)  # 检查请求是否合法
-            if check[0] != 0:
-                return jsonify(code=check[0], massage=check[1]), 403
-
-            return b64encode(str(dict(code=0, massage=refreshSessionToken(check[1]))).encode()), 200
-
-        elif request.method == 'GET':
-            check = check_req(request)  # 检查请求是否合法
-            if check[0] != 0:
-                return check[1], 403
-
-            return str(refreshSessionToken(check[1])), 200
-
-        else:
-            return jsonify(code=9, massage='Invalid request method'), 403
-
-    except Exception as e:
+    except Exception:
         trace_info = format_exc()
         print(trace_info)
         # print(e)

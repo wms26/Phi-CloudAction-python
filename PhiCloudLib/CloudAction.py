@@ -76,9 +76,9 @@ def getSave(url: str, checksum: str):
 def refreshSessionToken(sessionToken: str):
     """刷新sessionToken喵\n
     sessionToken：正如其名不用多说了吧喵\n
-    注意喵：原先的sessionToken将失效喵！\n
-    (其实具体什么时候能够真正刷新目前尚未实验所以并不清楚喵)\n
-    (根据以前的实验结果表明需要到每周一才会生效喵)"""
+    注意喵：原先的sessionToken将会失效喵！\n
+    (会返回新的sessionToken喵！)\n
+    (刷新是即时的喵，旧token会立即失效喵，新的会即时生效喵)"""
     if check_sessionToken(sessionToken):
         pigeon_req = PigeonCloud(sessionToken)
         objectId = pigeon_req.UserInfo()[1]['objectId']  # 获取玩家的objectId喵
