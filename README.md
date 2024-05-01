@@ -16,7 +16,7 @@
 
 </div>
 
-# 开学了喵，本项目将会保持极低频率的更新喵（
+# 近期繁忙，本项目将会保持极低频率的更新喵（
 
 ## 声明喵：
 
@@ -25,6 +25,8 @@
 编写本项目所需的资料和资源均源于互联网收集喵(所以本人就是一个废物喵，什么都要依靠互联网喵(bushi))
 
 本项目的初衷仅仅是为了供学习参考使用喵，本人从未想过要破坏音游圈的游戏平衡喵！
+
+请勿尝试滥用本项目！已加检测，请不要试图做出任何类似`倒卖`的行为！否则统一纳入黑名单！
 
 ## 环境准备喵！
 
@@ -108,7 +110,7 @@ pip install flask
 
 ## 喵喵喵~
 
-此项目云端操作的思路源于[文酱](https://github.com/7aGiven)的项目[PhigrosLibrary](https://github.com/7aGiven/PhigrosLibrary)喵(本文档前面也留了链接喵)
+此项目云端操作的思路源于[文酱](https://github.com/7aGiven)的项目[PhigrosLibrary](https://github.com/7aGiven/PhigrosLibrary)喵(本文档前面也留了链接喵)(快说“谢谢文酱！”)
 
 喵！小小宣传一下[废酱](https://github.com/Catrong)的项目[Phi-Plugin](https://github.com/catrong/phi-plugin)，是一个适用于`Yunzai-Bot V3`的`Phigros`辅助插件喵！(本文档前面也留了链接喵)
 
@@ -124,6 +126,7 @@ pip install flask
 1. 整理代码，对于新加的功能可能并没有过多去写注释，后面再补咕咕咕...
 2. 增加了存档历史记录的功能，可用于绘制rks曲线图或者单曲成绩的曲线图之类的。
 3. 给README.md增加了更新日志！
+4. 为项目增加了`GNU GPLv3`许可证
 
 ### 2024/04/05(v1.2.5-v1.2.5b)：
 1. 新增了对解析存档时传入数据的类型检查
