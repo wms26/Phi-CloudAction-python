@@ -1,11 +1,17 @@
 # 萌新写的代码喵，可能不是很好喵，但是已经尽可能注释了喵，希望各位大佬谅解喵=v=
 # ----------------------- 导包区喵 -----------------------
-from PhiCloudLib.AES import decrypt, encrypt
-from zipfile import ZipFile, ZIP_DEFLATED
-from sys import exit as exti  # emm我也不知道为啥要这样子做（
 from copy import deepcopy
+from datetime import datetime
 from io import BytesIO
+from json import dumps, loads
+from os import mkdir
+from os.path import exists
 from re import match
+from sys import exit as exti  # emm我也不知道为啥要这样子做（
+from zipfile import ZipFile, ZIP_DEFLATED
+
+from PhiCloudLib.AES import decrypt, encrypt
+from PhiCloudLib.ParseGameSave import ParseGameRecord
 
 
 # ---------------------- 定义赋值区喵 ----------------------
@@ -147,3 +153,102 @@ def zipGameSave(saveDict: dict):
             saveFile.writestr('settings', file_headers['settings'] + saveDict['setting'])
             saveFile.writestr('user', file_headers['user'] + saveDict['user'])
         return f.getvalue()  # 返回压缩包数据喵
+
+
+def find_differentKeys(dict1: dict, dict2: dict):
+    """寻找两个字典中不同的键\n
+    dict1：用于模板的字典\n
+    dict2：用于比较的字典\n
+    (将返回不同的根键列表，从后者向前者比较键的相同性)"""
+    diff_keys = []  # 记录不同的大键
+
+    for key in dict2.keys():  # 遍历第一个字典的大键
+        if key not in dict1:  # 如果第二个字典中不存在对应的大键，直接记录为不同的大键
+            diff_keys.append(key)
+        else:
+            if dict1[key] != dict2[key]:  # 比较对应大键的值是否相同，如果不同则记录为不同的大键
+                diff_keys.append(key)
+
+    return diff_keys  # 返回不同的大键
+
+
+def load_recordHistory(recordHistory: dict):
+    """解析record历史"""
+    # sorted_history = dict(sorted(recordHistory.items(), key=lambda x: datetime.strptime(x[0], "%Y-%m-%d_%H-%M-%S")))
+    records = {}
+    for history in recordHistory.values():
+        for name, record in history.items():
+            records[name] = record
+
+    return records
+
+
+def check_saveUpload(sessionToken: str, summary: dict, saveData: bytes, difficulty: dict):
+    """存储存档历史记录"""
+    if not exists('saveHistory/'):  # 如果历史文件夹不存在则创建喵
+        mkdir('saveHistory/')
+        print('[Info]存档历史记录文件夹不存在喵！已创建喵！')
+
+    if not exists(f'saveHistory/{sessionToken}/'):  # 如果对应token历史文件夹不存在则创建喵
+        mkdir(f'saveHistory/{sessionToken}/')
+        print('[Info]对应sessionToken的存档历史文件夹不存在喵！已创建喵！')
+
+    if not exists(f'saveHistory/{sessionToken}/summaryHistory.json'):  # 如果对应token的summary历史文件不存在则创建并写入存档喵
+        nowTime = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+
+        with open(f'saveHistory/{sessionToken}/summaryHistory.json', 'w', encoding='utf-8') as file:
+            file.write(dumps({nowTime: summary}, indent=4, ensure_ascii=False))
+        print('[Info]对应sessionToken的summary历史文件不存在喵！已创建喵！')
+
+        with open(f'saveHistory/{sessionToken}/{nowTime}.save', 'wb') as save:
+            save.write(saveData)
+        print(f'[Info]已保存了新的存档历史记录喵！时间喵：{nowTime}')
+
+    if not exists(f'saveHistory/{sessionToken}/recordHistory.json'):
+        nowTime = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+
+        with open(f'saveHistory/{sessionToken}/recordHistory.json', 'w', encoding='utf-8') as file:
+            record_new = ParseGameRecord(decrypt(unzipSave(saveData, 'gameRecord')), difficulty)
+            file.write(dumps({nowTime: record_new}, indent=4, ensure_ascii=False))
+        print('[Info]对应sessionToken的record历史文件不存在喵！已创建喵！')
+
+    else:  # 若对应token的summary的历史文件存在则进行对比喵
+        with open(f'saveHistory/{sessionToken}/summaryHistory.json', 'r', encoding='utf-8') as file:
+            summaryHistory: dict = loads(file.read())
+
+        checksumHistory = [i.get('checksum') for i in summaryHistory.values()]  # 获取历史所有校验值喵
+
+        # 如果没有相同校验值喵，则添加进历史记录并写入存档喵
+        if not summary['checksum'] in checksumHistory:
+            with open(f'saveHistory/{sessionToken}/recordHistory.json', 'r', encoding='utf-8') as file:
+                recordHistory = loads(file.read())
+
+            record_old = load_recordHistory(recordHistory)
+            record_new = ParseGameRecord(decrypt(unzipSave(saveData, 'gameRecord')), difficulty)
+            differentRecord = find_differentKeys(record_old, record_new)
+
+            if differentRecord:
+                nowTime = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+                summaryHistory[nowTime] = summary
+
+                new_record = {}
+                for key in differentRecord:
+                    new_record[key] = record_new[key]
+
+                with open(f'saveHistory/{sessionToken}/summaryHistory.json', 'w', encoding='utf-8') as file:
+                    file.write(dumps(summaryHistory, indent=4, ensure_ascii=False))
+
+                with open(f'saveHistory/{sessionToken}/{nowTime}.save', 'wb') as save:
+                    save.write(saveData)
+
+                with open(f'saveHistory/{sessionToken}/recordHistory.json', 'w', encoding='utf-8') as file:
+                    recordHistory[nowTime] = new_record
+                    file.write(dumps(recordHistory, indent=4, ensure_ascii=False))
+                print(f'[Info]已保存了新的record历史记录喵！歌曲数：{len(differentRecord)}')
+                print(f'[Info]已保存了新的存档历史记录喵！时间喵：{nowTime}')
+
+            else:
+                print('[Info]歌曲记录相同喵！未记录为新存档记录喵！')
+
+        else:
+            print('[Info]checksum重复喵！未记录为新存档记录喵！')

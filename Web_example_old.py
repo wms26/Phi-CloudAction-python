@@ -1,11 +1,13 @@
-from PhiCloudLib.ByteWriter import ByteWriter
 from base64 import b64encode, b64decode
-from Crypto.Cipher import PKCS1_OAEP
+from json import dumps
 from random import randint, shuffle
+from re import match
+
+from Crypto.Cipher import PKCS1_OAEP
 from Crypto.PublicKey import RSA
 from requests import post
-from json import dumps
-from re import match
+
+from PhiCloudLib.ByteWriter import ByteWriter
 
 sessionToken = ''
 

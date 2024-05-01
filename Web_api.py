@@ -20,8 +20,8 @@ reqData_encrypt = False  # 用于声明请求的数据是否使用本喵自己�
 
 def out_ErrorLog(req=None, *args):  # 输出错误日志
     nowDate = datetime.now().strftime('%Y-%m-%d')
-    if not exists(f'ErrorLog'):  # 如果错误日志目录不存在则创建
-        mkdir(f'ErrorLog')
+    if not exists('ErrorLog'):  # 如果错误日志目录不存在则创建
+        mkdir('ErrorLog')
 
     with open(f'ErrorLog/{nowDate}_error.log', 'a', encoding='utf-8') as f:  # 写入错误日志
         f.write(f'[{datetime.now().strftime("%H:%M:%S")}]发生错误：\n')

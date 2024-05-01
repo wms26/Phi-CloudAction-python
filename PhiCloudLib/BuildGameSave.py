@@ -1,7 +1,7 @@
 # 萌新写的代码喵，可能不是很好喵，但是已经尽可能注释了喵，希望各位大佬谅解喵=v=
 # ----------------------- 导包区喵 -----------------------
-from PhiCloudLib.ByteWriter import ByteWriter, setBits
 from PhiCloudLib.ByteReader import getBits
+from PhiCloudLib.ByteWriter import ByteWriter, setBits
 
 
 # ---------------------- 定义赋值区喵 ----------------------

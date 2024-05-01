@@ -12,9 +12,8 @@
 
 [![PhigrosLibrary](https://img.shields.io/badge/文酱-Phigros_Library-blue?style=for-the-badge&logo=Github)](https://github.com/7aGiven/PhigrosLibrary)
 [![phi-plugin](https://img.shields.io/badge/废酱-phi--plugin-blue?style=for-the-badge&logo=github)](https://github.com/Catrong/phi-plugin)
+[![Phigros_Resource](https://img.shields.io/badge/烧饼-Phigros__Resource-blue?style=for-the-badge&logo=Github)](https://github.com/3035936740/Phigros_Resource)
 
-
-[![Phi-CloudAction-pyinstaller_v1.0](https://img.shields.io/badge/Lasest--release-Phi--CloudAction--pyinstaller__v1.0-green?style=for-the-badge&logo=Github)](https://github.com/wms26/Phi-CloudAction-python/releases/download/v1.0-kawaii/Phi-CloudAction-pyinstaller_v1.0.kawaii.exe)
 </div>
 
 # 开学了喵，本项目将会保持极低频率的更新喵（
@@ -103,6 +102,7 @@ pip install flask
     - [x] ~~计算b19喵！~~
     - [x] ~~将各功能模块化喵~~(更方便使用喵)
     - [x] ~~WebApi~~(没什么用喵，建议别用喵，不能保证安全喵)
+    - [x] ~~存档历史记录~~(使用示例已经在`example.py`里面了喵，会检查存档是否有新记录喵，存在新记录时会进行保存存档和其他信息喵。往后可能会用上喵)
     - [ ] WebGUI(可视化存档信息喵，感觉也没用喵，先咕咕咕吧喵)
     - [ ] Bot(还是咕咕咕喵！)
 
@@ -117,3 +117,61 @@ pip install flask
 (小声BB：我也不知道我为什么要写云端数据操作的python实现喵，就当是消遣吧喵。想专门搞这方面的大佬还是移步到[文酱](https://github.com/7aGiven)的项目[PhigrosLibrary](https://github.com/7aGiven/PhigrosLibrary)吧喵)
 
 (快去给[文酱](https://github.com/7aGiven)和[废酱](https://github.com/Catrong)的项目点star喵！)
+
+## 更新日志喵：
+
+### 2024/05/01(v1.2.6)：
+1. 整理代码，对于新加的功能可能并没有过多去写注释，后面再补咕咕咕...
+2. 增加了存档历史记录的功能，可用于绘制rks曲线图或者单曲成绩的曲线图之类的。
+3. 给README.md增加了更新日志！
+
+### 2024/04/05(v1.2.5-v1.2.5b)：
+1. 新增了对解析存档时传入数据的类型检查
+2. 调换了解析record传参的顺序(感觉之前那个顺序有点不人性化，前后换了个位置顺眼多了)
+3. 修复了refreshSessionToken不能使用报错的问题(其实就是一个请求方法不对的问题，把get改成put就不会404了)
+4. 修正了部分注释(感觉注释还是有一些容易被误解的地方，本喵是个fw不会写注释，希望还是先看example.py的例子吧，防止误解)
+5. 重写了webapi，把加密去掉了，但是提供了一个选项来决定要不要使用本喵闲着没事搓出来没什么用的“混淆处理”进行提交token，默认没有开(旧的用“old”标记了)
+6. 更新了README.md并将旧的WebApi文档单独分到Old_WebApi.md中(什么时候才能记得把readme一起改了然后提交上来而不是每次都提交完了才想起来然后改完再提交)
+7. 我是傻逼忘记提交Old_WebApi.md了
+
+### 2024/03/30(v1.2.4-v1.2.4a)：
+1. 新增了WebApi，可以自行架个小服务器跑Web_api.py(GPT说建议用gunicorn跑，不懂百度)
+2. 没有什么好更的了（
+3. 好的刚刚忘记把index.html提交上来了，是个十分简单的api介绍页，请结合readme食用
+
+### 2024/03/08(v1.2.3)：
+1. 修复了在获取打歌记录时存在旧谱记录或者其他无定数的难度时报错的问题
+2. 修复了在获取b19时没有AP过歌时报错的问题(不会吧真的还有人没有AP过嘛)
+3. 将序列化反序列化存档全部一致改为字典传址
+4. 更新添加修改了一些注释
+
+### 2024/02/29(v1.2.2)：
+1. 在example.py中增加了上传存档等功能的示例与逻辑注释
+
+### 2024/02/27(v1.2.1)：
+1. 原仓库的作者文酱放弃维护了，之后烧饼接手了这个项目捏，好耶！
+2. 修改了CloudAction的一点逻辑代码，也许看起来没有这么*(shi)了？
+3. 将GetSession打包用的脚本分为两个脚本(单文件打包和多文件打包)
+4. 更新了一下示例脚本example.py
+5. 乱七八糟优化了点代码）
+
+### 2024/02/26(v1.2)：
+1. 将获取存档和上传存档写了两个调用脚本示例
+2. 稍微改了一点东西，无伤大雅
+
+### 2024/02/25(v1.1-v1.1.8)：
+1. 增加了三个云端操作：上传存档和上传summary以及刷新sessionToken
+2. 将云存档各api接口单独写为一个CloudLib，更方便调用(也更难懂了)
+3. 修改了一下反序列化和序列化存档的代码，把几个以二进制表示信息的键展开为列表来表示，便于理解阅读的同时也不影响序列化存档
+4. 给getSave增加了验证md5校验值和验证存档大小的代码，在校验失败和存档过小时输出警告并等待5秒
+5. 将release里面pyinstaller编译打包的主脚本开源(main.py)
+6. 修改了main.py的小部分代码，以适配getSave需要checksum进行md5校验的要求
+7. 刚刚更新忘记把pyinstaller编译打包时要用的UPX一起上传了）
+8. 把GetSession一起上传了）
+
+### 2024/02/18(v1.0)：
+1. 写了大部分功能喵，目前只有存档读取操作是最完善的喵，其他功能请自行琢磨喵
+2. 闲着没事把项目大部分内容喵化了（
+3. 将另一个本地数据操作的项目Phi-LocalAction-python里面的获取sessionToken独立了出来
+4. 添加了README.md和requirement.txt喵！
+5. 更新README.md

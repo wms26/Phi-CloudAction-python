@@ -1,8 +1,9 @@
 # 萌新写的代码喵，可能不是很好喵，但是已经尽可能注释了喵，希望各位大佬谅解喵=v=
 # ----------------------- 导包区喵 -----------------------
+from base64 import b64decode
+
 from Crypto.Cipher.AES import new, MODE_CBC, block_size
 from Crypto.Util.Padding import unpad, pad
-from base64 import b64decode
 
 # ---------------------- 定义赋值区喵 ----------------------
 
