@@ -25,15 +25,17 @@
 
 **本项目的初衷仅仅是为了供学习参考使用喵，本人从未想过要破坏音游圈的游戏平衡喵！**
 
-**请勿尝试滥用本项目！已加检测，请不要试图做出任何类似`倒卖`的行为！否则统一纳入黑名单！(此条声明可能与GPLv3许可证存在冲突，请以README.md中本声明为准！)**
+**请勿尝试滥用本项目！已加检测，请不要试图做出任何商业行为！否则统一纳入黑名单！(此条声明可能与GPLv3许可证存在冲突，请以README.md中本声明为准！)**
 
 **对于本项目本喵拥有最终解释权！请不要做出让任何一个音游玩家都会十分反感的事情！**
 
+**如果你认为本项目不应该存在或者有其他问题，可以提交Issues或者发送邮件到qianqi26@616.sb，我时不时会去查看邮箱**
+
 ## 环境准备喵！
 
-1. 编写本项目时使用的是 **python3.11.8** 的喵，不能完全保证其他版本会不会出现问题喵，建议使用 **python>=3.9** 来运行喵~(最近换成3.11.8滴喵！)
+1. 编写本项目时使用的是 **python3.11.8** 的喵，不能完全保证其他版本会不会出现问题喵，建议使用 **python>=3.9** 来运行喵~(后面换成3.11.8滴喵！)
 
-2. 注意在使用本项目前要先安装`PhiCloudLib/requirement.txt`中的模块喵
+2. 注意在使用本项目前要先安装`requirement.txt`中的模块喵
 
 3. 云端数据获取需要phigros的云端sessionToken，获取sessionToken的方法可以参考[**Mivik的bot说明文档**](https://mivik.moe/pgr-bot-help/)里面喵！也可以用本喵用pyinstaller打包好的[**GetSession**](https://github.com/wms26/Phi-CloudAction-python/releases/tag/GST_v1.0)来获取喵！
 
@@ -41,51 +43,23 @@
 
 ## 使用喵！
 
-### 安装pycryptodome库和requests库和喵：
+### 安装pycryptodome库和httpx库和colorlog库喵：
 
 直接在命令行运行喵：
 
 ```
-pip install pycryptodome requests
+pip install pycryptodome httpx colorlog
 ```
 
 或者如果想要一点仪式感也可以运行喵：
 
 ```
-pip install -r PhiCloudLib/requirement.txt
+pip install -r requirement.txt
 ```
 
 ### 各函数功能使用方法喵：
 
 看`example.py`吧喵，里面写了一个示例，几乎用上了所有功能，看注释理论上都能理解怎么用了罢~
-
-### 关于WebApi喵：
-
-使用WebApi前请先安装Flask库喵：
-
-```
-pip install flask
-```
-
-看Web_api.py里面就好啦喵，注释不多喵(因为懒喵)，Web_example.py是一个POST请求调用示例喵
-
-注意两个脚本中都提供了一个`reqData_encrypt`选项来决定是否要使用本喵闲着没事搓出来没什么用的“混淆处理”来传输sessionToken，默认是False，就是明文传输(虽然“混淆”后的也差不多算是明文了)
-
-#### POST：
-1. 请求各api时都需要将sessionToken经过处理后提交喵，可参考Web_example.py喵，调用了gen_data()进行"混淆处理"后再用gen_base64()输出特殊的base64
-2. POST请求返回的数据都是{"code"=xx, "massage"=xxx...}格式喵，code=0就是成功喵，http状态码是200喵，内容在massage里面喵，如果不是0就是出问题了喵，状态码是403喵，一般massage会说大致讲是什么问题喵
-3. 当出现未定义的错误时会返回{"code"=10, "massage"="Server error"}喵，状态码是500喵，此时服务端控制台会输出错误关键信息喵，比较具体错误信息会写入到ErrorLog/20xx-xx-xx_error.log里面喵喵
-
-#### GET：
-1. GET请求参数用token=xxx...喵，参数的值是sessionToken经过特殊处理的base64编码数据，就是base64编码后去除尾部的等于号喵，在前面用一个数字表示有几个等于号喵(比如编码后尾部有两个等于号喵，删掉后在头部加一个数字2喵喵，没有等于号就加0喵)(直接调用Web_example.py的gen_base64()也是一样的)
-2. GET请求返回的数据不像POST请求一样喵，在成功时不返回code喵，http状态码是200喵，直接返回数据喵(比如getPlayerId就只返回一个玩家昵称喵)，当出现错误时则会返回类似"Errorx：xxx..."的内容喵，Error后面会跟code喵，状态码是403喵
-3. 当出现未定义错误时返回的数据以及情况与POST一样喵
-
-#### 如果想要找旧的WebApi大致的使用方法的话，请看[旧WebApi文档](./Old_WebApi.md)
-
-> WenApi以及示例并没有进行严格验证，请不要使用在正式环境，并且并没有优化过代码结构，可以说是屎山代码，估计很难懂可能
-
-> **注意：** WebApi仅仅是本喵闲着没事写的，没有什么技术含量，可能存在安全问题，部署到服务器上需谨慎！
 
 ## 未来计划功能喵！
 
@@ -122,6 +96,12 @@ pip install flask
 (快去给[文酱](https://github.com/7aGiven)和[废酱](https://github.com/Catrong)的项目点star喵！)
 
 ## 更新日志喵：
+
+### 2024/07/20(v1.3.0)：
+1. 重写全部代码，全部统一改为异步处理(虽然代码跟原来的大差不差)
+2. 更正了一些函数的命名方式
+3. 修改了一些代码结构，现在要请求云端数据推荐使用异步with
+4. 代码将使用logging库输出(我还加上了colorlog库，带颜色的哦~)
 
 ### 2024/05/01(v1.2.6)：
 1. 整理代码，对于新加的功能可能并没有过多去写注释，后面再补咕咕咕...
