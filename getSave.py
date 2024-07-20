@@ -1,36 +1,38 @@
 # 萌新写的代码喵，可能不是很好喵，但是已经尽可能注释了喵，希望各位大佬谅解喵=v=
 # ----------------------- 导包区喵 -----------------------
+from asyncio import run
 from json import dumps
+from sys import argv
 
-from PhiCloudLib.ActionLib import readGameSave, readDifficulty, decryptGameSave
-from PhiCloudLib.CloudAction import getSummary, getSave
-from PhiCloudLib.ParseGameSave import ParseGameKey, ParseGameProgress, ParseGameRecord, ParseGameSettings, ParseGameUser
+from PhiCloudLib import PhigrosCloud, ReadDifficultyFile, logger, ParseGameSave
 
 # ---------------------- 定义赋值区喵 ----------------------
 
-sessionToken = ''
+arguments = argv  # 获取调用脚本时的参数喵
+
+if len(arguments) != 1:
+    sessionToken = arguments[1]
+else:
+    sessionToken = ''  # 填你的sessionToken喵
+
 
 # ----------------------- 运行区喵 -----------------------
 
-difficulty = readDifficulty('./difficulty.tsv')  # 读取难度定数列表文件喵
-summary = getSummary(sessionToken)  # 获取summary喵
-print(summary)
+async def main(token):
+    async with PhigrosCloud(token) as cloud:
+        difficulty = await ReadDifficultyFile('difficulty.tsv')  # 读取难度定数文件
 
-save = getSave(summary['url'], summary['checksum'])  # 获取存档数据喵
+        # 获取并解析存档
+        saveDict = {}
+        saveData = await cloud.getSave()
+        await ParseGameSave(saveData, saveDict, difficulty)
 
-# 读取并解密然后解析存档数据喵
-saveDict = {}
-readGameSave(save, saveDict)
-decryptGameSave(saveDict)
-ParseGameUser(saveDict)
-ParseGameProgress(saveDict)
-ParseGameSettings(saveDict)
-ParseGameRecord(saveDict, difficulty)
-ParseGameKey(saveDict)
+        # 写出存档解析json数据
+        with open('./PhigrosSave.json', 'w', encoding='utf-8') as savefile:
+            savefile.write(dumps(saveDict, ensure_ascii=False, indent=4))
 
-# 写出解析后所有的存档数据喵
-with open('./PhigrosSave.json', 'w', encoding='utf-8') as savefile:
-    savefile.write(dumps(saveDict, ensure_ascii=False, indent=4))
+        logger.info('获取存档成功喵！')
 
-for i in saveDict.keys():
-    print(i, ':', saveDict[i])
+
+if __name__ == '__main__':
+    run(main(sessionToken))

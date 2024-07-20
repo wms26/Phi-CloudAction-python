@@ -11,14 +11,14 @@ aes_key = b64decode('6Jaa0qVAJZuXkZCLiOa/Ax5tIZVu+taKUN1V1nqwkks=')
 aes_iv = b64decode('Kk/wisgNYwcAV8WVGMgyUw==')
 
 
-def decrypt(data: bytes):
+async def decrypt(data: bytes):
     """AES CBC解密喵\n
     data：要解密的数据喵"""
     data = new(aes_key, MODE_CBC, aes_iv).decrypt(data)
     return unpad(data, block_size)
 
 
-def encrypt(data: bytes):
+async def encrypt(data: bytes):
     """AES CBC加密喵\n
     data：要加密的数据喵"""
     data = pad(data, block_size)
