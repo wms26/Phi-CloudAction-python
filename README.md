@@ -97,6 +97,9 @@ pip install -r requirement.txt
 
 ## 更新日志喵：
 
+### 2024/08/11(PhiQRCodeGetSession_v1.0)：
+1. 新增了taptap扫码登录授权的方式获取sessionToken）
+
 ### 2024/07/22：
 1. 才发现上次更新不小心把`GPL`许可证整没了（
 
