@@ -37,7 +37,7 @@
 
 2. 注意在使用本项目前要先安装`requirement.txt`中的模块喵
 
-3. 云端数据获取需要phigros的云端sessionToken，获取sessionToken的方法可以参考[**Mivik的bot说明文档**](https://mivik.moe/pgr-bot-help/)里面喵！也可以用本喵用pyinstaller打包好的[**GetSession**](https://github.com/wms26/Phi-CloudAction-python/releases/tag/GST_v1.0)来获取喵！
+3. 云端数据获取需要phigros的云端sessionToken，获取sessionToken的方法可以参考[**Mivik的bot说明文档**](https://mivik.moe/pgr-bot-help/)里面喵！也可以用本喵用pyinstaller打包好的[**GetSession**](https://github.com/wms26/Phi-CloudAction-python/releases/tag/QR-GST_v1.0)扫码登录来获取喵！
 
 4. 获取存档打歌记录数据的过程会计算每首歌每个难度的rks喵，所以需要难度定数文件`difficulty.tsv`喵，本项目仓库里面已经有了喵，但不一定是最新的，获取最新的难度定数文件可以用[烧饼](https://github.com/3035936740)的项目[Phigros_Resource](https://github.com/3035936740/Phigros_Resource)哦喵！
 
@@ -74,12 +74,13 @@ pip install -r requirement.txt
 
 
 - [ ] **其他喵：**
-    - [x] ~~获取本地SessionToken喵~~(点[**这里**](https://github.com/wms26/Phi-CloudAction-python/releases/tag/GST_v1.0)来下载喵)
+    - [x] ~~获取本地SessionToken喵~~(点[**这里**](https://github.com/wms26/Phi-CloudAction-python/releases/tag/GST_v1.1)来下载喵)
     - [x] ~~获取summary和玩家昵称喵~~
     - [x] ~~计算b19喵！~~
     - [x] ~~将各功能模块化喵~~(更方便使用喵)
     - [x] ~~WebApi~~(没什么用喵，建议别用喵，不能保证安全喵)
     - [x] ~~存档历史记录~~(使用示例已经在`example.py`里面了喵，会检查存档是否有新记录喵，存在新记录时会进行保存存档和其他信息喵。往后可能会用上喵)
+    - [x] ~~taptap扫码授权获取sessionToken~~(已经发在release中了喵，在[**这里**](https://github.com/wms26/Phi-CloudAction-python/releases/tag/QR-GST_v1.0)喵)
     - [ ] WebGUI(可视化存档信息喵，感觉也没用喵，先咕咕咕吧喵)
     - [ ] Bot(还是咕咕咕喵！)
 
@@ -99,6 +100,7 @@ pip install -r requirement.txt
 
 ### 2024/08/11(PhiQRCodeGetSession_v1.0)：
 1. 新增了taptap扫码登录授权的方式获取sessionToken）
+2. 更新了下README
 
 ### 2024/07/22：
 1. 才发现上次更新不小心把`GPL`许可证整没了（
