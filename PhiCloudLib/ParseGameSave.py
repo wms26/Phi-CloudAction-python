@@ -86,7 +86,7 @@ async def ParseGameProgress(saveDict: dict | bytes):
     all_progress['unlockFlagOfIgallta']: str = str((await readBits(await Reader.getByte()))[:-4])  # Igallta解锁喵
     all_progress['unlockFlagOfRrharil']: str = str((await readBits(await Reader.getByte()))[:-4])  # Rrhar'il解锁喵
 
-    # (倒霉蛋,船,Shadow,心之所向,inferior,DESTRUCTION 3,2,1,Distorted Fate)
+    # (倒霉蛋, 船, Shadow, 心之所向, inferior, DESTRUCTION 3,2,1, Distorted Fate, Cuvism)
     all_progress['flagOfSongRecordKey']: str = str(await readBits(await Reader.getByte()))  # 部分歌曲IN达到S喵
 
     all_progress['randomVersionUnlocked']: str = str((await readBits(await Reader.getByte()))[:-2])  # Random切片解锁喵

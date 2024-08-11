@@ -5,7 +5,7 @@ from datetime import datetime
 from io import BytesIO
 from json import dumps, loads
 from os import mkdir
-from os.path import exists
+from os.path import exists, join
 from re import match
 from zipfile import ZipFile, ZIP_DEFLATED
 
@@ -195,7 +195,7 @@ async def CheckSaveHistory(sessionToken: str, summary: dict, saveData: bytes, di
         nowTime = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
 
         with open(f'saveHistory/{sessionToken}/recordHistory.json', 'w', encoding='utf-8') as file:
-            record_new = ParseGameRecord(await decrypt(await UnzipSave(saveData, 'gameRecord')), difficulty)
+            record_new = await ParseGameRecord(await decrypt(await UnzipSave(saveData, 'gameRecord')), difficulty)
             file.write(dumps({nowTime: record_new}, indent=4, ensure_ascii=False))
         logger.info('对应sessionToken的record历史文件不存在喵！已创建喵！')
 
@@ -243,3 +243,74 @@ async def CheckSaveHistory(sessionToken: str, summary: dict, saveData: bytes, di
 
         else:
             logger.info('checksum重复喵！未记录为新存档记录喵！')
+
+
+async def ReadTxtFile(path: str):
+    """读取txt文件喵\n
+    path：txt文件路径喵"""
+    txt_list = []
+    with open(path, encoding="UTF-8") as f:  # 打开tsv列表文件喵
+        lines = f.readlines()  # 解析所有行喵，输出一个列表喵
+
+    for line in lines:  # 遍历所有行喵
+        txt_list.append(line[:-1])  # 将该行最后的\n截取掉喵
+
+    return txt_list  # 返回解析出来的数据喵
+
+
+async def ReadTsvFile(path: str):
+    """读取tsv文件喵\n
+    path：tsv文件路径喵"""
+    tsv_list = {}
+    with open(path, encoding="UTF-8") as f:  # 打开tsv列表文件喵
+        lines = f.readlines()  # 解析所有行喵，输出一个列表喵
+
+    for line in lines:  # 遍历所有行喵
+        line = line[:-1].split("\t")  # 将该行最后的\n截取掉喵，并以\t为分隔符解析为一个列表喵
+        flags = []  # 用来存储单行信息喵
+
+        for i in range(1, len(line)):  # 遍历该行后面的值喵
+            flags.append(line[i])  # 添加到列表中喵
+        tsv_list[line[0]] = flags  # 与总列表拼接在一起喵
+
+    return tsv_list  # 返回解析出来的数据喵
+
+
+async def FormatGameKey(saveDict: dict, filePath: str = './'):
+    try:
+        gameKeys = saveDict['key']
+    except KeyError:
+        gameKeys = saveDict
+
+    allKey = {
+        'avatar': await ReadTxtFile(join(filePath, 'avatar.txt')),
+        'collection': await ReadTsvFile(join(filePath, 'collection.tsv')),
+        'illustration': await ReadTxtFile(join(filePath, 'illustration.txt')),
+        'single': await ReadTxtFile(join(filePath, 'single.txt'))
+    }
+
+    for key in allKey['avatar']:
+        try:
+            gameKeys[key]['4avatar'] = eval(gameKeys[key]['type'])[4]
+        except KeyError:
+            pass
+
+    for key in allKey['collection'].keys():
+        try:
+            gameKeys[key]['02collection'] = str([eval(gameKeys[key]['type'])[0], eval(gameKeys[key]['type'])[2]])
+        except KeyError:
+            pass
+
+    for key in allKey['illustration']:
+        try:
+            gameKeys[key]['3illustration'] = eval(gameKeys[key]['type'])[3]
+        except KeyError:
+            pass
+
+    for key in allKey['single']:
+        try:
+            gameKeys[key]['1single'] = eval(gameKeys[key]['type'])[1]
+        except KeyError:
+            pass
+
+    return saveDict

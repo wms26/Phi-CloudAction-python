@@ -19,7 +19,7 @@ def set_logger(level=DEBUG):
 def get_logger(name: str | None = None, level: int = INFO):
     set_logger()
     loggers = getLogger(name)  # 创建logger对象
-    loggers.setLevel(level)
+    loggers.setLevel(DEBUG)
 
     console_handler = StreamHandler()  # 创建控制台日志处理器
     console_handler.setLevel(level)
@@ -44,5 +44,5 @@ def get_logger(name: str | None = None, level: int = INFO):
     return loggers
 
 
-logger = get_logger('PCA', INFO)
+logger = get_logger('PCA', DEBUG)
 logger.debug('Logger is loading completed.')
