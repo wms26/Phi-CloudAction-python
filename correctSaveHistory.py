@@ -1,6 +1,6 @@
+from json import loads, dumps
 from os import listdir
 from os.path import exists, join
-from json import loads,dumps
 
 saveHistory_path = './saveHistory/'
 
@@ -26,6 +26,3 @@ if exists(saveHistory_path):
 
             with open(join(saveHistory_path, session, 'recordHistory.json'), 'w', encoding='utf-8') as file:
                 file.write(dumps(recordHistory, indent=4, ensure_ascii=False))
-
-
-

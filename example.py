@@ -13,7 +13,7 @@ arguments = argv  # 获取调用脚本时的参数喵
 if len(arguments) != 1:
     sessionToken = arguments[1]
 else:
-    sessionToken = 'ie9ttmlrbdjmmj9jiu454siw2'  # 填你的sessionToken喵
+    sessionToken = ''  # 填你的sessionToken喵
 
 
 # ----------------------- 运行区喵 -----------------------
