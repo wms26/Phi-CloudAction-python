@@ -100,7 +100,8 @@ pip install -r requirement.txt
 
 ### 2024/08/24(v1.3.1)：
 1. 新增了修改玩家昵称的函数
-2. 稍微改了点东西
+2. 鸽游更新了gameProgress的结构，新增了一个键
+3. 其他小更改
 
 ### 2024/08/11(PhiQRCodeGetSession_v1.0)：
 1. 新增了taptap扫码登录授权的方式获取sessionToken）
