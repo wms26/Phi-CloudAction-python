@@ -5,14 +5,14 @@ from struct import unpack
 
 # ---------------------- 定义赋值区喵 ----------------------
 
-async def readBit(byte, index: int):
+async def getBit(byte, index: int):
     """获取一个字节中index位的值喵\n
     byte：字节数据喵\n
     index：要读取的位数喵"""
     return 1 if bool(byte & (1 << index)) else 0
 
 
-async def readBits(byte):
+async def getBits(byte):
     """获取一个字节中所有位的值喵\n
     byte：字节数据喵\n
     (会以列表类型数据返回喵)"""

@@ -1,6 +1,8 @@
 # 萌新写的代码喵，可能不是很好喵，但是已经尽可能注释了喵，希望各位大佬谅解喵=v=
 # ----------------------- 导包区喵 -----------------------
-from .ByteReader import ByteReader, readBit, readBits
+from token import AWAIT
+
+from .ByteReader import ByteReader, getBit, getBits
 from .LibApi import logger
 
 
@@ -32,15 +34,15 @@ async def ParseGameKey(saveDict: dict | bytes):
         name: str = await Reader.getString()  # key的昵称喵
         length: int = await Reader.getByte()  # 总数据长度喵(不包含key的昵称喵)
         Key = all_keys[name] = {}  # 存储单个key的数据喵
-        Key['type']: str = str((await readBits(await Reader.getByte()))[:-3])  # 获取key的类型标志喵
+        Key['type']: str = str((await getBits(await Reader.getByte()))[:-3])  # 获取key的类型标志喵
 
         flag: list = []  # 用来存储该key的状态喵(比如头像是否获得/曲绘是否解锁/收藏品是否获取/打开喵)
         for i in range(length - 1):  # 因为前面已经读取了一个类型标志了喵，所以减一喵
             flag.append(await Reader.getByte())
         Key['flag'] = str(flag)
 
-    all_keys['lanotaReadKeys'] = await Reader.getByte()  # 读取Lanota收藏品喵(解锁倒霉蛋和船的AT喵)
-    all_keys['camelliaReadKey'] = await Reader.getByte()  # 读取极星卫破译收藏品喵(解锁S.A.T.E.L.L.I.T.E.的AT喵)
+    all_keys['lanotaReadKeys'] = str(await getBits(await Reader.getByte()))  # 读取Lanota收藏品喵(解锁倒霉蛋和船的AT喵)
+    all_keys['camelliaReadKey'] = str(await getBits(await Reader.getByte()))  # 读取极星卫破译收藏品喵(解锁S.A.T.E.L.L.I.T.E.的AT喵)
 
     if await Reader.remaining() > 0 or await Reader.remaining() < 0:
         logger.warning(f'警告喵，gameKey文件尚未读取完毕喵！剩余字节喵：{await Reader.remaining()}')
@@ -68,7 +70,7 @@ async def ParseGameProgress(saveDict: dict | bytes):
         Reader = ByteReader(saveDict)
         all_progress = {}  # 用来存储解析出来的数据喵
 
-    tem: list = await readBits(await Reader.getByte())  # 鸽游用一个字节表示了下面4个数据喵（
+    tem: list = await getBits(await Reader.getByte())  # 鸽游用一个字节表示了下面4个数据喵（
     all_progress['isFirstRun']: int = tem[0]  # 首次运行喵
     all_progress['legacyChapterFinished']: int = tem[1]  # 过去的章节已完成喵
     all_progress['alreadyShowCollectionTip']: int = tem[2]  # 已展示收藏品Tip喵
@@ -82,19 +84,20 @@ async def ParseGameProgress(saveDict: dict | bytes):
         money.append(await Reader.getVarInt())
     all_progress['money']: str = str(money)
 
-    all_progress['unlockFlagOfSpasmodic']: str = str((await readBits(await Reader.getByte()))[:-4])  # Spasmodic解锁喵
-    all_progress['unlockFlagOfIgallta']: str = str((await readBits(await Reader.getByte()))[:-4])  # Igallta解锁喵
-    all_progress['unlockFlagOfRrharil']: str = str((await readBits(await Reader.getByte()))[:-4])  # Rrhar'il解锁喵
+    all_progress['unlockFlagOfSpasmodic']: str = str((await getBits(await Reader.getByte()))[:-4])  # Spasmodic解锁喵
+    all_progress['unlockFlagOfIgallta']: str = str((await getBits(await Reader.getByte()))[:-4])  # Igallta解锁喵
+    all_progress['unlockFlagOfRrharil']: str = str((await getBits(await Reader.getByte()))[:-4])  # Rrhar'il解锁喵
 
     # (倒霉蛋, 船, Shadow, 心之所向, inferior, DESTRUCTION 3,2,1, Distorted Fate, Cuvism)
-    all_progress['flagOfSongRecordKey']: str = str(await readBits(await Reader.getByte()))  # 部分歌曲IN达到S喵
+    all_progress['flagOfSongRecordKey']: str = str(await getBits(await Reader.getByte()))  # 部分歌曲IN达到S喵
 
-    all_progress['randomVersionUnlocked']: str = str((await readBits(await Reader.getByte()))[:-2])  # Random切片解锁喵
-    tem: list = await readBits(await Reader.getByte())  # 鸽游用一个字节表示了下面3个数据喵（
+    all_progress['randomVersionUnlocked']: str = str((await getBits(await Reader.getByte()))[:-2])  # Random切片解锁喵
+    tem: list = await getBits(await Reader.getByte())  # 鸽游用一个字节表示了下面3个数据喵（
     all_progress['chapter8UnlockBegin']: int = tem[0]  # 第八章入场喵
     all_progress['chapter8UnlockSecondPhase']: int = tem[1]  # 第八章第二阶段喵
     all_progress['chapter8Passed']: int = tem[2]  # 第八章通过喵
-    all_progress['chapter8SongUnlocked']: int = str((await readBits(await Reader.getByte()))[:-2])  # 第八章各曲目解锁喵
+    all_progress['chapter8SongUnlocked']: int = str((await getBits(await Reader.getByte()))[:-2])  # 第八章各曲目解锁喵
+    all_progress['flagOfSongRecordKeyTakumi']: int = str((await getBits(await Reader.getByte()))[:-5])
 
     if await Reader.remaining() > 0 or await Reader.remaining() < 0:
         logger.warning(f'警告喵，gameProgress文件尚未读取完毕喵！剩余字节喵：{await Reader.remaining()}')
@@ -136,7 +139,7 @@ async def ParseGameRecord(saveDict: dict | bytes, diff: dict, countRks: bool = T
         song = all_record[songName] = {}  # 存储单首歌的成绩数据喵
 
         for level in range(5):  # 遍历每首歌的EZ、HD、IN、AT、Legacy(旧谱喵)难度的成绩喵
-            if await readBit(unlock, level):  # 判断当前难度是否解锁喵
+            if await getBit(unlock, level):  # 判断当前难度是否解锁喵
                 score: int = await Reader.getInt()  # 读取分数喵
                 acc: float = await Reader.getFloat()  # 读取acc喵
                 try:
@@ -163,7 +166,7 @@ async def ParseGameRecord(saveDict: dict | bytes, diff: dict, countRks: bool = T
                         'difficulty': difficulty,  # 定数喵
                         'score': score,  # 分数喵
                         'acc': acc,  # 正如其名喵，就是ACC喵
-                        'fc': await readBit(fc, level),  # 是否Full Combo喵(FC)
+                        'fc': await getBit(fc, level),  # 是否Full Combo喵(FC)
                         'rks': rks  # 单曲rks喵
                     }
                 else:
@@ -171,7 +174,7 @@ async def ParseGameRecord(saveDict: dict | bytes, diff: dict, countRks: bool = T
                         'difficulty': difficulty,  # 定数喵
                         'score': score,  # 分数喵
                         'acc': acc,  # 正如其名喵，就是ACC喵
-                        'fc': await readBit(fc, level),  # 是否Full Combo喵(FC)
+                        'fc': await getBit(fc, level),  # 是否Full Combo喵(FC)
                     }
 
         if Reader.position != end_position:
@@ -204,7 +207,7 @@ async def ParseGameSettings(saveDict: dict | bytes):
         Reader = ByteReader(saveDict)
         all_settings = {}  # 用来存储解析出来的数据喵
 
-    tem: list = await readBits(await Reader.getByte())  # 鸽游用一个字节表示了下面4个数据喵（
+    tem: list = await getBits(await Reader.getByte())  # 鸽游用一个字节表示了下面4个数据喵（
     all_settings['chordSupport']: int = tem[0]  # 多押辅助喵
     all_settings['fcAPIndicator']: int = tem[1]  # 开启FC/AP指示器喵
     all_settings['enableHitSound']: int = tem[2]  # 开启打击音效喵

@@ -1,7 +1,9 @@
 # 萌新写的代码喵，可能不是很好喵，但是已经尽可能注释了喵，希望各位大佬谅解喵=v=
 # ----------------------- 导包区喵 -----------------------
 from base64 import b64decode
+from base64 import b64encode
 from hashlib import md5
+from json import dumps
 from struct import unpack
 
 from httpx import AsyncClient
@@ -153,7 +155,7 @@ class PhigrosCloud:
     async def close(self):
         await self.client.aclose()
 
-    async def getPlayerId(self):
+    async def getNickname(self):
         """获取玩家昵称喵"""
         logger.debug('调用函数：getPlayerId()')
         return_data = (await self.request.get(self.baseUrl + 'users/me')).json()['nickname']  # 请求并解析获取玩家昵称喵
@@ -226,11 +228,37 @@ class PhigrosCloud:
         logger.debug(f'函数"refreshSessionToken()"返回：{return_data}')
         return return_data
 
+    async def uploadNickname(self, name: str):
+        """用于更新玩家昵称\n
+        name：要更改的昵称"""
+
+        # 请求存档信息喵
+        response = (await self.request.get(self.baseUrl + 'users/me')).json()
+        userObjectId = response['objectId']  # 获取user的ObjectId喵
+        logger.debug(f'userObjectId：{userObjectId}')
+
+        # 请求更新用户信息喵
+        response = (await self.request.put(
+            url=self.baseUrl + f'users/{userObjectId}',
+            data=dumps({
+                'nickname': name
+            }),
+            headers={
+                **self.request.headers,
+                'Content-Type': 'application/json'
+            }
+        ))
+
+        return response
+
     # async def uploadSummary(self, summarys: dict):
     #     """上传summary喵(从上传存档里面独立出来的喵)\n
-    #     sessionToken：正如其名不用多说了吧喵\n
     #     summarys：要上传的summary喵\n
     #     (注意这个只能用来看喵，没有任何实际用处喵，同步之后就没用了喵)"""
+    #
+    #     from struct import pack
+    #     from json import dumps
+    #     from datetime import datetime
     #
     #     # 将解析过的summary构建回去喵
     #     avatar_data = summarys['avatar'].encode()  # 对头像名称进行编码

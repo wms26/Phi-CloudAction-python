@@ -24,7 +24,7 @@ async def debugTemporaryFiles(string, mode: str, filetype: str):  # 这个是测
 
 file_headers = {  # 存档中各文件的版本号文件头喵
     'gameKey': b'\x02',
-    'gameProgress': b'\x03',
+    'gameProgress': b'\x04',
     'gameRecord': b'\x01',
     'settings': b'\x01',
     'user': b'\x01'

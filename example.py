@@ -22,7 +22,7 @@ async def main(token):
     async with PhigrosCloud(token) as cloud:
         difficulty = await ReadDifficultyFile('difficulty.tsv')  # 读取难度定数文件
 
-        logger.info(f'玩家昵称："{await cloud.getPlayerId()}"')  # 获取玩家昵称并输出
+        logger.info(f'玩家昵称："{await cloud.getNickname()}"')  # 获取玩家昵称并输出
         summary = await cloud.getSummary()  # 获取玩家summary
         logger.info(f'玩家summary：{summary}')
 
