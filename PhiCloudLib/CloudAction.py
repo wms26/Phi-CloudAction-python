@@ -1,7 +1,6 @@
 # 萌新写的代码喵，可能不是很好喵，但是已经尽可能注释了喵，希望各位大佬谅解喵=v=
 # ----------------------- 导包区喵 -----------------------
 from base64 import b64decode
-from base64 import b64encode
 from hashlib import md5
 from json import dumps
 from struct import unpack

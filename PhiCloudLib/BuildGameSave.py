@@ -1,6 +1,6 @@
 # 萌新写的代码喵，可能不是很好喵，但是已经尽可能注释了喵，希望各位大佬谅解喵=v=
 # ----------------------- 导包区喵 -----------------------
-from .ByteReader import getBits
+from .ByteReader import readBits
 from .ByteWriter import ByteWriter, writeBits
 
 
@@ -18,6 +18,8 @@ async def BuildGameKey(saveDict: dict):
         awa = True
     lanotaReadKeys: int = await writeBits(eval(all_key.pop('lanotaReadKeys')))
     camelliaReadKey: int = await writeBits(eval(all_key.pop('camelliaReadKey')))
+    sideStory4BeginReadKey: int = all_key.pop('sideStory4BeginReadKey')
+    oldScoreClearedV390: int = all_key.pop('oldScoreClearedV390')
     await Writer.writeVarInt(len(saveDict))
 
     for keys in all_key.items():
@@ -30,6 +32,8 @@ async def BuildGameKey(saveDict: dict):
 
     await Writer.writeByte(lanotaReadKeys)
     await Writer.writeByte(camelliaReadKey)
+    await Writer.writeByte(sideStory4BeginReadKey)
+    await Writer.writeByte(oldScoreClearedV390)
     if not awa:
         saveDict['key']: bytes = await Writer.getData()
     else:
@@ -46,7 +50,7 @@ async def BuildGameProgress(saveDict: dict):
     except KeyError:
         all_progress: dict = saveDict
         awa = True
-    tem: list = await getBits(0)
+    tem: list = await readBits(0)
     tem[0]: int = all_progress['isFirstRun']
     tem[1]: int = all_progress['legacyChapterFinished']
     tem[2]: int = all_progress['alreadyShowCollectionTip']
@@ -67,7 +71,7 @@ async def BuildGameProgress(saveDict: dict):
     await Writer.writeByte(await writeBits(eval(all_progress['flagOfSongRecordKey'])))
     await Writer.writeByte(await writeBits(eval(all_progress['randomVersionUnlocked']) + [0, 0]))
 
-    tem: list = await getBits(0)
+    tem: list = await readBits(0)
     tem[0]: int = all_progress['chapter8UnlockBegin']
     tem[1]: int = all_progress['chapter8UnlockSecondPhase']
     tem[2]: int = all_progress['chapter8Passed']
@@ -104,8 +108,8 @@ async def BuildGameRecord(saveDict: dict):
     for song in all_record.items():
         await Writer.writeString(song[0] + '.0')
         await Writer.writeVarInt(len(song[1]) * (4 + 4) + 1 + 1)  # 此处不是冗余代码啊喵！本喵这样子写是有原因的！
-        unlock: list = await getBits(0)
-        fc: list = await getBits(0)
+        unlock: list = await readBits(0)
+        fc: list = await readBits(0)
         record_writer = ByteWriter()
         for record in song[1].items():
             unlock[diff_list[record[0]]]: int = 1
@@ -132,7 +136,7 @@ async def BuildGameSettings(saveDict: dict):
     except KeyError:
         all_setting: dict = saveDict
         awa = True
-    tem: list = await getBits(0)
+    tem: list = await readBits(0)
     tem[0]: int = all_setting['chordSupport']
     tem[1]: int = all_setting['fcAPIndicator']
     tem[2]: int = all_setting['enableHitSound']
