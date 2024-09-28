@@ -11,7 +11,7 @@
 
 [![PhigrosLibrary](https://img.shields.io/badge/文酱-Phigros_Library-blue?style=for-the-badge&logo=Github)](https://github.com/7aGiven/PhigrosLibrary)
 [![phi-plugin](https://img.shields.io/badge/废酱-phi--plugin-blue?style=for-the-badge&logo=github)](https://github.com/Catrong/phi-plugin)
-[![Phigros_Resource](https://img.shields.io/badge/烧饼-Phigros__Resource-blue?style=for-the-badge&logo=Github)](https://github.com/3035936740/Phigros_Resource)
+[![Phigros_Resource](https://img.shields.io/badge/文酱-Phigros__Resource-blue?style=for-the-badge&logo=Github)](https://github.com/7aGiven/Phigros_Resource)
 
 </div>
 
