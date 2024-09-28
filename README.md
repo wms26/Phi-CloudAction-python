@@ -98,6 +98,9 @@ pip install -r requirement.txt
 
 ## 更新日志喵：
 
+### 2024/09/28：
+1. 文酱恢复更新[Phigros_Resource](https://github.com/7aGiven/Phigros_Resource)啦！
+
 ### 2024/08/31(v1.3.2)：
 1. 鸽游在3.9.0更新了gameKey的结构，新增了两个键
 2. 更新了3.9.0的定数文件(其实之前一直都有在更新，每次提交时都会把最新的定数提交上来)
