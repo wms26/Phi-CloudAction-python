@@ -1,1 +1,0 @@
-pyinstaller --clean --upx-dir ./upx-4.2.4-win64 --version-file=version.txt -i ./ico/icons.ico -F QRCodeGetToken.py
