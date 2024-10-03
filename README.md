@@ -98,6 +98,9 @@ pip install -r requirement.txt
 
 ## 更新日志喵：
 
+### 2024/10/03：
+1. 总是看着右下角那个语言组成有那0.6%的Batchfile，所以为了看着舒服清理了一些无用文件（诶嘿~）
+
 ### 2024/09/28：
 1. 文酱恢复更新[Phigros_Resource](https://github.com/7aGiven/Phigros_Resource)啦！
 
