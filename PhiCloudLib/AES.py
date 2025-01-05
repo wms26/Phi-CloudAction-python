@@ -7,19 +7,33 @@ from Crypto.Util.Padding import unpad, pad
 
 # ---------------------- 定义赋值区喵 ----------------------
 
-aes_key = b64decode('6Jaa0qVAJZuXkZCLiOa/Ax5tIZVu+taKUN1V1nqwkks=')
-aes_iv = b64decode('Kk/wisgNYwcAV8WVGMgyUw==')
+aes_key = b64decode("6Jaa0qVAJZuXkZCLiOa/Ax5tIZVu+taKUN1V1nqwkks=")
+aes_iv = b64decode("Kk/wisgNYwcAV8WVGMgyUw==")
 
 
-async def decrypt(data: bytes):
-    """AES CBC解密喵\n
-    data：要解密的数据喵"""
-    data = new(aes_key, MODE_CBC, aes_iv).decrypt(data)
-    return unpad(data, block_size)
+def encrypt(data: bytes):
+    """
+    AES CBC加密喵
 
+    参数:
+        data (bytes): 要加密的数据喵
 
-async def encrypt(data: bytes):
-    """AES CBC加密喵\n
-    data：要加密的数据喵"""
+    返回:
+        (bytes): 加密后的数据
+    """
     data = pad(data, block_size)
     return new(aes_key, MODE_CBC, aes_iv).encrypt(data)
+
+
+def decrypt(data: bytes):
+    """
+    AES CBC解密喵
+
+    参数:
+        data (bytes): 要解密的数据喵
+
+    返回:
+        (bytes): 解密后的数据
+    """
+    data = new(aes_key, MODE_CBC, aes_iv).decrypt(data)
+    return unpad(data, block_size)

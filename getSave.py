@@ -1,10 +1,17 @@
 # 萌新写的代码喵，可能不是很好喵，但是已经尽可能注释了喵，希望各位大佬谅解喵=v=
 # ----------------------- 导包区喵 -----------------------
-from asyncio import run
 from json import dumps
 from sys import argv
 
-from PhiCloudLib import PhigrosCloud, ReadDifficultyFile, logger, ParseGameSave, FormatGameKey
+from PhiCloudLib import (
+    PhigrosCloud,
+    readDifficultyFile,
+    unzipSave,
+    decryptSave,
+    countRks,
+    logger,
+)
+
 
 # ---------------------- 定义赋值区喵 ----------------------
 
@@ -13,28 +20,28 @@ arguments = argv  # 获取调用脚本时的参数喵
 if len(arguments) != 1:
     sessionToken = arguments[1]
 else:
-    sessionToken = ''  # 填你的sessionToken喵
+    sessionToken = ""  # 填你的sessionToken喵
 
 
 # ----------------------- 运行区喵 -----------------------
 
-async def main(token):
-    async with PhigrosCloud(token) as cloud:
-        difficulty = await ReadDifficultyFile('difficulty.tsv')  # 读取难度定数文件
+
+def getSave(token):
+    with PhigrosCloud(token) as cloud:
+        difficulty = readDifficultyFile()  # 读取难度定数文件
 
         # 获取并解析存档
-        saveDict = {}
-        saveData = await cloud.getSave()
-        await ParseGameSave(saveData, saveDict, difficulty)
-
-        await FormatGameKey(saveDict)
+        save_data = cloud.getSave()
+        save_dict = unzipSave(save_data)
+        save_dict = decryptSave(save_dict)
+        save_dict["gameRecord"] = countRks(save_dict["gameRecord"], difficulty)
 
         # 写出存档解析json数据
-        with open('./PhigrosSave.json', 'w', encoding='utf-8') as savefile:
-            savefile.write(dumps(saveDict, ensure_ascii=False, indent=4))
+        with open("./PhigrosSave.json", "w", encoding="utf-8") as save_file:
+            save_file.write(dumps(save_dict, ensure_ascii=False, indent=4))
 
-        logger.info('获取存档成功喵！')
+        logger.info("获取存档成功喵！")
 
 
-if __name__ == '__main__':
-    run(main(sessionToken))
+if __name__ == "__main__":
+    getSave(sessionToken)
