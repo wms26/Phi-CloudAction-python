@@ -11,7 +11,6 @@ from PhiCloudLib import (
     formatSaveDict,
     getB19,
     checkSaveHistory,
-    countRks,
     logger,
 )
 
@@ -31,28 +30,26 @@ else:
 
 def example(token):
     with PhigrosCloud(token) as cloud:
-        difficulty = readDifficultyFile()  # 读取难度定数文件
+        difficulty = readDifficultyFile()  # 读取难度定数文件喵
 
-        logger.info(f'玩家昵称："{cloud.getNickname()}"')  # 获取玩家昵称并输出
-        summary = cloud.getSummary()  # 获取玩家summary
+        # 获取玩家昵称并输出喵
+        logger.info(f'玩家昵称："{cloud.getNickname()}"')
+        summary = cloud.getSummary()  # 获取玩家summary喵
         logger.info(f"玩家summary：{summary}")
 
-        # 获取并解析存档
+        # 获取并解析存档喵
         save_data = cloud.getSave(summary["url"], summary["checksum"])
         save_dict = unzipSave(save_data)
         save_dict = decryptSave(save_dict)
         save_dict = formatSaveDict(save_dict)
 
-        # 写出存档解析json数据
+        # 写出存档解析json数据喵
         with open("./PhigrosSave.json", "w", encoding="utf-8") as save_file:
             save_file.write(dumps(save_dict, ensure_ascii=False, indent=4))
 
-        save_dict["gameRecord"] = countRks(
-            save_dict["gameRecord"], difficulty, False
-        )
-        b19 = getB19(save_dict["gameRecord"], difficulty)  # 获取b19
+        b19 = getB19(save_dict["gameRecord"], difficulty)  # 获取b19喵
 
-        # 输出并计算玩家rks
+        # 输出并计算玩家rks喵
         rks = 0.0
         logger.info("玩家b19：")
         for song in b19:
@@ -60,11 +57,13 @@ def example(token):
             rks += song["rks"]
         logger.info(f"玩家rks：{rks / 20}")
 
-        # 存储存档历史记录
+        # 存储存档历史记录喵
         checkSaveHistory(token, summary, save_data, difficulty)
 
-        # 其他功能）↓
-        # cloud.refreshSessionToken()  # 刷新sessionToken喵(注意此功能尚未经过大量测试喵，刷新是即时的喵，旧token会立即失效喵)
+        # 其他功能喵）↓
+
+        # 刷新sessionToken喵(注意此功能尚未经过大量测试，刷新是即时的，旧token会立即失效喵)
+        # cloud.refreshSessionToken()
 
 
 if __name__ == "__main__":

@@ -1,4 +1,4 @@
-# 萌新写的代码喵，可能不是很好喵，但是已经尽可能注释了喵，希望各位大佬谅解喵=v=
+# 萌新写的代码，可能不是很好，但是已经尽可能注释了，希望各位大佬谅解喵=v=
 # ----------------------- 导包区喵 -----------------------
 from sys import argv
 
@@ -22,7 +22,7 @@ else:
 def uploadNickname(token):
     with PhigrosCloud(token) as cloud:
         global nickname
-        logger.info(f'玩家昵称："{cloud.getNickname()}"')  # 获取玩家昵称并输出
+        logger.info(f'玩家昵称："{cloud.getNickname()}"')  # 获取玩家昵称并输出喵
 
         if nickname is None or nickname == "":
             nickname = input("请输入你要更改的名称：")

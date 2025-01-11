@@ -1,4 +1,4 @@
-# 萌新写的代码喵，可能不是很好喵，但是已经尽可能注释了喵，希望各位大佬谅解喵=v=
+# 萌新写的代码，可能不是很好，但是已经尽可能注释了，希望各位大佬谅解喵=v=
 # ----------------------- 导包区喵 -----------------------
 from copy import deepcopy
 from datetime import datetime
@@ -113,6 +113,7 @@ def unzipFile(zip_data: bytes, filename: str):
     with ZipFile(BytesIO(zip_data)) as zip_file:
         # 打开压缩包中中对应的文件喵
         with zip_file.open(filename) as file:
+            logger.debug(f'解压单文件"{filename}"喵')
             return file.read()  # 返回文件数据喵
 
 
@@ -130,10 +131,14 @@ def unzipSave(zip_data: bytes) -> Dict[str, bytes]:
     # 打开存档文件喵(其实存档是个压缩包哦喵！)
     with ZipFile(BytesIO(zip_data)) as zip_file:
         # 打开压缩包中中对应的文件喵
-        for filename in SAVE_LIST:
+
+        for file in zip_file.filelist:
+            filename = file.filename
+            logger.debug(f'解压"{filename}"文件喵')
             with zip_file.open(filename) as file:
                 save_dict[filename] = file.read()  # 读取文件数据喵
 
+    logger.debug("解压完毕喵！")
     return save_dict
 
 
@@ -150,8 +155,10 @@ def zipSave(save_dict: Dict[str, Any]):
     with BytesIO() as file:
         with ZipFile(file, "w", compression=ZIP_DEFLATED) as zip_file:
             for filename, filedata in save_dict.items():
+                logger.debug(f'压缩"{filename}"文件喵')
                 zip_file.writestr(filename, filedata)
 
+        logger.debug("压缩完毕喵！")
         return file.getvalue()
 
 
@@ -464,9 +471,14 @@ def checkSaveHistory(
     # 如果没有相同校验值，则添加进历史记录并保存存档喵
     if not summary["checksum"] in checksumHistory:
         record_old = loadRecordHistory(recordHistory)
-        save_dict = countRks(
-            decryptSave(unzipSave(save_data)), difficulty, False
-        )
+        save_dict = unzipSave(save_data)
+
+        del save_dict["gameKey"]
+        del save_dict["gameProgress"]
+        del save_dict["settings"]
+        del save_dict["user"]
+
+        save_dict = countRks(decryptSave(save_dict), difficulty, False)
         record_new = save_dict["gameRecord"]
         differentRecord = findDifferentKeys(record_old, record_new)
 
@@ -558,7 +570,7 @@ def readTsvFile(path: str):
     return tsv_list  # 返回解析出来的数据喵
 
 
-def formatGameKey(save_dict: dict, filePath: str = "./"):
+def formatGameKey(save_dict: dict, filePath: str = "./") -> Dict[str, dict]:
     """
     为gameKey反序列化数据添加key类型标记
 
@@ -617,5 +629,5 @@ def formatSaveDict(save_dict: Dict[str, dict]):
     for key in ["user", "gameProgress", "settings", "gameRecord", "gameKey"]:
         if save_dict.get(key) is not None:
             new_save_dict[key] = save_dict[key]
-    
+
     return new_save_dict

@@ -45,12 +45,12 @@
 
 ## 使用喵！
 
-### 安装pycryptodome库和httpx库和colorlog库喵：
+### 安装requests、pycryptodome、colorlog库喵：
 
 直接在命令行运行喵：
 
 ```
-pip install pycryptodome httpx colorlog
+pip install requests pycryptodome colorlog
 ```
 
 或者如果想要一点仪式感也可以运行喵：
@@ -61,30 +61,41 @@ pip install -r requirement.txt
 
 ### 各函数功能使用方法喵：
 
-看`example.py`吧喵，里面写了一个示例，几乎用上了所有功能，看注释理论上都能理解怎么用了罢~
+看`example.py`吧喵，里面写了一个示例，用上了主要功能，看注释也许都能理解怎么用了罢喵~
+
+`getSave.py`是获取云存档并解析写出到`PhigrosSave.json`的示例喵
+
+`uploadNickname.py`是修改昵称的示例，但Phigros仅在登录Taptap时会同步一次昵称好像，不如自己去手机上改`.userdata`喵
 
 ## 未来计划功能喵！
 
-- [x] **存档获取喵[CloudAction]**(已模块化喵)(注释较为完整喵)
-  - [x] ~~通过sessionToken获取云存档喵~~
-  - [x] ~~防呆措施喵~~(bushi)
-  - [x] ~~下载存档时进行md5校验喵~~
+- [x] **云端操作喵[CloudAction.py]**(已模块化喵)(注释较为完整喵)
+  - [x] ~~获取玩家昵称喵~~
+  - [x] ~~获取玩家summary并解析喵~~
+  - [x] ~~刷新玩家sessionToken喵~~
+  - [x] ~~获取玩家云存档喵~~
+  - [x] ~~修改玩家云端昵称喵~~(但Phigros仅在登录Taptap时会同步一次昵称好像喵)
+  - [x] ~~修改玩家summary喵~~(但只能看没有任何用喵)
+  - [x] ~~获取存档时进行md5校验喵~~
+  - [] ~~上传云存档~~(不计划实现)
 
 
-- [x] **存档解析喵[ParseGameSave]**(已模块化喵)(注释较为完整喵)
-  - [x] ~~解析输出所有内容喵~~
+- [x] **存档操作喵[Structure/*.py]**(已模块化喵)(注释较为完整喵)
+  - [x] ~~云存档解密喵~~
+  - [x] ~~根据云存档解析所有内容喵~~
+  - [x] ~~根据解析内容构建云存档喵~~
+  - [x] ~~结构化解析存档喵~~
+  - [x] ~~支持旧版云存档喵~~(`gameKey`最低支持到`\x02`的文件头，`gameProgress`最低`\x03`喵)
 
 
 - [ ] **其他喵：**
-    - [x] ~~获取本地SessionToken喵~~(点[**这里**](https://github.com/wms26/Phi-CloudAction-python/releases/tag/GST_v1.1)来下载喵)
-    - [x] ~~获取summary和玩家昵称喵~~
-    - [x] ~~计算b19喵！~~
-    - [x] ~~将各功能模块化喵~~(更方便使用喵)
-    - [x] ~~WebApi~~(没什么用喵，建议别用喵，不能保证安全喵)
-    - [x] ~~存档历史记录~~(使用示例已经在`example.py`里面了喵，会检查存档是否有新记录喵，存在新记录时会进行保存存档和其他信息喵。往后可能会用上喵)
-    - [x] ~~taptap扫码授权获取sessionToken~~(已经发在release中了喵，在[**这里**](https://github.com/wms26/Phi-CloudAction-python/releases/tag/QR-GST_v1.0)喵)
-    - [ ] WebGUI(可视化存档信息喵，感觉也没用喵，先咕咕咕吧喵)
-    - [ ] Bot(还是咕咕咕喵！)
+  - [x] ~~获取本地SessionToken喵~~(点[**这里**](https://github.com/wms26/Phi-CloudAction-python/releases/tag/GST_v1.1)来下载喵)
+  - [x] ~~计算b19喵！~~
+  - [x] ~~将各功能模块化喵~~(更方便使用喵)
+  - [x] ~~存档历史记录~~(使用示例已经在`example.py`里面了喵，会检查存档是否有新记录喵，存在新记录时会进行保存存档和其他信息喵。往后可能会用上喵)
+  - [x] ~~taptap扫码授权获取sessionToken~~(已经发在release中了喵，在[**这里**](https://github.com/wms26/Phi-CloudAction-python/releases/tag/QR-GST_v1.0)喵)
+  - [ ] WebGUI(可视化存档信息喵，感觉也没用喵，先咕咕咕吧喵)
+  - [ ] Bot(还是咕咕咕，预计可能开新仓库来写喵！)
 
 ## 喵喵喵~
 
@@ -99,6 +110,12 @@ pip install -r requirement.txt
 (快去给[文酱](https://github.com/7aGiven)和[废酱](https://github.com/Catrong)的项目点star喵！)
 
 ## 更新日志喵：
+
+### 2025/01/11(v1.4.1)：
+1. 修改了部分注释以及函数注释 (请注意DataType.py里面的注释部分是AI生成后来修改的，可能描述不太规范)
+2. 为Bits数据类型添加了长度限制 (emm可能有的人不太懂所以还是看代码吧，新增了_Bits类)
+3. 基于Bits新增的功能上，修改了部分结构类的类型注释，防止在编辑存档时超出了有效Bit单位长度 (好吧可能越描述越糊了x)
+4. 修改了下README.md
 
 ### 2025/01/05(v1.4.0)：
 1. 重写大量代码，删除了之前发癫时添加的异步代码，修改了解析存档的逻辑，采用结构化解析方式，相关请看PhiCloudLib/Structure/

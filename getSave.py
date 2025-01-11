@@ -1,4 +1,4 @@
-# 萌新写的代码喵，可能不是很好喵，但是已经尽可能注释了喵，希望各位大佬谅解喵=v=
+# 萌新写的代码，可能不是很好，但是已经尽可能注释了，希望各位大佬谅解喵=v=
 # ----------------------- 导包区喵 -----------------------
 from json import dumps
 from sys import argv
@@ -8,7 +8,6 @@ from PhiCloudLib import (
     readDifficultyFile,
     unzipSave,
     decryptSave,
-    countRks,
     logger,
 )
 
@@ -28,15 +27,16 @@ else:
 
 def getSave(token):
     with PhigrosCloud(token) as cloud:
-        difficulty = readDifficultyFile()  # 读取难度定数文件
+        difficulty = readDifficultyFile()  # 读取难度定数文件喵
 
-        # 获取并解析存档
-        save_data = cloud.getSave()
+        # 获取并解析存档喵
+        # save_data = cloud.getSave()
+        with open("save", "rb") as file:
+            save_data = file.read()
         save_dict = unzipSave(save_data)
         save_dict = decryptSave(save_dict)
-        save_dict["gameRecord"] = countRks(save_dict["gameRecord"], difficulty)
 
-        # 写出存档解析json数据
+        # 写出存档解析json数据喵
         with open("./PhigrosSave.json", "w", encoding="utf-8") as save_file:
             save_file.write(dumps(save_dict, ensure_ascii=False, indent=4))
 

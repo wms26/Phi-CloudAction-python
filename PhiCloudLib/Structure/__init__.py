@@ -1,4 +1,4 @@
-# 萌新写的代码喵，可能不是很好喵，但是已经尽可能注释了喵，希望各位大佬谅解喵=v=
+# 萌新写的代码，可能不是很好，但是已经尽可能注释了，希望各位大佬谅解喵=v=
 # ----------------------- 导包区喵 -----------------------
 from typing import Any, Dict
 from .DataType import *
@@ -12,6 +12,15 @@ from .user import *
 
 
 def getStructure(file_head: Dict[str, bytes]) -> Dict[str, Any]:
+    """
+    根据文件头获取对应结构类喵
+
+    参数:
+        file_head (dict[str, bytes]): 每个文件的文件头喵
+
+    返回:
+        (dict[str, Any]): 每个文件对应的结构类喵
+    """
     structure_list = {}
 
     # gameKey
@@ -80,7 +89,16 @@ def getStructure(file_head: Dict[str, bytes]) -> Dict[str, Any]:
     return structure_list
 
 
-def getFileHead(save_dict: Dict[str, Any]):
+def getFileHead(save_dict: Dict[str, dict]) -> Dict[str, bytes]:
+    """
+    根据存档反序列化数据获取最高支持的文件头喵
+
+    参数:
+        save_dict (dict[str, dict]): 存档反序列化数据喵
+
+    返回:
+        (dict[str, bytes]): 每个存档文件最高支持的文件头喵
+    """
     file_head = {}
     for key, file_dict in save_dict.items():
         if key == "gameKey":
@@ -105,5 +123,5 @@ def getFileHead(save_dict: Dict[str, Any]):
 
         elif key == "user":
             file_head[key] = b"\x01"
-            
+
     return file_head

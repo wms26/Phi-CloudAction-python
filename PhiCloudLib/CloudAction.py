@@ -1,4 +1,4 @@
-# 萌新写的代码喵，可能不是很好喵，但是已经尽可能注释了喵，希望各位大佬谅解喵=v=
+# 萌新写的代码，可能不是很好，但是已经尽可能注释了，希望各位大佬谅解喵=v=
 # ----------------------- 导包区喵 -----------------------
 from base64 import b64decode
 from hashlib import md5
@@ -70,7 +70,7 @@ class PigeonRequest:
             self._req = self.client.delete(url, headers=headers, **kwargs)
 
         else:
-            raise ValueError(f'传入的请求类型不合法！不应为"{method}"！')
+            raise ValueError(f'传入的请求类型不合法喵！不应为"{method}"！')
 
         logger.debug(f"请求类型 ：{method}")
         logger.debug(f"请求URL ：{url}")
@@ -158,7 +158,7 @@ class PhigrosCloud:
         获取玩家昵称喵
 
         返回:
-            (str): 玩家昵称
+            (str): 玩家昵称喵
         """
         logger.debug("调用函数：getNickname()")
 
@@ -175,7 +175,7 @@ class PhigrosCloud:
         获取玩家summary喵
 
         返回:
-            (dict): 玩家summary数据
+            (dict): 玩家summary数据喵
         """
         logger.debug("调用函数：getSummary()")
 
@@ -197,10 +197,10 @@ class PhigrosCloud:
             "rks": summary[2],  # 正如其名不多讲了喵
             "gameVersion": summary[3],  # 这是游戏版本喵
             "avatar": summary[4].decode(),  # 这是头像喵
-            "EZ": summary[5:8],  # EZ难度的评级情况
-            "HD": summary[8:11],  # HD难度的评级情况
-            "IN": summary[11:14],  # IN难度的评级情况
-            "AT": summary[14:17],  # AT难度的评级情况
+            "EZ": summary[5:8],  # EZ难度的评级情况喵
+            "HD": summary[8:11],  # HD难度的评级情况喵
+            "IN": summary[11:14],  # IN难度的评级情况喵
+            "AT": summary[14:17],  # AT难度的评级情况喵
         }
 
         logger.debug(f'函数"getSummary()"返回：{return_data}')
@@ -210,16 +210,16 @@ class PhigrosCloud:
         self, url: Optional[str] = None, checksum: Optional[str] = None
     ) -> bytes:
         """
-        获取存档数据喵(压缩包数据喵)
+        获取存档数据喵 (压缩包数据喵)
 
         (返回的数据可用ReadGameSave()读取喵)
 
         参数:
-            url (str | None): 存档的URL喵。留空自动获取当前token的数据
-            checksum (str | None): 存档的md5校验值。留空自动获取当前token的数据
+            url (str | None): 存档的 URL 喵。留空自动获取当前token的数据喵
+            checksum (str | None): 存档的 md5 校验值喵。留空自动获取当前token的数据喵
 
         返回:
-            (bytes): 存档压缩包数据
+            (bytes): 存档压缩包数据喵
         """
         logger.debug("调用函数：getSave()")
 
@@ -236,16 +236,16 @@ class PhigrosCloud:
         save_data = (self.request.get(url)).content  # type: ignore
         if len(save_data) <= 30:
             logger.error(
-                f"严重警告喵！！！获取到的云存档大小不足30字节喵！当前大小喵：{len(save_data)}"
+                f"严重警告喵！！！获取到的云存档大小不足 30 字节喵！当前大小喵：{len(save_data)}"
             )
             logger.error(
                 "可能云存档已丢失喵！！！请重新将本地存档同步至云端喵！"
             )
             raise ValueError(
-                f"获取到的云存档大小不足30字节喵！当前大小喵：{len(save_data)}"
+                f"获取到的云存档大小不足 30 字节喵！当前大小喵：{len(save_data)}"
             )
 
-        save_md5 = md5()  # 创建一个md5对象喵，用来计算md5校验值喵
+        save_md5 = md5()  # 创建一个md5对象，用来计算md5校验值喵
         save_md5.update(save_data)  # 将存档数据更新进去喵
         actual_checksum = save_md5.hexdigest()
         if (
@@ -264,14 +264,14 @@ class PhigrosCloud:
         """
         刷新sessionToken喵
 
-        注意喵：原先的sessionToken将会失效喵！
+        注意：原先的sessionToken将会失效喵！
 
         (会返回新的sessionToken喵！)
 
         (刷新是即时的喵，旧token会立即失效喵，新的会即时生效喵)
 
         返回:
-            (str): 新的sessionToken
+            (str): 新的sessionToken喵
         """
         logger.debug("调用函数：refreshSessionToken()")
 
@@ -292,13 +292,13 @@ class PhigrosCloud:
 
     def uploadNickname(self, name: str):
         """
-        用于更新玩家昵称
+        用于更新玩家昵称喵
 
         参数:
-            name (str): 要更改的昵称
+            name (str): 要更改的昵称喵
 
         返回:
-            (Response): 请求返回的对象
+            (None): 无喵~
         """
         logger.debug("调用函数：uploadNickname()")
 
@@ -319,7 +319,7 @@ class PhigrosCloud:
 
         logger.debug('函数"uploadNickname()"无返回')
 
-    def uploadSummary(self, summarys: dict):
+    def uploadSummary(self, summary: dict):
         """
         上传summary喵(从上传存档里面独立出来的喵)
 
@@ -336,31 +336,32 @@ class PhigrosCloud:
         from datetime import datetime
 
         # 将解析过的summary构建回去喵
-        avatar_data = summarys["avatar"].encode()  # 对头像名称进行编码
-        summary = bytearray()  # 创建一个空的summary数据喵
-        summary.extend(pack("=B", summarys["saveVersion"]))
-        summary.extend(pack("=H", summarys["challenge"]))
-        summary.extend(pack("=f", summarys["rks"]))
-        summary.extend(pack("=B", summarys["gameVersion"]))
-        summary.append(len(avatar_data))
-        summary.extend(avatar_data)
+        avatar_data = summary["avatar"].encode()  # 对头像名称进行编码喵
+        _summary = bytearray()  # 创建一个空的summary数据喵
+        _summary.extend(pack("=B", summary["saveVersion"]))
+        _summary.extend(pack("=H", summary["challenge"]))
+        _summary.extend(pack("=f", summary["rks"]))
+        _summary.extend(pack("=B", summary["gameVersion"]))
+        _summary.append(len(avatar_data))
+        _summary.extend(avatar_data)
         for key in ["EZ", "HD", "IN", "AT"]:
-            for i in summarys[key]:
-                summary.extend(pack("=H", i))
+            for i in summary[key]:
+                _summary.extend(pack("=H", i))
 
-        summary = b64encode(summary).decode()  # 把summary数据编码回去喵
+        _summary = b64encode(_summary).decode()  # 把summary数据编码回去喵
 
         # 请求存档信息喵
         save_info = (
             self.request.get(self.baseUrl + "classes/_GameSave?limit=1")
         ).json()["results"][0]
 
-        objectId = save_info["objectId"]  # 获取objectId
-        userObjectId = save_info["user"]["objectId"]  # 获取user的ObjectId
-        # 存档的md5校验值
+        objectId = save_info["objectId"]  # 获取objectId喵
+        userObjectId = save_info["user"]["objectId"]  # 获取user的ObjectId喵
+        # 存档的md5校验值喵
         checksum = save_info["gameFile"]["metaData"]["_checksum"]
-        saveSize = save_info["gameFile"]["metaData"]["size"]  # 存档的大小
-        fileObjectId = save_info["gameFile"]["objectId"]  # 存档的objectId
+        saveSize = save_info["gameFile"]["metaData"]["size"]  # 存档的大小喵
+        fileObjectId = save_info["gameFile"]["objectId"]  # 存档的objectId喵
+
         logger.debug(f"objectId：{objectId}")
         logger.debug(f"userObjectId：{userObjectId}")
         logger.debug(f"checksum：{checksum}")
