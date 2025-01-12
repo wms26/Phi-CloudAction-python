@@ -12,6 +12,7 @@ from PhiCloudLib import (
     getB19,
     checkSaveHistory,
     logger,
+    countRks,
 )
 
 
@@ -47,6 +48,7 @@ def example(token):
         with open("./PhigrosSave.json", "w", encoding="utf-8") as save_file:
             save_file.write(dumps(save_dict, ensure_ascii=False, indent=4))
 
+        save_dict = countRks(save_dict, difficulty)
         b19 = getB19(save_dict["gameRecord"], difficulty)  # 获取b19喵
 
         # 输出并计算玩家rks喵

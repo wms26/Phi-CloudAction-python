@@ -509,11 +509,13 @@ class GameRecord(dataTypeAbstract):
             unlock = eval(Bits.read(b"\x00", 0)[0])
             fc = eval(Bits.read(b"\x00", 0)[0])
             record_writer = Writer()
-            for record in song.items():
-                unlock[diff_list[record[0]]] = 1
-                record_writer.type_write(Int, record[1]["score"])
-                record_writer.type_write(Float, record[1]["acc"])
-                fc[diff_list[record[0]]] = record[1]["fc"]
+            for diff, index in diff_list.items():
+                if song.get(diff) is not None:
+                    unlock[index] = 1
+                    record_writer.type_write(Int, song[diff]["score"])
+                    record_writer.type_write(Float, song[diff]["acc"])
+                    fc[index] = song[diff]["fc"]
+
             writer.type_write(Bits, str(unlock))
             writer.type_write(Bits, str(fc))
             writer.type_write(Byte, record_writer.get_data())

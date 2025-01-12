@@ -5,7 +5,6 @@ from sys import argv
 
 from PhiCloudLib import (
     PhigrosCloud,
-    readDifficultyFile,
     unzipSave,
     decryptSave,
     logger,
@@ -27,17 +26,18 @@ else:
 
 def getSave(token):
     with PhigrosCloud(token) as cloud:
-        difficulty = readDifficultyFile()  # 读取难度定数文件喵
-
         # 获取并解析存档喵
-        # save_data = cloud.getSave()
-        with open("save", "rb") as file:
-            save_data = file.read()
+        save_data = cloud.getSave()
+
+        # 读取存档文件
+        # with open("save", "rb") as file:
+        #     save_data = file.read()
+
         save_dict = unzipSave(save_data)
         save_dict = decryptSave(save_dict)
 
         # 写出存档解析json数据喵
-        with open("./PhigrosSave.json", "w", encoding="utf-8") as save_file:
+        with open("./PhigrosSaves.json", "w", encoding="utf-8") as save_file:
             save_file.write(dumps(save_dict, ensure_ascii=False, indent=4))
 
         logger.info("获取存档成功喵！")
