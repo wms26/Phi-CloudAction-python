@@ -11,6 +11,7 @@ import platform
 import shutil  # 用于文件复制喵~
 from importlib.resources import files  # 导入 importlib.resources 喵~
 from phi_cloud_action import PhigrosCloud, unzipSave, decryptSave, logger
+from pydantic import BaseModel
 
 # 重写 argparse.ArgumentParser 类，修改帮助信息的显示格式喵~
 class CustomArgumentParser(argparse.ArgumentParser):
@@ -131,46 +132,53 @@ class ConfigManager:
                 logger.error(f"配置文件初始化失败喵~: {str(e)}")
                 raise
 
+# Token 请求模型喵~
+class TokenRequest(BaseModel):
+    token: str
+
 # 获取并解析存档数据喵~
-def get_archive(token: str):
+def get_cloud_saves(request: TokenRequest) -> JSONResponse:
     try:
-        with PhigrosCloud(token) as cloud:
+        # 使用 request.token 来获取传递的 token 值
+        with PhigrosCloud(request.token) as cloud:
             # 获取并解析存档喵~
             save_data = cloud.getSave()
 
             save_dict = unzipSave(save_data)
             save_dict = decryptSave(save_dict)
 
-        return JSONResponse(content={"code":200, "status": "ok", "data": save_dict},status_code=200)
+        return JSONResponse(content={"code": 200, "status": "ok", "data": save_dict}, status_code=200)
     except Exception as e:
-        return JSONResponse(content={"code":400, "status": "error", "message": str(e)},status_code=400)
+        return JSONResponse(content={"code": 400, "status": "error", "message": str(e)}, status_code=400)
+
 
 # 主程序入口喵~
 if __name__ == '__main__':
     try:
         manager: ConfigManager = ConfigManager()
+        config = manager.config
         # FastAPI 实例喵~
         app = FastAPI()
 
         # 配置 CORS 喵~
-        if manager.config.CORS_siwtch:  # 根据 CORS 配置中的开关进行判断
+        if config.CORS_siwtch:  # 根据 CORS 配置中的开关进行判断
             app.add_middleware(
                 CORSMiddleware,
-                allow_origins=manager.config.CORS_allow_origins,
-                allow_credentials=manager.config.CORS_allow_credentials,
-                allow_methods=manager.config.CORS_allow_methods, 
-                allow_headers=manager.config.CORS_allow_headers,  
+                allow_origins=config.CORS_allow_origins,
+                allow_credentials=config.CORS_allow_credentials,
+                allow_methods=config.CORS_allow_methods, 
+                allow_headers=config.CORS_allow_headers,  
             )
         
         # 配置路由喵~
-        app.add_api_route("/get/archive", get_archive, methods=["POST","GET"])
+        app.add_api_route("/get/cloud/saves", get_cloud_saves, methods=["POST"])
 
         # 输出配置信息喵~
-        logger.info(f"监听主机: {manager.config.host}, 端口: {manager.config.port} 喵~")
+        logger.info(f"监听主机: {config.host}, 端口: {config.port} 喵~")
         logger.info(f"配置文件路径喵~: {manager.config_path}")
 
         # 启动 FastAPI Web 服务喵~
-        run(app, host=manager.config.host, port=manager.config.port)
+        run(app, host=config.host, port=config.port)
 
     except Exception as e:
         logger.error(f"发生错误喵~: {e}")
