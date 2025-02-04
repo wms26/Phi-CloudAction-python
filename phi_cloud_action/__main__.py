@@ -1,24 +1,38 @@
-from . import PhiCloudLib
-import inspect
-from . import example
+from importlib.resources import files
+import shutil
+import os
+from .PhiCloudLib import logger
 
-def list_class_methods_with_file(cls):
-    """列出类中的所有方法及其文件路径"""
-    methods_with_file = []
-    
-    # 遍历类中的所有方法
-    for method_name, method in inspect.getmembers(cls, predicate=inspect.isfunction):
-        # 获取方法的源文件路径
-        file_path = inspect.getfile(method)
-        methods_with_file.append((method_name, file_path))
-    
-    return methods_with_file
+def copy_data():
+    # 获取包名称和目标工作目录
+    package_name = 'phi_cloud_action'
+    work_dir = os.getcwd()
 
-# 获取 example 模块中的所有方法及其文件路径
-methods_with_file = list_class_methods_with_file(example)
+    # 获取包内 data 文件夹
+    try:
+        # 使用 files() 来访问包内的 data 文件夹
+        data_dir = files(package_name) / 'data'
 
-# 格式化输出每个方法和文件路径，每行一个方法
-methods_str = '\n'.join([f"{method_name} (文件路径: {file_path})" for method_name, file_path in methods_with_file])
+        # 遍历 data 文件夹中的所有文件和文件夹
+        for item in data_dir.iterdir():
+            if item.is_dir():  # 如果是文件夹
+                dest_folder = os.path.join(work_dir, item.name)
+                # 如果目标文件夹不存在，创建它
+                os.makedirs(dest_folder, exist_ok=True)
 
-# 使用 logger 输出方法及其文件路径
-PhiCloudLib.logger.info(f"目前的所有的示例方法及文件位置喵:\n{methods_str}")
+                # 遍历文件夹中的内容并拷贝
+                for sub_item in item.iterdir():
+                    dest_file = os.path.join(dest_folder, sub_item.name)
+                    if sub_item.is_file():
+                        # 拷贝文件到目标目录
+                        shutil.copy(sub_item, dest_file)
+                        logger.info(f"已将 {sub_item.name} 从 {item.name} 拷贝到当前目录了喵")
+
+        logger.info("所有文件已成功拷贝到当前目录了喵")
+        logger.info(f"可以查看 examples 文件夹中的示例代码了喵")
+    except Exception as e:
+        logger.error(f"发生错误: {e}")
+
+if __name__ == '__main__':
+    # 执行拷贝操作
+    copy_data()

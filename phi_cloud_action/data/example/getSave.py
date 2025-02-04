@@ -3,7 +3,7 @@
 from json import dumps
 from sys import argv
 
-from ..PhiCloudLib import (
+from phi_cloud_action import (
     PhigrosCloud,
     unzipSave,
     decryptSave,

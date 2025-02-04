@@ -2,7 +2,7 @@
 # ----------------------- 导包区喵 -----------------------
 from sys import argv
 
-from ..PhiCloudLib import PhigrosCloud, logger
+from phi_cloud_action import PhigrosCloud, logger
 
 # ---------------------- 定义赋值区喵 ----------------------
 
