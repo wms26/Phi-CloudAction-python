@@ -35,37 +35,33 @@
 
 ## 环境准备喵！
 
-1. 编写本项目时使用的是 **python3.11.8** 的喵，不能完全保证其他版本会不会出现问题喵，建议使用 **python>=3.9** 来运行喵~(后面换成3.11.8滴喵！)
+1. 编写本项目时使用的是 **python3.11.8** 的喵，不能完全保证其他版本会不会出现问题喵，推荐使用 **python>=3.9** 来运行喵~(后面换成3.11.8滴喵！)
 
-2. 注意在使用本项目前要先安装`requirement.txt`中的模块喵
+2. 云端数据获取需要phigros的云端sessionToken，获取sessionToken的方法可以参考[**Mivik的bot说明文档**](https://mivik.moe/pgr-bot-help/)里面喵！也可以用本喵用pyinstaller打包好的[**GetSession**](https://github.com/wms26/Phi-CloudAction-python/releases/tag/QR-GST_v1.0)扫码登录来获取喵！也可以使用文酱的tomato部署的[**Phi-Login**](https://www.tomato-aoarasi.com/phi-login/)喵!
 
-3. 云端数据获取需要phigros的云端sessionToken，获取sessionToken的方法可以参考[**Mivik的bot说明文档**](https://mivik.moe/pgr-bot-help/)里面喵！也可以用本喵用pyinstaller打包好的[**GetSession**](https://github.com/wms26/Phi-CloudAction-python/releases/tag/QR-GST_v1.0)扫码登录来获取喵！
-
-4. 获取存档打歌记录数据的过程会计算每首歌每个难度的rks喵，所以需要难度定数文件`difficulty.tsv`喵，本项目仓库里面已经有了喵，但不一定是最新的，获取最新的难度定数文件可以用[文酱](https://github.com/7aGiven)的项目[Phigros_Resource](https://github.com/7aGiven/Phigros_Resource)哦喵！
+3. 获取存档打歌记录数据的过程会计算每首歌每个难度的rks喵，所以需要难度定数文件`difficulty.tsv`喵，本项目仓库里面已经有了喵，但不一定是最新的，获取最新的难度定数文件可以用[文酱](https://github.com/7aGiven)的项目[Phigros_Resource](https://github.com/7aGiven/Phigros_Resource)哦喵！
 
 ## 使用喵！
 
-### 安装requests、pycryptodome、colorlog库喵：
+### 安装喵!
 
-直接在命令行运行喵：
+1. 查看[Releases](https://github.com/wms26/Phi-CloudAction-python/releases)喵
+2. 查找最新版本的 `.whl` 文件喵
+3. 复制链接并使用以下命令安装喵：
+```bash
+pip install <whl_url>
+```
 
-```
-pip install requests pycryptodome colorlog
-```
+### 初始化喵!
 
-或者如果想要一点仪式感也可以运行喵：
-
+```bash
+python -m phi_cloud_action
 ```
-pip install -r requirement.txt
-```
+会把``info``目录和``example``目录拷贝到运行目录下喵
 
 ### 各函数功能使用方法喵：
 
-看`example.py`吧喵，里面写了一个示例，用上了主要功能，看注释也许都能理解怎么用了罢喵~
-
-`getSave.py`是获取云存档并解析写出到`PhigrosSave.json`的示例喵
-
-`uploadNickname.py`是修改昵称的示例，但Phigros仅在登录Taptap时会同步一次昵称好像，不如自己去手机上改`.userdata`喵
+看``example``目录下的文件吧喵,用上了主要功能，看注释也许都能理解怎么用了罢喵~
 
 ## 未来计划功能喵！
 
