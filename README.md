@@ -1,16 +1,19 @@
 <div align="center">
+
 <h1>Phi-CloudAction-python</h1>
 使用python实现的phigros云端数据操作喵<br>
 注意本项目已经猫化了喵，带有大量喵元素喵，介意者勿用喵！<br><br>
 
 [![Github仓库喵](https://img.shields.io/badge/github-Phi--CA--py-red?style=for-the-badge&logo=Github)](https://github.com/wms26/Phi-CloudAction-python)
 
-<img src="https://counter.seku.su/cmoe?name=phi-cloud-py&theme=r34" title="喵喵喵~"/><br>
+[![喵喵喵~](https://counter.seku.su/cmoe?name=phi-cloud-py&theme=r34)](https://github.com/wms26/Phi-CloudAction-python/graphs/traffic)
 
 [![Phi-LocalAction-python](https://img.shields.io/badge/Github-LocalAction(本地数据操作)-red?style=for-the-badge&logo=Github)](https://github.com/wms26/Phi-LocalAction-python)
 
 [![PhigrosLibrary](https://img.shields.io/badge/文酱-Phigros_Library-blue?style=for-the-badge&logo=Github)](https://github.com/7aGiven/PhigrosLibrary)
+
 [![phi-plugin](https://img.shields.io/badge/废酱-phi--plugin-blue?style=for-the-badge&logo=github)](https://github.com/Catrong/phi-plugin)
+
 [![Phigros_Resource](https://img.shields.io/badge/文酱-Phigros__Resource-blue?style=for-the-badge&logo=Github)](https://github.com/7aGiven/Phigros_Resource)
 
 </div>
@@ -75,14 +78,12 @@ python -m phi_cloud_action
   - [x] ~~获取存档时进行md5校验喵~~
   - [ ] ~~上传云存档~~(不计划实现)
 
-
 - [x] **存档操作喵[Structure/*.py]**(已模块化喵)(注释较为完整喵)
   - [x] ~~云存档解密喵~~
   - [x] ~~根据云存档解析所有内容喵~~
   - [x] ~~根据解析内容构建云存档喵~~
   - [x] ~~结构化解析存档喵~~
   - [x] ~~支持旧版云存档喵~~(`gameKey`最低支持到`\x02`的文件头，`gameProgress`最低`\x03`喵)
-
 
 - [ ] **其他喵：**
   - [x] ~~获取本地SessionToken喵~~(点[**这里**](https://github.com/wms26/Phi-CloudAction-python/releases/tag/GST_v1.1)来下载喵)
