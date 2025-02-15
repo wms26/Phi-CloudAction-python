@@ -285,7 +285,7 @@ class PhigrosCloud:
             self.request.put(
                 self.baseUrl + f"users/{objectId}/refreshSessionToken"
             )
-        ).json()[1]["sessionToken"]
+        ).json()["sessionToken"]
 
         logger.debug(f'函数"refreshSessionToken()"返回：{new_sessionToken}')
         return new_sessionToken
