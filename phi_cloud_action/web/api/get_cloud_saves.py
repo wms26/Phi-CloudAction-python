@@ -8,7 +8,7 @@ class get_cloud_saves(example):
         self.route_path = "/get/cloud/saves"
         self.methods = ["POST"]
 
-    def __call__(request: TokenRequest) -> JSONResponse:
+    def __call__(self, request: TokenRequest) -> JSONResponse:
         try:
             # 使用 request.token 来获取传递的 token 值
             with PhigrosCloud(request.token) as cloud:
