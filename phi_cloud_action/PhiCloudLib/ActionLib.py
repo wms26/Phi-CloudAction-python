@@ -4,6 +4,7 @@ from copy import deepcopy
 from datetime import datetime
 from io import BytesIO
 from json import dumps, loads
+import warnings
 from os import mkdir
 from os.path import exists, join
 from re import match
@@ -18,7 +19,14 @@ from .other import read_json,write_json,add_game_record,complete_game_record
 
 
 # ---------------------- 定义赋值区喵 ----------------------
+class b30():
+    def __init__(self,p3:List,b27:list):
+        self.p3 = p3
+        self.b27 = b27
+        self.b30:list = p3 + b27
 
+    def __call__(self):
+        return self.b30
 
 def debugTempFiles(
     data, mode: str = "w", filetype: str = "txt", encoding: str = "utf-8"
@@ -237,55 +245,72 @@ def countRks(
 
     return record_data
 
-
-def getB19(records: dict, difficult: dict):
+def getB30(records: dict, difficult: dict,b_num: int = 27) -> b30:
     """
-    获取b19喵
+    获取b30喵
 
     参数:
         records (dict): 打歌成绩数据喵
+        difficult (dict): 歌曲难度数据喵
+        b_num (int): 返回的b的数量,不包含p3,默认为27
 
     返回:
-        (list[dict]): b19列表喵
+        (b30): b30喵,使用命名元组,包含p3和b27
     """
     diff_list = {"EZ": 0, "HD": 1, "IN": 2, "AT": 3, "Legacy": 4}
     all_record = []  # 存储所有打歌成绩记录喵
 
-    # 深度拷贝打歌成绩数据字典喵(防止进行b19排序等操作影响到原数据喵)
+    # 深度拷贝打歌成绩数据字典喵(防止进行b30排序等操作影响到原数据喵)
     record = deepcopy(records)
 
-    # 这段代码怪复杂的喵(至少对于本喵来说喵，明明是自己写的却看不太懂喵)
     for song in record.items():  # 遍历所有歌曲记录喵
         for song_record in song[1].items():  # 遍历每首歌的所有难度记录喵
             song_record[1]["name"] = song[0]  # 取歌名添加进原数据中喵
-
-            # 将难度等级添加进原数据中喵
-            song_record[1]["level"] = song_record[0]
-
-            difficulty: float = difficult[song[0]][diff_list[song_record[0]]]
+            song_record[1]["level"] = song_record[0]  # 将难度等级添加进原数据中喵
+            if song_record[1]["acc"] < 70:  # 如果acc小于70，则跳过该记录
+                continue
+            try:
+                difficulty: float = difficult[song[0]][diff_list[song_record[0]]]
+            except IndexError as e:
+                logger.error("没有找到定数,可能是difficulty.tsv版本太旧,请更新")
+                raise RuntimeError
             song_record[1]["rks"] = (
                 ((song_record[1]["acc"] - 55) / 45) ** 2
             ) * difficulty
             all_record.append(song_record[1])  # 添加到全部记录列表中喵
 
     # 对全部记录以rks为准进行排序
-    all_record.sort(key=lambda x: x["rks"], reverse=True)
+    def sort_by_rks(record):
+        """
+        以rks进行排序的辅助函数喵
+        """
+        return record["rks"]
+    
+    all_record.sort(key=sort_by_rks, reverse=True)
+
+    # 获取3个最高等效rks的phi成绩
+    phi_top_3 = []
     try:
-        # 脑子爆烧唔，应该是取最高等效rks的phi成绩喵(抄过来的喵x)
-        b19 = [
-            max(
-                filter(lambda x: x["score"] == 1000000, all_record),
-                key=lambda x: x["difficulty"],
-            )
-        ]
-
-    except ValueError:  # 如果找不到AP曲子就返回全部记录列表的前19个
+        for record in all_record:
+            if record["score"] == 1000000:
+                phi_top_3.append(record)
+                if len(phi_top_3) == 3:
+                    break
+        if not phi_top_3:
+            raise ValueError("没有AP曲子喵！")
+    except ValueError:
         logger.warning("好家伙，居然一首AP曲子都没有喵！")
-        return all_record[:19]
+        phi_top_3 = []
 
-    # 将全部记录列表中取前19个拼接到b19列表中喵，准确来说是b20喵(?)
-    b19.extend(all_record[:19])
-    return b19  # 返回b19喵(准确来说应该得叫b20喵)
+    # 获取N个最高rks的成绩
+    top_27 = all_record[:b_num]
+    
+    return b30(p3=phi_top_3,b27=top_27)
+
+# 兼容性
+def getB19(records: dict, difficult: dict):
+    warnings.warn("getB19 is deprecated, use getB30.", DeprecationWarning, 2)
+    return getB30(records, difficult)()  # 调用新函数
 
 
 def decryptSave(save_dict: Dict[str, Any]) -> Dict[str, Dict[str, Any]]:
