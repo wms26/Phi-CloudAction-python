@@ -4,14 +4,14 @@ from pathlib import Path
 from typing import Dict, Any, Union, Optional
 from yaml import safe_load
 from fastapi import FastAPI
-from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from uvicorn import run
 import platform
 import shutil  # 用于文件复制喵~
 from importlib.resources import files  # 导入 importlib.resources 喵~
-from phi_cloud_action import PhigrosCloud, unzipSave, decryptSave, logger
-from pydantic import BaseModel
+import inspect
+from phi_cloud_action import logger
+from .web.api.example import example
 
 # 重写 argparse.ArgumentParser 类，修改帮助信息的显示格式喵~
 class CustomArgumentParser(argparse.ArgumentParser):
@@ -30,7 +30,7 @@ class Config:
     def __init__(self, host: str, port: int, cors_switch: bool, cors_allow_origins: list, cors_allow_credentials: bool, cors_allow_methods: list, cors_allow_headers: list) -> None:
         self.host = host
         self.port = port
-        self.CORS_siwtch = cors_switch
+        self.CORS_switch = cors_switch
         self.CORS_allow_origins = cors_allow_origins
         self.CORS_allow_credentials = cors_allow_credentials
         self.CORS_allow_methods = cors_allow_methods
@@ -132,24 +132,19 @@ class ConfigManager:
                 logger.error(f"配置文件初始化失败喵~: {str(e)}")
                 raise
 
-# Token 请求模型喵~
-class TokenRequest(BaseModel):
-    token: str
-
-# 获取并解析存档数据喵~
-def get_cloud_saves(request: TokenRequest) -> JSONResponse:
-    try:
-        # 使用 request.token 来获取传递的 token 值
-        with PhigrosCloud(request.token) as cloud:
-            # 获取并解析存档喵~
-            save_data = cloud.getSave()
-
-            save_dict = unzipSave(save_data)
-            save_dict = decryptSave(save_dict)
-
-        return JSONResponse(content={"code": 200, "status": "ok", "data": save_dict}, status_code=200)
-    except Exception as e:
-        return JSONResponse(content={"code": 400, "status": "error", "message": str(e)}, status_code=400)
+# 注册路由
+def register_routes(app: FastAPI, interface_class):
+    for name, obj in inspect.getmembers(interface_class):
+        if inspect.isclass(obj):  # 如果是类
+            # 获取类中的方法，并判断其是否有 __call__ 方法
+            for method_name, method_obj in inspect.getmembers(obj):
+                if method_name == "__call__" and inspect.isfunction(method_obj):
+                    # 获取该类的实例
+                    instance:example = obj()
+                    # 获取 HTTP 方法（例如 POST, GET）和路径（例如 /get/cloud/saves）
+                    if hasattr(instance, "route_path") and hasattr(instance, "methods"):
+                        # 将该方法注册到 FastAPI
+                        app.add_api_route(instance.route_path, instance, methods=instance.methods)
 
 
 # 主程序入口喵~
@@ -161,7 +156,7 @@ if __name__ == '__main__':
         app = FastAPI()
 
         # 配置 CORS 喵~
-        if config.CORS_siwtch:  # 根据 CORS 配置中的开关进行判断
+        if config.CORS_switch:  # 根据 CORS 配置中的开关进行判断
             app.add_middleware(
                 CORSMiddleware,
                 allow_origins=config.CORS_allow_origins,
@@ -171,7 +166,8 @@ if __name__ == '__main__':
             )
         
         # 配置路由喵~
-        app.add_api_route("/get/cloud/saves", get_cloud_saves, methods=["POST"])
+        from .web import api
+        register_routes(app,api)
 
         # 输出配置信息喵~
         logger.info(f"监听主机: {config.host}, 端口: {config.port} 喵~")

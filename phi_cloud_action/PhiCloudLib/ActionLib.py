@@ -14,6 +14,7 @@ from typing import Any, Dict, List
 from .AES import decrypt, encrypt
 from .Structure import getStructure, getFileHead, Reader, Writer
 from .logger import logger
+from .other import read_json,write_json,add_game_record,complete_game_record
 
 
 # ---------------------- 定义赋值区喵 ----------------------
