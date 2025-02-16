@@ -9,6 +9,8 @@ from phi_cloud_action import (
     unzipSave,
     formatSaveDict,
     checkSaveHistory,
+    readSaveHistory,
+    logger
 )
 
 
@@ -42,6 +44,10 @@ def archives(token):
 
         # 存储存档历史记录喵
         checkSaveHistory(token, summary, save_data, difficulty)
+        
+        # 输出存档记录喵
+        SaveHistory = readSaveHistory(token)
+        logger.info(SaveHistory.saves)
 
 if __name__ == "__main__":
     archives(sessionToken)

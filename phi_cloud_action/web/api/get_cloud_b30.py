@@ -1,4 +1,4 @@
-from phi_cloud_action import PhigrosCloud, unzipSave, decryptSave, readDifficultyFile, formatSaveDict, getB30
+from phi_cloud_action import PhigrosCloud, unzipSave, decryptSave, formatSaveDict, getB30, checkSaveHistory
 from fastapi.responses import JSONResponse
 from .request_models import TokenRequest,BNumRequest
 from .example import example
@@ -10,8 +10,7 @@ class get_cloud_b30(example):
     def __init__(self):
         self.route_path = "/get/cloud/b30"
         self.methods = ["POST"]
-        # 读取难度定数文件喵
-        self.difficulty = readDifficultyFile()
+        super().__init__()
 
     def __call__(self, request:BNumAndTokenRequest) -> JSONResponse:
         try:
@@ -25,6 +24,9 @@ class get_cloud_b30(example):
                 save_dict = unzipSave(save_data)
                 save_dict = decryptSave(save_dict)
                 save_dict = formatSaveDict(save_dict)
+
+                # 存档历史记录
+                checkSaveHistory(request.token, summary, save_data, self.difficulty)
 
                 # 获取b30喵
                 b30 = getB30(save_dict["gameRecord"], self.difficulty, request.b_num)

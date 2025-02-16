@@ -1,4 +1,4 @@
-from phi_cloud_action import readDifficultyFile, getB30, logger
+from phi_cloud_action import getB30, logger
 from fastapi.responses import JSONResponse
 from .request_models import SavesRequest, BNumRequest
 from .example import example
@@ -10,8 +10,7 @@ class get_saves_b30(example):
     def __init__(self):
         self.route_path = "/get/saves/b30"
         self.methods = ["POST"]
-        # 读取难度定数文件喵
-        self.difficulty = readDifficultyFile()
+        super().__init__()
 
     def __call__(self, request:BNumAndSavesRequest) -> JSONResponse:
         try:

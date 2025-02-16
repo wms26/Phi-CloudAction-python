@@ -27,6 +27,15 @@ class b30():
 
     def __call__(self):
         return self.b30
+    
+class savesHistory():
+    def __init__(self,summary:dict,record:dict):
+        self.summary:dict = summary
+        self.record:dict = record
+        self.saves:dict = {"summary":summary,"record":record}
+
+    def __call__(self):
+        return self.saves
 
 def debugTempFiles(
     data, mode: str = "w", filetype: str = "txt", encoding: str = "utf-8"
@@ -434,6 +443,23 @@ def loadRecordHistory(recordHistory: Dict[str, dict]):
 
     return records
 
+def readSaveHistory(sessionToken:str) -> savesHistory:
+    """
+    读取存档历史记录喵
+
+    参数
+        sessionToken (str): 玩家的sessionToken喵
+
+    返回:
+        (savesHistory): 存档历史记录喵,可以访问属性summary、record和saves获得数据喵。也可以当函数使用,会返回saves
+    """
+    recordHistory_path = f"saveHistory/{sessionToken}/recordHistory.json"
+    summaryHistory_path = f"saveHistory/{sessionToken}/summaryHistory.json"
+    if not exists(recordHistory_path) or not exists(summaryHistory_path):
+        raise RuntimeError("存档不存在喵!")
+    recordHistory:dict = read_json(recordHistory_path)
+    summaryHistory:dict = read_json(summaryHistory_path)
+    return savesHistory(record=recordHistory,summary=summaryHistory)
 
 def checkSaveHistory(
     sessionToken: str,

@@ -48,10 +48,9 @@
 
 ### 安装喵!
 
-1. 查看[Actions](https://github.com/wms26/Phi-CloudAction-python/actions)喵
-2. 查找最新的**工作流**喵,点进去喵
-3. 查找 `.whl` 文件喵
-4. 复制链接并使用以下命令安装喵：
+1. 查看[Releases](https://github.com/wms26/Phi-CloudAction-python/releases)喵
+2. 查找最新版本的 `.whl` 文件喵
+3. 复制链接并使用以下命令安装喵：
 ```bash
 pip install <whl_url>
 ```
@@ -117,7 +116,12 @@ python -m phi_cloud_action.webapi
 
 ## 更新日志喵：
 
-### 2025/01/12(x1.4.2)：
+### 2025/02/16(v1.5.0):
+1. 改成包分发,原有项目``pip``安装完后把``PhiCloudLib``改成``phi_cloud_action``即可
+1. 添加**WebAPI**
+2. 由于Phi改成B30算法,``getB19``将弃用,使用``getB30``
+
+### 2025/01/12(v1.4.2)：
 1. 修复了写出的存档json数据在修改后，gameRecord中难度顺序更改导致成绩错误的问题
 2. 修复了example.py中未计算等效rks的问题
 
