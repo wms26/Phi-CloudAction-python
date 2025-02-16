@@ -20,9 +20,9 @@ from .other import read_json,write_json,add_game_record,complete_game_record
 
 # ---------------------- 定义赋值区喵 ----------------------
 class b30():
-    def __init__(self,p3:List,b27:list):
-        self.p3 = p3
-        self.b27 = b27
+    def __init__(self,p3:list,b27:list):
+        self.p3:list = p3
+        self.b27:list = b27
         self.b30:list = p3 + b27
 
     def __call__(self):
@@ -255,7 +255,7 @@ def getB30(records: dict, difficult: dict,b_num: int = 27) -> b30:
         b_num (int): 返回的b的数量,不包含p3,默认为27
 
     返回:
-        (b30): b30喵,使用命名元组,包含p3和b27
+        (b30): b30喵,可以访问属性p3、b27和b30获得数据喵。也可以当函数使用,会返回b30
     """
     diff_list = {"EZ": 0, "HD": 1, "IN": 2, "AT": 3, "Legacy": 4}
     all_record = []  # 存储所有打歌成绩记录喵
@@ -310,7 +310,7 @@ def getB30(records: dict, difficult: dict,b_num: int = 27) -> b30:
 # 兼容性
 def getB19(records: dict, difficult: dict):
     warnings.warn("getB19 is deprecated, use getB30.", DeprecationWarning, 2)
-    return getB30(records, difficult)()  # 调用新函数
+    return getB30(records, difficult).b30  # 调用新函数
 
 
 def decryptSave(save_dict: Dict[str, Any]) -> Dict[str, Dict[str, Any]]:
