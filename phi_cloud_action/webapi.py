@@ -1,7 +1,9 @@
+# 萌新写的代码，可能不是很好，但是已经尽可能注释了，希望各位大佬谅解喵=v=
+# ----------------------- 导包区喵 -----------------------
 import argparse
 import os
 from pathlib import Path
-from typing import Dict, Any, Union, Optional
+from typing import Dict, Any, List, Optional
 from yaml import safe_load
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -9,25 +11,30 @@ from uvicorn import run
 import platform
 import shutil  # 用于文件复制喵~
 from importlib.resources import files  # 导入 importlib.resources 喵~
+
 import inspect
 from phi_cloud_action import logger
 from .web.api.example import example
+from pydantic import BaseModel
+from phi_cloud_action import PhigrosCloud, unzipSave, decryptSave, logger  # 导入本地模块喵~
+
+
+# ---------------------- 定义类区喵 ----------------------
+
 
 # 重写 argparse.ArgumentParser 类，修改帮助信息的显示格式喵~
 class CustomArgumentParser(argparse.ArgumentParser):
     def print_help(self, *args, **kwargs):
-        # 获取格式化的帮助信息
+        """自定义帮助信息显示格式喵~"""
         help_text = self.format_help()
-        
-        # 去除短选项和长选项之间的空格
-        help_text = help_text.replace('-c ,', '-c,').replace('--config ', '--config')
-        
-        # 输出修改后的帮助信息
+        help_text = help_text.replace('-c ,', '-c,').replace('--config ', '--config')  # 去除短选项和长选项之间的空格喵~
         self._print_message(help_text, *args, **kwargs)
+
 
 # 配置类喵~
 class Config:
-    def __init__(self, host: str, port: int, cors_switch: bool, cors_allow_origins: list, cors_allow_credentials: bool, cors_allow_methods: list, cors_allow_headers: list) -> None:
+    def __init__(self, host: str, port: int, cors_switch: bool, cors_allow_origins: List[str],
+                 cors_allow_credentials: bool, cors_allow_methods: List[str], cors_allow_headers: List[str]) -> None:
         self.host = host
         self.port = port
         self.CORS_switch = cors_switch
@@ -35,21 +42,28 @@ class Config:
         self.CORS_allow_credentials = cors_allow_credentials
         self.CORS_allow_methods = cors_allow_methods
         self.CORS_allow_headers = cors_allow_headers
+        self.CORS_switch = cors_switch  # CORS 开关喵~
+        self.CORS_allow_origins = cors_allow_origins  # 允许的源喵~
+        self.CORS_allow_credentials = cors_allow_credentials  # 是否允许凭据喵~
+        self.CORS_allow_methods = cors_allow_methods  # 允许的 HTTP 方法喵~
+        self.CORS_allow_headers = cors_allow_headers  # 允许的 HTTP 头喵~
+
 
     @classmethod
     def from_dict(cls, config_dict: Dict[str, Any]) -> "Config":
         """从字典创建 Config 实例喵~"""
-        server_config: Dict[str, Any] = config_dict.get('net')
-        host: str = server_config.get('host')
-        port: int = server_config.get('port')
-        cors: dict = server_config.get('cors')
-        cors_switch: bool = cors.get('switch')
-        cors_config: dict = cors.get('config')
-        cors_allow_origins: list = cors_config.get('allow_origins')
-        cors_allow_credentials: bool = cors_config.get('allow_credentials')
-        cors_allow_methods: list = cors_config.get('allow_methods')
-        cors_allow_headers: list = cors_config.get('allow_headers')
+        server_config = config_dict.get('net', {})
+        host = server_config.get('host')
+        port = server_config.get('port')
+        cors = server_config.get('cors', {})
+        cors_switch = cors.get('switch')
+        cors_config = cors.get('config', {})
+        cors_allow_origins = cors_config.get('allow_origins', [])
+        cors_allow_credentials = cors_config.get('allow_credentials', False)
+        cors_allow_methods = cors_config.get('allow_methods', [])
+        cors_allow_headers = cors_config.get('allow_headers', [])
         return cls(host, port, cors_switch, cors_allow_origins, cors_allow_credentials, cors_allow_methods, cors_allow_headers)
+
 
 # 配置管理器喵~
 class ConfigManager:
@@ -57,9 +71,9 @@ class ConfigManager:
     def get_default_dir() -> Path:
         """获取默认配置文件目录喵~"""
         package_name = 'phi_cloud_action'
-        system: str = platform.system()
+        system = platform.system()
         if system == 'Windows':
-            appdata: Optional[str] = os.getenv('APPDATA')
+            appdata = os.getenv('APPDATA')
             if appdata:
                 return Path(appdata) / package_name
             else:
@@ -67,14 +81,14 @@ class ConfigManager:
         else:
             return Path.home() / '.config' / package_name
 
-    DEFAULT_DIR: Path = get_default_dir()
-    CONFIG_FILE: str = 'RunConfig.yml'
+    DEFAULT_DIR = get_default_dir()
+    CONFIG_FILE = 'RunConfig.yml'
 
     def __init__(self) -> None:
-        self.args: argparse.Namespace = self._parse_args()
-        self.config_path: Path = self._get_config_path()
+        self.args = self._parse_args()  # 解析命令行参数喵~
+        self.config_path = self._get_config_path()  # 获取配置文件路径喵~
         self._ensure_config_file_exists()  # 确保配置文件存在喵~
-        self.config: Config = self._read_config()
+        self.config = self._read_config()  # 读取配置文件喵~
 
     def _parse_args(self) -> argparse.Namespace:
         """解析命令行参数喵~"""
@@ -84,7 +98,6 @@ class ConfigManager:
         )
         parser.add_argument('-c', '--config', type=str, help='自定义配置文件路径喵~', metavar="")
         return parser.parse_args()
-
 
     def _get_config_path(self) -> Path:
         """获取配置文件路径喵~"""
@@ -96,14 +109,10 @@ class ConfigManager:
         """读取并返回配置对象喵~"""
         try:
             with open(self.config_path, 'r', encoding="utf-8") as f:
-                config_dict: Dict[str, Any] = safe_load(f)
-
-            # 检查配置文件格式喵~
+                config_dict = safe_load(f)
             if 'net' not in config_dict:
                 raise ValueError("配置文件格式错误，缺少 'net' 部分喵~")
-
             return Config.from_dict(config_dict)
-
         except Exception as e:
             raise RuntimeError(f"读取配置文件失败喵~: {str(e)}")
 
@@ -111,12 +120,9 @@ class ConfigManager:
         """检查配置文件是否存在，不存在则从包内复制喵~"""
         if not self.config_path.exists():
             try:
-                # 创建目标目录喵~
                 self.config_path.parent.mkdir(parents=True, exist_ok=True)
-
                 logger.info(f"配置文件 {self.config_path} 不存在，正在从包内复制喵~...")
 
-                # 处理包名（直接运行脚本时 __package__ 为 None）喵~
                 package_name = __package__ or "phi_cloud_action"
                 package_config_path = files(package_name) / 'data' / self.CONFIG_FILE
 
@@ -127,7 +133,6 @@ class ConfigManager:
                     logger.info(f"配置文件已从 {package_config_path} 拷贝到 {self.config_path} 喵~")
                 else:
                     raise FileNotFoundError(f"包内默认配置文件 {package_config_path} 找不到喵~。")
-
             except Exception as e:
                 logger.error(f"配置文件初始化失败喵~: {str(e)}")
                 raise
@@ -146,13 +151,12 @@ def register_routes(app: FastAPI, interface_class):
                         # 将该方法注册到 FastAPI
                         app.add_api_route(instance.route_path, instance, methods=instance.methods)
 
+# ----------------------- 主程序入口喵 -----------------------
 
-# 主程序入口喵~
 if __name__ == '__main__':
     try:
-        manager: ConfigManager = ConfigManager()
+        manager = ConfigManager()
         config = manager.config
-        # FastAPI 实例喵~
         app = FastAPI()
 
         # 配置 CORS 喵~
@@ -161,10 +165,10 @@ if __name__ == '__main__':
                 CORSMiddleware,
                 allow_origins=config.CORS_allow_origins,
                 allow_credentials=config.CORS_allow_credentials,
-                allow_methods=config.CORS_allow_methods, 
-                allow_headers=config.CORS_allow_headers,  
+                allow_methods=config.CORS_allow_methods,
+                allow_headers=config.CORS_allow_headers,
             )
-        
+
         # 配置路由喵~
         from .web import api
         register_routes(app,api)
