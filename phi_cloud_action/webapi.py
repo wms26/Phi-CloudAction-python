@@ -10,7 +10,6 @@ import platform
 import shutil  # 用于文件复制喵~
 from importlib.resources import files  # 导入 importlib.resources 喵~
 import inspect
-from phi_cloud_action import logger
 from .web.api.example import example
 from phi_cloud_action import logger
 from pydantic import BaseModel
