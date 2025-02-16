@@ -162,7 +162,7 @@ if __name__ == '__main__':
         app = FastAPI()
 
         # 配置 CORS 喵~
-        if config.CORS_siwtch:  # 根据 CORS 配置中的开关进行判断
+        if config.CORS_switch:  # 根据 CORS 配置中的开关进行判断
             app.add_middleware(
                 CORSMiddleware,
                 allow_origins=config.CORS_allow_origins,
