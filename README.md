@@ -48,9 +48,10 @@
 
 ### 安装喵!
 
-1. 查看[Releases](https://github.com/wms26/Phi-CloudAction-python/releases)喵
-2. 查找最新版本的 `.whl` 文件喵
-3. 复制链接并使用以下命令安装喵：
+1. 查看[Actions](https://github.com/wms26/Phi-CloudAction-python/actions)喵
+2. 查找最新的**工作流**喵,点进去喵
+3. 查找 `.whl` 文件喵
+4. 复制链接并使用以下命令安装喵：
 ```bash
 pip install <whl_url>
 ```
@@ -98,7 +99,7 @@ python -m phi_cloud_action.webapi
   - [x] ~~将各功能模块化喵~~(更方便使用喵)
   - [x] ~~存档历史记录~~(使用示例已经在`example.py`里面了喵，会检查存档是否有新记录喵，存在新记录时会进行保存存档和其他信息喵。往后可能会用上喵)
   - [x] ~~taptap扫码授权获取sessionToken~~(已经发在release中了喵，在[**这里**](https://github.com/wms26/Phi-CloudAction-python/releases/tag/QR-GST_v1.0)喵)
-  - [x] ~~WebAPI~~(点[**这里**](https://github.com/Shua-github/Phi-CloudAction-python#WebAPI喵)查看教程喵)
+  - [x] ~~WebAPI~~(点[**这里**](https://github.com/wms26/Phi-CloudAction-python#WebAPI喵)查看教程喵)
   - [ ] WebGUI(可视化存档信息喵，感觉也没用喵，先咕咕咕吧喵)
   - [ ] Bot(还是咕咕咕，预计可能开新仓库来写喵！) 
 
