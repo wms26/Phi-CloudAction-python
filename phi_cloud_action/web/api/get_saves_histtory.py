@@ -1,4 +1,4 @@
-from phi_cloud_action import readSaveHistory
+from phi_cloud_action import readSaveHistory,logger
 from fastapi.responses import JSONResponse
 from .request_models import TokenRequest
 from .example import example
@@ -24,4 +24,5 @@ class get_saves_histtory(example):
                 }
                 }, status_code=200)
         except Exception as e:
+            logger.warning(repr(e))
             return JSONResponse(content={"code": 400, "status": "error", "message": str(e)}, status_code=400)

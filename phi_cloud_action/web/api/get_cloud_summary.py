@@ -1,4 +1,4 @@
-from phi_cloud_action import PhigrosCloud,unzipSave, decryptSave, formatSaveDict, getB30, checkSaveHistory
+from phi_cloud_action import PhigrosCloud,unzipSave, decryptSave, formatSaveDict, checkSaveHistory, logger
 from fastapi.responses import JSONResponse
 from .request_models import TokenRequest
 from .example import example
@@ -27,4 +27,5 @@ class get_cloud_summary(example):
 
             return JSONResponse(content={"code": 200, "status": "ok", "data": summary}, status_code=200)
         except Exception as e:
+            logger.warning(repr(e))
             return JSONResponse(content={"code": 400, "status": "error", "message": str(e)}, status_code=400)

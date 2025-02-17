@@ -4,18 +4,20 @@ from copy import deepcopy
 from datetime import datetime
 from io import BytesIO
 from json import dumps, loads
+import csv
 import warnings
 from os import mkdir
 from os.path import exists, join
 from re import match
 from zipfile import ZipFile, ZIP_DEFLATED
+import json
 
 from typing import Any, Dict, List
 
 from .AES import decrypt, encrypt
 from .Structure import getStructure, getFileHead, Reader, Writer
 from .logger import logger
-from .other import read_json,write_json,add_game_record,complete_game_record
+from .other import add_game_record,complete_game_record
 
 
 # ---------------------- 定义赋值区喵 ----------------------
@@ -60,12 +62,13 @@ SAVE_LIST = [
 ]
 
 
-def checkSessionToken(sessionToken: str):
+def checkSessionToken(sessionToken: str,log_switch:bool = True):
     """
     检查sessionToken格式是否合法喵
 
     参数:
         sessionToken (str): 玩家的sessionToken喵
+        log_switch (bool): 是否开启日志输出,默认为开
 
     返回:
         (bool): 是否合法喵
@@ -84,37 +87,77 @@ def checkSessionToken(sessionToken: str):
         )
 
     else:
-        logger.debug(f"sessionToken正确喵：{sessionToken}")
+        if log_switch:
+            logger.debug(f"sessionToken正确喵：{sessionToken}")
         return True
 
+# 读取定数文件喵
+def readDifficultyFile(path: str = "./info/difficulty.tsv") -> Dict[str, List[float]]:
+    if path.endswith('.tsv'):
+        return readFile.difficulty_tsv(path)
+    elif path.endswith('.csv'):
+        return readFile.difficulty_csv(path)
+    else:
+        raise ValueError("定数文件应该是.tsv或.csv")
+    
+class readFile():
+    
+    # 读取json喵
+    @staticmethod
+    def json(path: str) -> Dict:
+        """
+        从 JSON 文件读取数据喵~
+        """
+        with open(path, 'r', encoding='utf-8') as file:
+            return json.load(file)
+        
+    # 读取tsv定数
+    @staticmethod
+    def difficulty_tsv(path: str) -> Dict[str, List[float]]:
+        """
+        读取难度文件喵
 
-def readDifficultyFile(
-    path: str = "./info/difficulty.tsv",
-) -> Dict[str, List[float]]:
-    """
-    读取难度文件喵
+        参数:
+            path (str): 难度文件路径喵
 
-    参数:
-        path (str): 难度文件路径喵
+        返回:
+            (dict[str, list[float]]): 难度数据喵。以歌曲id为键，值为单曲难度列表喵
+        """
+        difficulty_list = {}
 
-    返回:
-        (dict[str, list[float]]): 难度数据喵。以歌曲id为键，值为单曲难度列表喵
-    """
-    difficulty_list = {}
-    with open(path, encoding="UTF-8") as f:  # 打开难度列表文件喵
-        lines = f.readlines()  # 解析所有行，输出一个列表喵
+        with open(path, encoding="UTF-8", newline='') as f:  # 打开难度列表文件喵
+            reader = csv.reader(f, delimiter="\t")  # 使用csv.reader并设置分隔符为tab
+            for row in reader:
+                song_id = row[0]
+                diff = [float(value) for value in row[1:]]  # 转换后面的难度值为float并存入列表
+                difficulty_list[song_id] = diff  # 将歌曲id和难度列表存入字典
 
-    for line in lines:  # 遍历所有行喵
-        # 将该行最后的"\n"截取掉，并以"\t"为分隔符解析为一个列表喵
-        line = line[:-1].split("\t")
-        diff = []  # 用来存储单首歌的难度信息喵
+        return difficulty_list  # 返回解析出来的各歌曲难度列表喵
+    
+    # 读取csv定数
+    @staticmethod
+    def difficulty_csv(path: str = "./info/difficulty.csv") -> Dict[str, List[float]]:
+        """
+        读取带有标题行的难度文件喵。
 
-        for i in range(1, len(line)):  # 遍历该行后面的那三个难度值喵
-            diff.append(float(line[i]))  # 将难度添加到列表中喵
-        difficulty_list[line[0]] = diff  # 与总列表拼接在一起喵
+        参数:
+            path (str): 难度文件路径喵
 
-    return difficulty_list  # 返回解析出来的各歌曲难度列表喵
+        返回:
+            (dict[str, list[float]]): 难度数据。以歌曲ID为键，值为单曲难度列表
+        """
+        difficulty_list = {}
 
+        with open(path, encoding="UTF-8") as f:
+            reader = csv.reader(f, delimiter=',')  # 使用csv库读取文件
+            next(reader)  # 跳过标题行
+
+            for row in reader:
+                song_id = row[0]  # 获取歌曲ID
+                diff_values = [float(x) for x in row[1:] if x]  # 忽略空值
+                difficulty_list[song_id] = diff_values
+
+        return difficulty_list
 
 def unzipFile(zip_data: bytes, filename: str):
     """
@@ -457,8 +500,8 @@ def readSaveHistory(sessionToken:str) -> savesHistory:
     summaryHistory_path = f"saveHistory/{sessionToken}/summaryHistory.json"
     if not exists(recordHistory_path) or not exists(summaryHistory_path):
         raise RuntimeError("存档不存在喵!")
-    recordHistory:dict = read_json(recordHistory_path)
-    summaryHistory:dict = read_json(summaryHistory_path)
+    recordHistory:dict = readFile.json(recordHistory_path)
+    summaryHistory:dict = readFile.json(summaryHistory_path)
     return savesHistory(record=recordHistory,summary=summaryHistory)
 
 def checkSaveHistory(

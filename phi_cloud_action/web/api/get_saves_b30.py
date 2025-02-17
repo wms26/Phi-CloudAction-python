@@ -28,5 +28,5 @@ class get_saves_b30(example):
 
             return JSONResponse(content={"code": 200,"status": "ok", "data": {"rks":rks,"b30":{"p3":b30.p3,"b27":b30.b27}}}, status_code=200)
         except Exception as e:
-            logger.error(e)
+            logger.warning(repr(e))
             return JSONResponse(content={"code": 400, "status": "error", "message": str(e)}, status_code=400)

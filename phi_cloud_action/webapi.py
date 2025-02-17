@@ -12,8 +12,6 @@ from importlib.resources import files  # 导入 importlib.resources 喵~
 import inspect
 from .web.api.example import example
 from phi_cloud_action import logger
-from pydantic import BaseModel
-
 
 # 重写 argparse.ArgumentParser 类，修改帮助信息的显示格式喵~
 class CustomArgumentParser(argparse.ArgumentParser):
@@ -155,33 +153,28 @@ def register_routes(app: FastAPI, interface_class):
 
 # 主程序入口喵~
 if __name__ == '__main__':
-    try:
-        manager: ConfigManager = ConfigManager()
-        config = manager.config
-        # FastAPI 实例喵~
-        app = FastAPI()
+    manager: ConfigManager = ConfigManager()
+    config = manager.config
+    # FastAPI 实例喵~
+    app = FastAPI()
 
-        # 配置 CORS 喵~
-        if config.CORS_switch:  # 根据 CORS 配置中的开关进行判断
-            app.add_middleware(
-                CORSMiddleware,
-                allow_origins=config.CORS_allow_origins,
-                allow_credentials=config.CORS_allow_credentials,
-                allow_methods=config.CORS_allow_methods, 
-                allow_headers=config.CORS_allow_headers,  
-            )
-        
-        # 配置路由喵~
-        from .web import api
-        register_routes(app,api)
+    # 配置 CORS 喵~
+    if config.CORS_switch:  # 根据 CORS 配置中的开关进行判断
+        app.add_middleware(
+            CORSMiddleware,
+            allow_origins=config.CORS_allow_origins,
+            allow_credentials=config.CORS_allow_credentials,
+            allow_methods=config.CORS_allow_methods, 
+            allow_headers=config.CORS_allow_headers,  
+        )
+    
+    # 配置路由喵~
+    from .web import api
+    register_routes(app,api)
 
-        # 输出配置信息喵~
-        logger.info(f"监听主机: {config.host}, 端口: {config.port} 喵~")
-        logger.info(f"配置文件路径喵~: {manager.config_path}")
+    # 输出配置信息喵~
+    logger.info(f"监听主机: {config.host}, 端口: {config.port} 喵~")
+    logger.info(f"配置文件路径喵~: {manager.config_path}")
 
-        # 启动 FastAPI Web 服务喵~
-        run(app, host=config.host, port=config.port)
-
-    except Exception as e:
-        logger.error(f"发生错误喵~: {e}")
-        exit(1)
+    # 启动 FastAPI Web 服务喵~
+    run(app, host=config.host, port=config.port)

@@ -69,8 +69,12 @@ python -m phi_cloud_action.webapi
 ```
 会启动``FastAPI``服务器喵,默认监听地址是[``http://127.0.0.1:8000``](http://127.0.0.1:8000),可以查看``FastAPI``的[文档](http://127.0.0.1:8000/docs),监听路径在``/docs``和``/redoc``
 
-### 各函数功能使用方法喵：
+### 各功能使用方法喵：
 
+#### (暂不推荐)**WebAPI**喵!
+点[**这里**](https://github.com/wms26/Phi-CloudAction-python#WebAPI喵),查看``FastAPI``自带的文档也许都能理解怎么用了罢喵~
+
+#### 手动调用函数喵!
 看``example``目录下的文件吧喵,用上了主要功能，看注释也许都能理解怎么用了罢喵~
 
 ## 未来计划功能喵！
@@ -94,19 +98,22 @@ python -m phi_cloud_action.webapi
 
 - [ ] **其他喵：**
   - [x] ~~获取本地SessionToken喵~~(点[**这里**](https://github.com/wms26/Phi-CloudAction-python/releases/tag/GST_v1.1)来下载喵)
-  - [x] ~~计算b19喵！~~
+  - [x] ~~计算b19喵！~~ ~~是b30了~~
   - [x] ~~将各功能模块化喵~~(更方便使用喵)
-  - [x] ~~存档历史记录~~(使用示例已经在`example.py`里面了喵，会检查存档是否有新记录喵，存在新记录时会进行保存存档和其他信息喵。往后可能会用上喵)
+  - [x] ~~存档历史记录~~(使用示例已经在`example`目录里面了喵，会检查存档是否有新记录喵，存在新记录时会进行保存存档和其他信息喵。~~往后可能会用上喵~~,已经用上了)
   - [x] ~~taptap扫码授权获取sessionToken~~(已经发在release中了喵，在[**这里**](https://github.com/wms26/Phi-CloudAction-python/releases/tag/QR-GST_v1.0)喵)
   - [x] ~~WebAPI~~(点[**这里**](https://github.com/wms26/Phi-CloudAction-python#WebAPI喵)查看教程喵)
+  - [x] ~~更新难度定数文件~~
   - [ ] WebGUI(可视化存档信息喵，感觉也没用喵，先咕咕咕吧喵)
   - [ ] Bot(还是咕咕咕，预计可能开新仓库来写喵！) 
+  - [ ] 更新PCA本体(还是咕咕,没精力~~写爬虫~~了喵)
+  - [ ] 完整的`Pytest`的自动化测试(还是咕咕,没精力了喵)
 
 ## 喵喵喵~
 
 此项目云端操作的思路源于[文酱](https://github.com/7aGiven)的项目[PhigrosLibrary](https://github.com/7aGiven/PhigrosLibrary)喵(本文档前面也留了链接喵)(快说“谢谢文酱！”)
 
-喵！小小宣传一下[废酱](https://github.com/Catrong)的项目[Phi-Plugin](https://github.com/catrong/phi-plugin)，是一个适用于`Yunzai-Bot V3`的`Phigros`辅助插件喵！(本文档前面也留了链接喵)
+喵！小小宣传一下[废酱](https://github.com/Catrong)的项目[Phi-Plugin](https://github.com/catrong/phi-plugin)，[Koishi版](https://github.com/catrong/phi-plugin-koishi), 是一个适用于`Yunzai-Bot V3`和`Koishi`的`Phigros`辅助插件喵！(本文档前面也留了链接喵)
 
 介于本喵懒惰的性格和本项目的特殊性喵，本项目也许应该可能大概会在未来也可能在现在某个时间突然停更或者消失喵(bushi)
 
@@ -115,6 +122,16 @@ python -m phi_cloud_action.webapi
 (快去给[文酱](https://github.com/7aGiven)和[废酱](https://github.com/Catrong)的项目点star喵！)
 
 ## 更新日志喵：
+
+### 2025/02/18(v1.5.1):
+针对用户:
+1. 修复许多bng
+2. 添加``更新难度定数文件``功能
+3. 支持废酱的`.csv`难度定数文件
+
+针对开发者:
+1. 添加环境变量,以后可以~~不用手动改`example.py`文件了~~自动检测开发环境并调整到正确的目录
+2. 初步添加`Pytest`的测试功能,暂未实装
 
 ### 2025/02/16(v1.5.0):
 1. 改成包分发,原有项目``pip``安装完后把``PhiCloudLib``改成``phi_cloud_action``即可
