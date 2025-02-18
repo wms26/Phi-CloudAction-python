@@ -223,15 +223,18 @@ def extract_whl_urls(repo_url: str, github_token: str = None) -> List[str]:
 
     return whl_links
 
-def extract_version_from_url(url):
+def extract_version_from_url(url:str):
     """
     从whl文件的url中提取版本号
-    假设文件名格式为：phi_cloud_action-1.5.1-py3-none-any.whl
+    假设文件名格式为：phi_cloud_action-1.5.1.1b0-whl
     """
-    # 使用正则提取版本号
-    match = re.search(r'-(\d+\.\d+\.\d+)-py', url)
+    # 去掉前后空格和换行符
+    url = url.strip()
+    
+    # 使用正则提取版本号，支持带有后缀（如b、rc等）的版本号
+    match = re.search(r'-(\d+\.\d+\.\d+[\.\d\w]*)$', url)
     if match:
-        return match.group(1)
+        return match.group(1).strip()
     return None
 
 # 难度定数表下载源
