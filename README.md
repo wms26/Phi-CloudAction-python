@@ -48,11 +48,30 @@
 
 ### 安装喵!
 
+#### 方法1
 1. 查看[Releases](https://github.com/wms26/Phi-CloudAction-python/releases)喵
 2. 查找最新版本的 `.whl` 文件喵
 3. 复制链接并使用以下命令安装喵：
 ```bash
 pip install <whl_url>
+```
+
+#### 方法2
+1. 安装 [pdm](https://pdm.fming.dev/) 喵
+```bash
+pip install pdm
+```
+2. 克隆仓库喵
+```bash
+git clone https://github.com/wms26/Phi-CloudAction-python.git
+```
+3. 进入项目目录喵
+```bash
+cd Phi-CloudAction-python
+```
+4. 使用 pdm 安装依赖喵
+```bash
+pdm install
 ```
 
 ### 拷贝依赖和示例喵!
@@ -67,7 +86,13 @@ python -m phi_cloud_action
 ```bash
 python -m phi_cloud_action.webapi
 ```
-会启动``FastAPI``服务器喵,默认监听地址是[``http://127.0.0.1:8000``](http://127.0.0.1:8000),可以查看``FastAPI``的[文档](http://127.0.0.1:8000/docs),监听路径在``/docs``和``/redoc``
+
+#### 方法2可以使用:
+```bash
+pdm run start
+```
+
+会启动``FastAPI``服务器喵,默认监听地址是[``http://127.0.0.1:8000``](http://127.0.0.1:8000),可以查看``FastAPI``的[文档](http://127.0.0.1:8000/docs),监听路径在``/docs``和``/redoc``,可以通过``-c``来指定配置路径
 
 ### 各功能使用方法喵：
 
@@ -102,12 +127,16 @@ python -m phi_cloud_action.webapi
   - [x] ~~将各功能模块化喵~~(更方便使用喵)
   - [x] ~~存档历史记录~~(使用示例已经在`example`目录里面了喵，会检查存档是否有新记录喵，存在新记录时会进行保存存档和其他信息喵。~~往后可能会用上喵~~,已经用上了)
   - [x] ~~taptap扫码授权获取sessionToken~~(已经发在release中了喵，在[**这里**](https://github.com/wms26/Phi-CloudAction-python/releases/tag/QR-GST_v1.0)喵)
-  - [x] ~~WebAPI~~(点[**这里**](https://github.com/wms26/Phi-CloudAction-python#WebAPI喵)查看教程喵)
   - [x] ~~更新难度定数文件~~
-  - [ ] WebGUI(可视化存档信息喵，感觉也没用喵，先咕咕咕吧喵)
+  - [x] 更新``PCA``本体,还在测试中
   - [ ] Bot(还是咕咕咕，预计可能开新仓库来写喵！) 
-  - [ ] 更新PCA本体(还是咕咕,没精力~~写爬虫~~了喵)
   - [ ] 完整的`Pytest`的自动化测试(还是咕咕,没精力了喵)
+
+- [ ] Web喵!
+  - [x] API(部分实现,点[**这里**](https://github.com/wms26/Phi-CloudAction-python#WebAPI喵)查看教程喵)
+  - [ ] GUI(可视化存档信息喵，~~感觉也没用喵，先咕咕咕吧喵~~,不太会前端)
+  - [ ] 通过API更新PCA本体(还是咕咕,没精力~~?~~了喵)
+  - [ ] API集成[Phi-Login](https://www.tomato-aoarasi.com/phi-login/)和[PhiLogin](https://github.com/7aGiven/PhiLogin) (咕咕,没时间了喵)
 
 ## 喵喵喵~
 
@@ -122,6 +151,10 @@ python -m phi_cloud_action.webapi
 (快去给[文酱](https://github.com/7aGiven)和[废酱](https://github.com/Catrong)的项目点star喵！)
 
 ## 更新日志喵：
+
+### 2025/02/18(v1.5.2):
+针对用户:
+1. 添加``更新PCA本体``功能,但是处于测试阶段,不保证可用性
 
 ### 2025/02/18(v1.5.1):
 针对用户:

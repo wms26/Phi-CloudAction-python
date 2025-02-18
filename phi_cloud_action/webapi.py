@@ -151,8 +151,8 @@ def register_routes(app: FastAPI, interface_class):
                         # 将该方法注册到 FastAPI
                         app.add_api_route(instance.route_path, instance, methods=instance.methods)
 
-# 主程序入口喵~
-if __name__ == '__main__':
+# 启动程序
+def main():
     manager: ConfigManager = ConfigManager()
     config = manager.config
     # FastAPI 实例喵~
@@ -178,3 +178,7 @@ if __name__ == '__main__':
 
     # 启动 FastAPI Web 服务喵~
     run(app, host=config.host, port=config.port)
+    
+# 主程序入口喵~
+if __name__ == '__main__':
+    main()

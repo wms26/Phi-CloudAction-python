@@ -17,35 +17,30 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v4
 
-    # 设置 Python 环境
-    - name: Set up Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: '3.12'  # 可以根据需要选择特定版本
-        architecture: 'x64'
-        
-
     # 安装 PDM
-    - name: Install PDM
-      run: |
-        python -m pip install --upgrade pip
-        pip install pdm
+    - name: Setup PDM
+      uses: pdm-project/setup-pdm@v4
+      with:
+        python-version: 3.12
+        cache: true
 
     # 安装依赖
     - name: Install dependencies
-      run: |
-        pdm install
+      run: pdm install
 
     # 生成构建（如果你使用 PDM 构建分发包）
     - name: Build distribution
       run: |
         pdm build
 
-    # 上传构建产物到 GitHub Artifacts（如果需要）
-    - name: Upload distribution
+    - name: Upload *.whl
       uses: actions/upload-artifact@v4
       with:
-        name: distribution
-        path: |
-            **/*.whl
-            **/*.tar.gz
+        name: package.whl
+        path: dist/*.whl
+
+    - name: Upload *.tar.gz
+      uses: actions/upload-artifact@v4
+      with:
+        name: package.tar.gz
+        path: dist/*.tar.gz
