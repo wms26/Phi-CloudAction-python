@@ -1,6 +1,6 @@
 [project]
 name = "phi_cloud_action"
-version = "1.5.1.1b1"
+version = "1.5.1.1b2"
 description = "使用Python实现的Phigros云端数据操作"
 authors = [
     {name = "wms26", email = "2652015696@qq.com"},
