@@ -3,8 +3,7 @@
 from sys import argv
 
 from phi_cloud_action import (
-    Update,
-    extract_whl_urls
+    Update
 )
 
 
@@ -36,4 +35,4 @@ SOURCE_INFO = {
 # ----------------------- 运行区喵 -----------------------
 if __name__ == "__main__":
     Update.info(source,3,SOURCE_INFO)
-    print(extract_whl_urls("https://github.com/Shua-github/Phi-CloudAction-python/"))
+    Update.pca()
