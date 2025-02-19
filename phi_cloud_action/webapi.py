@@ -1,7 +1,7 @@
 import argparse
 import os
 from pathlib import Path
-from typing import Dict, Any, Union, Optional
+from typing import Dict, Any, Union, Optional,Type
 from yaml import safe_load
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -12,6 +12,7 @@ from importlib.resources import files  # 导入 importlib.resources 喵~
 import inspect
 from .web.api.example import example
 from phi_cloud_action import logger
+from .utils import get_dev_mode
 
 # 重写 argparse.ArgumentParser 类，修改帮助信息的显示格式喵~
 class CustomArgumentParser(argparse.ArgumentParser):
@@ -138,25 +139,34 @@ class ConfigManager:
                 raise RuntimeError(f"配置文件初始化失败喵~: {str(e)}")
 
 # 注册路由
-def register_routes(app: FastAPI, interface_class):
+def register_routes(app: FastAPI, interface_class: Type[example]):
+    # 首先按路径优先级排序
+    route_classes = []
+
+    # 获取类中的所有接口
     for name, obj in inspect.getmembers(interface_class):
         if inspect.isclass(obj):  # 如果是类
-            # 获取类中的方法，并判断其是否有 __call__ 方法
             for method_name, method_obj in inspect.getmembers(obj):
                 if method_name == "__call__" and inspect.isfunction(method_obj):
-                    # 获取该类的实例
-                    instance:example = obj()
-                    # 获取 HTTP 方法（例如 POST, GET）和路径（例如 /get/cloud/saves）
+                    instance: example = obj()
+                    # 获取 HTTP 方法和路径
                     if hasattr(instance, "route_path") and hasattr(instance, "methods"):
-                        # 将该方法注册到 FastAPI
-                        app.add_api_route(instance.route_path, instance, methods=instance.methods)
+                        route_classes.append(instance)
+
+    # 排序路由，确保静态路径（例如`/get/token/login`）优先注册
+    route_classes.sort(key=lambda x: (x.route_path.find("{") != -1, len(x.route_path)))
+
+    # 注册路由
+    for instance in route_classes:
+        logger.debug(f"注册模块:{instance}")
+        app.add_api_route(instance.route_path, instance, methods=instance.methods)
 
 # 启动程序
 def main():
     manager: ConfigManager = ConfigManager()
     config = manager.config
     # FastAPI 实例喵~
-    app = FastAPI()
+    app = FastAPI(debug=get_dev_mode())
 
     # 配置 CORS 喵~
     if config.CORS_switch:  # 根据 CORS 配置中的开关进行判断

@@ -128,15 +128,15 @@ pdm run start
   - [x] ~~存档历史记录~~(使用示例已经在`example`目录里面了喵，会检查存档是否有新记录喵，存在新记录时会进行保存存档和其他信息喵。~~往后可能会用上喵~~,已经用上了)
   - [x] ~~taptap扫码授权获取sessionToken~~(已经发在release中了喵，在[**这里**](https://github.com/wms26/Phi-CloudAction-python/releases/tag/QR-GST_v1.0)喵)
   - [x] ~~更新难度定数文件~~
-  - [x] 更新``PCA``本体,还在测试中
+  - [x] ~~更新``PCA``本体~~
   - [ ] Bot(还是咕咕咕，预计可能开新仓库来写喵！) 
   - [ ] 完整的`Pytest`的自动化测试(还是咕咕,没精力了喵)
 
 - [ ] Web喵!
   - [x] API(部分实现,点[**这里**](https://github.com/wms26/Phi-CloudAction-python#WebAPI喵)查看教程喵)
   - [ ] GUI(可视化存档信息喵，~~感觉也没用喵，先咕咕咕吧喵~~,不太会前端)
-  - [ ] 通过API更新PCA本体(还是咕咕,没精力~~?~~了喵)
-  - [ ] API集成[Phi-Login](https://www.tomato-aoarasi.com/phi-login/)和[PhiLogin](https://github.com/7aGiven/PhiLogin) (咕咕,没时间了喵)
+  - [ ] 通过API更新PCA本体(还是咕咕~~,没精力了~~喵)
+  - [ ] API集成[Phi-Login](https://www.tomato-aoarasi.com/phi-login/)和[PhiLogin](https://github.com/7aGiven/PhiLogin) (咕咕,可能出bng了,还在修)
 
 ## 喵喵喵~
 
@@ -151,6 +151,11 @@ pdm run start
 (快去给[文酱](https://github.com/7aGiven)和[废酱](https://github.com/Catrong)的项目点star喵！)
 
 ## 更新日志喵：
+
+### 2025/02/18(v1.5.2b):
+针对用户:
+1. 添加``通过API更新INFO文件``功能
+2. ``更新PCA本体``能用了?
 
 ### 2025/02/18(v1.5.1.1b):
 针对用户:

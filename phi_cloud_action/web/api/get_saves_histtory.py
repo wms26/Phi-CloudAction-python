@@ -7,7 +7,6 @@ class get_saves_histtory(example):
     def __init__(self):
         self.route_path = "/get/saves/histtory"
         self.methods = ["POST"]
-        super().__init__()
 
     def __call__(self, request:TokenRequest) -> JSONResponse:
         try:

@@ -8,14 +8,13 @@ import requests
 from tqdm import tqdm
 from ..utils import get_info_dir
 import subprocess
-import pkg_resources
+import importlib.metadata
 import sys
 from packaging import version
 import re
 from github import Github, RateLimitExceededException
 import time
 from datetime import datetime
-
 
 # ---------------------- 定义赋值区喵 ----------------------
 
@@ -282,10 +281,11 @@ class Update:
         返回：
             (bool) 是否成功
         """
+        
         # 获取当前安装的版本
         try:
-            current_version = pkg_resources.get_distribution(package_name).version
-        except pkg_resources.DistributionNotFound:
+            current_version = importlib.metadata.version(package_name)
+        except importlib.metadata.PackageNotFoundError:
             current_version = None  # 如果没有安装该包，设置为 None
 
         release_links = extract_whl_urls(repo_url,github_token)
@@ -311,5 +311,7 @@ class Update:
             return False
 
         # 使用 pip 安装 .whl 文件
+        logger.info(f"开始更新,当前版本:{current_version},目标版本:{release_version}")
         subprocess.check_call([sys.executable, "-m", "pip", "install", download_url])
+        logger.info("更新完成!")
         return True
