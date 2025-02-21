@@ -16,9 +16,8 @@ class update_info(example):
         # 路由路径和请求方法
         self.route_path = "/update/info"
         self.methods = ["GET", "POST"]
-        self.__name__ = "update_info" # FastAPI的奇怪兼容性
 
-    def __call__(self, source: str = Query(None), body: boby = Body(None), max_retries: int = 3):
+    def api(self, source: str = Query(...), body: boby = Body(None), max_retries: int = 3):
         try:
             # 获取请求中的源信息，Pydantic会自动进行验证喵~
             source_info = body.source_info  # 通过Pydantic的model来获取 source_info 喵~

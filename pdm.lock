@@ -5,7 +5,7 @@
 groups = ["default", "dev"]
 strategy = ["inherit_metadata"]
 lock_version = "4.5.0"
-content_hash = "sha256:a91694f325688a9a9adf368237d816d1246d3fd7efacddfb95325fbb77717194"
+content_hash = "sha256:d6d2b638e1bb7add3e097c340ccb6d3342f1301e6e983b6fca3a8f733992574d"
 
 [[metadata.targets]]
 requires_python = ">=3.8"
@@ -648,6 +648,16 @@ files = [
     {file = "PyNaCl-1.5.0-cp36-abi3-win32.whl", hash = "sha256:e46dae94e34b085175f8abb3b0aaa7da40767865ac82c928eeb9e57e1ea8a543"},
     {file = "PyNaCl-1.5.0-cp36-abi3-win_amd64.whl", hash = "sha256:20f42270d27e1b6a29f54032090b972d97f0a1b0948cc52392041ef7831fee93"},
     {file = "PyNaCl-1.5.0.tar.gz", hash = "sha256:8ac7448f09ab85811607bdd21ec2464495ac8b7c66d146bf545b0f08fb9220ba"},
+]
+
+[[package]]
+name = "pyqrcode"
+version = "1.2.1"
+summary = "A QR code generator written purely in Python with SVG, EPS, PNG and terminal output."
+groups = ["default"]
+files = [
+    {file = "PyQRCode-1.2.1.tar.gz", hash = "sha256:fdbf7634733e56b72e27f9bce46e4550b75a3a2c420414035cae9d9d26b234d5"},
+    {file = "PyQRCode-1.2.1.zip", hash = "sha256:1b2812775fa6ff5c527977c4cd2ccb07051ca7d0bc0aecf937a43864abe5eff6"},
 ]
 
 [[package]]

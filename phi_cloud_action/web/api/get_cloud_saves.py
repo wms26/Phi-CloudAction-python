@@ -8,7 +8,7 @@ class get_cloud_saves(example):
         self.route_path = "/get/cloud/saves"
         self.methods = ["POST"]
 
-    def __call__(self, request: TokenRequest) -> JSONResponse:
+    def api(self, request: TokenRequest) -> JSONResponse:
         try:
             # 获取存档
             temp = self.get_saves(request.token)

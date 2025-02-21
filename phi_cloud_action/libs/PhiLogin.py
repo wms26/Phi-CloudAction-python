@@ -31,7 +31,7 @@ def mac(token):
     
     return f"MAC id=\"{token['kid']}\",ts=\"{ts}\",nonce=\"{nonce}\",mac=\"{mac_base64}\""
 
-def login(device_id):
+def login(device_id:str):
     url = "https://www.taptap.com/oauth2/v1/device/code"
     payload = f"client_id=rAK3FfdieFob2Nn8Am&response_type=device_code&scope=basic_info&version=1.2.0&platform=unity&info=%7b%22device_id%22%3a%22{device_id}%22%7d"
     
@@ -40,8 +40,8 @@ def login(device_id):
     
     return json_response['data']
 
-def get_token(device_code, device_id):
-    url = "https://www.taptap.com/oauth2/v1/token"
+def get_token(device_code:str, device_id:str):
+    url = "https://www.taptap.cn/oauth2/v1/token"
     payload = f"grant_type=device_token&client_id=rAK3FfdieFob2Nn8Am&secret_type=hmac-sha-1&code={device_code}&version=1.0&platform=unity&info=%7b%22device_id%22%3a%22{device_id}%22%7d"
     
     response = share.client.post(url, headers=share.tap_headers, data=payload)
@@ -57,7 +57,7 @@ def get_token(device_code, device_id):
     return user_info
 
 def get_account_info(token):
-    url = "https://openapi.taptap.com/account/basic-info/v1?client_id=rAK3FfdieFob2Nn8Am"
+    url = "https://open.tapapis.cn/account/basic-info/v1?client_id=rAK3FfdieFob2Nn8Am"
     headers = share.tap_headers.copy()
     headers['Authorization'] = mac(token)
     
@@ -84,4 +84,5 @@ def register_user(token, account):
     })
     
     response = share.client.post(url, headers=headers, data=payload)
-    return response.text
+    resp_json = response.json()
+    return resp_json

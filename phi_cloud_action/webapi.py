@@ -1,18 +1,20 @@
 import argparse
 import os
 from pathlib import Path
-from typing import Dict, Any, Union, Optional,Type
-from yaml import safe_load
+from typing import List,Type,Optional
+from pydantic import BaseModel, Field , ValidationError
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from uvicorn import run
 import platform
-import shutil  # 用于文件复制喵~
-from importlib.resources import files  # 导入 importlib.resources 喵~
-import inspect
+import shutil
+from importlib.resources import files
 from .web.api.example import example
 from phi_cloud_action import logger
 from .utils import get_dev_mode
+import inspect
+from yaml import safe_load
+import re
 
 # 重写 argparse.ArgumentParser 类，修改帮助信息的显示格式喵~
 class CustomArgumentParser(argparse.ArgumentParser):
@@ -21,49 +23,47 @@ class CustomArgumentParser(argparse.ArgumentParser):
         help_text = self.format_help()
         
         # 去除短选项和长选项之间的空格
-        help_text = help_text.replace('-c ,', '-c,').replace('--config ', '--config')
+        help_text = help_text.replace('-c ,', '-c,').replace('--config', '--config ')
         
         # 输出修改后的帮助信息
         self._print_message(help_text, *args, **kwargs)
 
-# 配置类喵~
-class Config:
-    def __init__(self, host: str, port: int, cors_switch: bool, cors_allow_origins: list, cors_allow_credentials: bool, cors_allow_methods: list, cors_allow_headers: list) -> None:
-        self.host = host
-        self.port = port
-        self.CORS_switch = cors_switch
-        self.CORS_allow_origins = cors_allow_origins
-        self.CORS_allow_credentials = cors_allow_credentials
-        self.CORS_allow_methods = cors_allow_methods
-        self.CORS_allow_headers = cors_allow_headers
-        self.CORS_switch = cors_switch  # CORS 开关喵~
-        self.CORS_allow_origins = cors_allow_origins  # 允许的源喵~
-        self.CORS_allow_credentials = cors_allow_credentials  # 是否允许凭据喵~
-        self.CORS_allow_methods = cors_allow_methods  # 允许的 HTTP 方法喵~
-        self.CORS_allow_headers = cors_allow_headers  # 允许的 HTTP 头喵~
+# 配置类 (使用 Pydantic)
+class RoutesConfig(BaseModel):
+    allow_routes: set[str] = None
+    ban_routes: set[str] = None
 
-    @classmethod
-    def from_dict(cls, config_dict: Dict[str, Any]) -> "Config":
-        """从字典创建 Config 实例喵~"""
-        server_config: Dict[str, Any] = config_dict.get('net')
-        host: str = server_config.get('host')
-        port: int = server_config.get('port')
-        cors: dict = server_config.get('cors')
-        cors_switch: bool = cors.get('switch')
-        cors_config: dict = cors.get('config')
-        cors_allow_origins: list = cors_config.get('allow_origins')
-        cors_allow_credentials: bool = cors_config.get('allow_credentials')
-        cors_allow_methods: list = cors_config.get('allow_methods')
-        cors_allow_headers: list = cors_config.get('allow_headers')
-        return cls(host, port, cors_switch, cors_allow_origins, cors_allow_credentials, cors_allow_methods, cors_allow_headers)
 
-# 配置管理器喵~
+class CORSConfig(BaseModel):
+    switch: bool = Field(..., alias="CORS_switch")
+    allow_origins: List[str] = Field(..., alias="CORS_allow_origins")
+    allow_credentials: bool = Field(..., alias="CORS_allow_credentials")
+    allow_methods: List[str] = Field(..., alias="CORS_allow_methods")
+    allow_headers: List[str] = Field(..., alias="CORS_allow_headers")
+
+
+class ServerConfig(BaseModel):
+    host: str
+    port: int
+    cors: CORSConfig
+    routes: RoutesConfig = None
+
+
+class Config(BaseModel):
+    net: ServerConfig
+
+
+# 配置管理器
 class ConfigManager:
     @staticmethod
     def get_default_dir() -> Path:
         """获取默认配置文件目录喵~"""
         package_name = 'phi_cloud_action'
         system: str = platform.system()
+
+        if get_dev_mode():
+            return Path.cwd() / package_name / "data"
+    
         if system == 'Windows':
             appdata: Optional[str] = os.getenv('APPDATA')
             if appdata:
@@ -73,14 +73,13 @@ class ConfigManager:
         else:
             return Path.home() / '.config' / package_name
 
-    DEFAULT_DIR: Path = get_default_dir()
-    CONFIG_FILE: str = 'RunConfig.yml'
-
     def __init__(self) -> None:
         self.args: argparse.Namespace = self._parse_args()
         self.config_path: Path = self._get_config_path()
-        self._ensure_config_file_exists()  # 确保配置文件存在喵~
         self.config: Config = self._read_config()
+
+    DEFAULT_DIR: Path = get_default_dir()
+    CONFIG_FILE: str = 'RunConfig.yml'
 
     def _parse_args(self) -> argparse.Namespace:
         """解析命令行参数喵~"""
@@ -91,7 +90,6 @@ class ConfigManager:
         parser.add_argument('-c', '--config', type=str, help='自定义配置文件路径喵~', metavar="")
         return parser.parse_args()
 
-
     def _get_config_path(self) -> Path:
         """获取配置文件路径喵~"""
         if self.args.config:
@@ -101,16 +99,21 @@ class ConfigManager:
     def _read_config(self) -> Config:
         """读取并返回配置对象喵~"""
         try:
+            # 打开配置文件并读取
             with open(self.config_path, 'r', encoding="utf-8") as f:
-                config_dict: Dict[str, Any] = safe_load(f)
-
-            # 检查配置文件格式喵~
-            if 'net' not in config_dict:
-                raise ValueError("配置文件格式错误，缺少 'net' 部分喵~")
-
-            return Config.from_dict(config_dict)
+                config_dict = safe_load(f)
+            
+            # 使用 model_validate 来解析配置文件
+            return Config.model_validate(config_dict)
+        
+        except ValidationError as e:
+            logger.error("配置文件解析失败，错误信息如下：")
+            for error in e.errors():
+                logger.error(f"字段: {error['loc']}, 错误: {error['msg']}")
+            exit(1)
 
         except Exception as e:
+            # 捕获其他异常并抛出更清晰的错误信息
             raise RuntimeError(f"读取配置文件失败喵~: {str(e)}")
 
     def _ensure_config_file_exists(self) -> None:
@@ -138,57 +141,108 @@ class ConfigManager:
                 logger.error(f"配置文件初始化失败喵~: {str(e)}")
                 raise RuntimeError(f"配置文件初始化失败喵~: {str(e)}")
 
-# 注册路由
-def register_routes(app: FastAPI, interface_class: Type[example]):
-    # 首先按路径优先级排序
+
+# 路由分类
+def routes_classification(name:str) -> str:
+    if name.startswith("/get/cloud"):
+        group = "cloud"
+    elif name.startswith("/get/saves"):
+        group = "saves"
+    elif name.startswith("/update"):
+        group = "update"
+    elif name.startswith("/get/token"):
+        group = "token"
+    else:
+        group = "other"
+    
+    return group
+
+# 路由注册
+def register_routes(app: FastAPI, interface_class: Type[example], routes_config: RoutesConfig):
     route_classes = []
 
-    # 获取类中的所有接口
+    # 获取路由对象
     for name, obj in inspect.getmembers(interface_class):
-        if inspect.isclass(obj):  # 如果是类
+        if inspect.isclass(obj):
             for method_name, method_obj in inspect.getmembers(obj):
-                if method_name == "__call__" and inspect.isfunction(method_obj):
+                if method_name == "api" and inspect.isfunction(method_obj):
                     instance: example = obj()
-                    # 获取 HTTP 方法和路径
                     if hasattr(instance, "route_path") and hasattr(instance, "methods"):
                         route_classes.append(instance)
 
-    # 排序路由，确保静态路径（例如`/get/token/login`）优先注册
-    route_classes.sort(key=lambda x: (x.route_path.find("{") != -1, len(x.route_path)))
+    # 辅助排序
+    def sort_key(route_class: example):
+        return (route_class.route_path.find("{") != -1, len(route_class.route_path))
 
-    # 注册路由
+    # 排序
+    route_classes.sort(key=sort_key)
+
+    # 获取白名单和黑名单, 只有在 routes_config 不为 None 时才会进行这些检查
+    if routes_config:
+        allow_route = set(routes_config.allow_routes) if routes_config.allow_routes else None
+        ban_route = set(routes_config.ban_routes) if routes_config.ban_routes else None
+    else:
+        allow_route = ban_route = None
+
     for instance in route_classes:
-        logger.debug(f"注册模块:{instance}")
-        app.add_api_route(instance.route_path, instance, methods=instance.methods)
+        route_path = instance.route_path
+
+        # 如果黑名单为 None，则不做检查，跳过黑名单检查
+        if ban_route is not None and route_path in ban_route:
+            logger.info(f"黑名单中，跳过路由: {route_path}")
+            continue
+        
+        # 如果白名单为 None，则直接注册路由；否则检查是否在白名单中
+        if allow_route is not None and route_path not in allow_route:
+            logger.info(f"不在白名单中，跳过路由: {route_path}")
+            continue
+
+        logger.info(f"注册路由: {route_path}")
+
+        # 获取名称
+        name: str = route_path
+
+        # 分类
+        group = routes_classification(name)
+
+        # summary名称
+        title_name = re.sub(r'\{.*?\}', '', name)  # 清除{和}之间的内容
+        title_name = title_name.replace("/", " ").title()
+
+        # 注册路由
+        app.add_api_route(
+            route_path,
+            instance.api,
+            methods=instance.methods,
+            summary=title_name,
+            tags=[group]
+        )
 
 # 启动程序
 def main():
     manager: ConfigManager = ConfigManager()
-    config = manager.config
-    # FastAPI 实例喵~
+    config = manager.config.net  # 获取配置中的 net 部分
     app = FastAPI(debug=get_dev_mode())
 
-    # 配置 CORS 喵~
-    if config.CORS_switch:  # 根据 CORS 配置中的开关进行判断
+    if config.cors.switch:
         app.add_middleware(
             CORSMiddleware,
-            allow_origins=config.CORS_allow_origins,
-            allow_credentials=config.CORS_allow_credentials,
-            allow_methods=config.CORS_allow_methods, 
-            allow_headers=config.CORS_allow_headers,  
+            allow_origins=config.cors.allow_origins,
+            allow_credentials=config.cors.allow_credentials,
+            allow_methods=config.cors.allow_methods,
+            allow_headers=config.cors.allow_headers,
         )
-    
-    # 配置路由喵~
-    from .web import api
-    register_routes(app,api)
 
-    # 输出配置信息喵~
+    # 注册路由
+    from .web import api
+    register_routes(app, api, config.routes)
+
     logger.info(f"监听主机: {config.host}, 端口: {config.port} 喵~")
     logger.info(f"配置文件路径喵~: {manager.config_path}")
 
-    # 启动 FastAPI Web 服务喵~
     run(app, host=config.host, port=config.port)
-    
+
+
 # 主程序入口喵~
 if __name__ == '__main__':
     main()

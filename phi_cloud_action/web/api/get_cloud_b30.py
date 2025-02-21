@@ -11,7 +11,7 @@ class get_cloud_b30(example):
         self.route_path = "/get/cloud/b30"
         self.methods = ["POST"]
 
-    def __call__(self, request:BNumAndTokenRequest) -> JSONResponse:
+    def api(self, request:BNumAndTokenRequest) -> JSONResponse:
         try:
             # 获取存档
             temp = self.get_saves(request.token)

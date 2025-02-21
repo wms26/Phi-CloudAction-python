@@ -1,6 +1,6 @@
 [project]
 name = "phi_cloud_action"
-version = "1.5.2.1b"
+version = "1.5.3b"
 description = "使用Python实现的Phigros云端数据操作"
 authors = [
     {name = "wms26", email = "2652015696@qq.com"},
@@ -15,7 +15,8 @@ dependencies = [
     "tqdm>=4.67.1", 
     "beautifulsoup4>=4.13.3", 
     "setuptools>=75.3.0", 
-    "PyGithub>=2.6.0",
+    "PyGithub>=2.6.0", 
+    "pyqrcode>=1.2.1",
     ]
 requires-python = ">=3.8"
 readme = "README.md"
@@ -38,7 +39,7 @@ dev = [
 
 [tool.pdm.scripts]
 test = "pytest -s"  # 测试脚本
-safe_test = "pytest"
+safe_test = "pytest" # 安全测试
 dev = {call = "phi_cloud_action.webapi:main", env = {DEV = "true"} } # dev启动
 start = {call = "phi_cloud_action.webapi:main"} # 正常启动
 build = "pdm build" # 打包

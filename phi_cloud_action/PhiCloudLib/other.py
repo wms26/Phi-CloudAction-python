@@ -4,6 +4,7 @@
 from typing import Dict,Literal,Optional,List,Any
 from .logger import logger
 import os
+import pyqrcode
 import requests
 from tqdm import tqdm
 from ..utils import get_info_dir
@@ -268,7 +269,6 @@ class Update:
         update(source_data["download_urls"], source_data["save_name"], max_retries)
 
     # 更新 本体
-    # 测试中
     @staticmethod
     def pca(github_token:str = None,repo_url: str = "https://github.com/Shua-github/Phi-CloudAction-python/", package_name='phi_cloud_action'):
         """
@@ -315,3 +315,29 @@ class Update:
         subprocess.check_call([sys.executable, "-m", "pip", "install", download_url])
         logger.info("更新完成!")
         return True
+    
+def get_qr_text(data:str):
+    """
+    获取二维码文本
+
+    参数：
+        data(str) 需要生成二维码的字符串
+    返回：
+        (str) 二维码字符串
+    """
+    qr = pyqrcode.create(data, error='L')
+
+    # 获取二维码的文本图案
+    qr_str = qr.text(quiet_zone=1)  # 生成二维码文本
+
+    # 手动替换字符，使每个像素宽度为 2，高度为 1
+    expanded_qr_str = ""
+    for line in qr_str.splitlines():
+        expanded_line = ""
+        for char in line:
+            if char == '0':  # 黑色模块
+                expanded_line += "██"  # 每个黑色模块用两个“█”表示
+            else:  # 白色模块
+                expanded_line += "  "  # 每个白色模块用两个空格表示
+        expanded_qr_str += expanded_line + "\n"
+    return expanded_qr_str

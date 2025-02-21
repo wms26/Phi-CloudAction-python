@@ -68,5 +68,5 @@ class example(ABC):
         return data
         
     @abstractmethod
-    def __call__(self):
+    def api(self):
         pass

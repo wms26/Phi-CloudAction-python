@@ -2,12 +2,18 @@ net:
   host: "127.0.0.1"
   port: 8000
   cors:
-    switch: true
-    config:
-      allow_origins:
-        - "*"
-      allow_credentials: true
-      allow_methods:
-        - "*"
-      allow_headers:
-        - "*"
+    CORS_switch: true
+    CORS_allow_origins:
+      - "*"
+    CORS_allow_credentials: true
+    CORS_allow_methods:
+      - "*"
+    CORS_allow_headers:
+      - "*"
+  # 路由部分,删除开头的#就可以使用
+  #routes:
+    #allow_routes: # 白名单列表,可以去fastapi文档看路由,(比如/get/token/login)
+    # - "/get/token/login"
+    #ban_routes: # 白名单列表,可以去fastapi文档看路由,(比如/update/info)
+    # - "/update/info"
+      

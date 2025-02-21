@@ -2,7 +2,8 @@
 
 <h1>Phi-CloudAction-python</h1>
 使用python实现的phigros云端数据操作喵<br>
-注意本项目已经猫化了喵，带有大量喵元素喵，介意者勿用喵！<br><br>
+> [!WARNING]
+> 注意本项目已经猫化了喵，带有大量喵元素喵，介意者勿用喵！
 
 [![Github仓库喵](https://img.shields.io/badge/github-Phi--CA--py-red?style=for-the-badge&logo=Github)](https://github.com/wms26/Phi-CloudAction-python)
 
@@ -22,6 +23,10 @@
 
 ## 声明喵：
 
+> [!WARNING]
+> **严禁使用本项目或相关项目进行对Phigros数据库的攻击行为**，包括但不限于:
+> - 大规模查分对鸽游服务器进行DDOS
+
 **本项目仅作为学习参考用喵，请勿用作违法用途喵！(虽然我也想不到能做什么违法的事情就是了喵)**
 
 **编写本项目所需的资料和资源均源于互联网收集喵(所以本人就是一个废物喵，什么都要依靠互联网喵(bushi))**
@@ -32,17 +37,17 @@
 
 **对于本项目本喵拥有最终解释权！请不要做出让任何一个音游玩家都会十分反感的事情！**
 
-**如果你认为本项目不应该存在或者有其他问题，可以提交Issues或者发送邮件到qianqi26@616.sb，我时不时会去查看邮箱**
+**如果你认为本项目不应该存在或者有其他问题，可以提交Issues或者发送邮件到qianqi26@616.sb，我时不时会去查看**
 
 **Emmm...对于本项目有建议或者问题的请提交Issue谢谢喵~(提Issue方便往后其他有相同问题的人不会再问一遍喵)**
 
 ## 环境准备喵！
 
-1. 编写本项目时使用的是 **python3.11.8** 的喵，不能完全保证其他版本会不会出现问题喵，推荐使用 **python>=3.9** 来运行喵~(后面换成3.11.8滴喵！)
+1. 编写本项目时使用的是 **CPython3.11.8** 和 **CPython3.12.8** 的喵，不能完全保证其他版本会不会出现问题喵，推荐使用 **python>=3.9** 来运行喵~
 
 2. 云端数据获取需要phigros的云端sessionToken，获取sessionToken的方法可以参考[**Mivik的bot说明文档**](https://mivik.moe/pgr-bot-help/)里面喵！也可以用本喵用pyinstaller打包好的[**GetSession**](https://github.com/wms26/Phi-CloudAction-python/releases/tag/QR-GST_v1.0)扫码登录来获取喵！也可以使用文酱的tomato部署的[**Phi-Login**](https://www.tomato-aoarasi.com/phi-login/)喵!
 
-3. 获取存档打歌记录数据的过程会计算每首歌每个难度的rks喵，所以需要难度定数文件`difficulty.tsv`喵，本项目仓库里面已经有了喵，但不一定是最新的，获取最新的难度定数文件可以用[文酱](https://github.com/7aGiven)的项目[Phigros_Resource](https://github.com/7aGiven/Phigros_Resource)哦喵！
+3. 获取存档打歌记录数据的过程会计算每首歌每个难度的rks喵，所以需要难度定数文件`difficulty.tsv`喵，本项目仓库里面已经有了喵，但不一定是最新的，获取最新的难度定数文件可以用[文酱](https://github.com/7aGiven)的项目[Phigros_Resource](https://github.com/7aGiven/Phigros_Resource)哦喵！,也可以使用废酱的难度定数文件[phi-plugin-resources](https://github.com/Catrong/phi-plugin-resources/tree/main/info)
 
 ## 使用喵！
 
@@ -136,11 +141,13 @@ pdm run start
   - [x] API(部分实现,点[**这里**](https://github.com/wms26/Phi-CloudAction-python#WebAPI喵)查看教程喵)
   - [ ] GUI(可视化存档信息喵，~~感觉也没用喵，先咕咕咕吧喵~~,不太会前端)
   - [ ] 通过API更新PCA本体(还是咕咕~~,没精力了~~喵)
-  - [ ] API集成[Phi-Login](https://www.tomato-aoarasi.com/phi-login/)和[PhiLogin](https://github.com/7aGiven/PhiLogin) (咕咕,可能出bng了,还在修)
+  - [x] API集成[Phi-Login](https://www.tomato-aoarasi.com/phi-login/)和~~[PhiLogin](https://github.com/7aGiven/PhiLogin)~~ (完成一半,Phi-Login还没搬)
 
 ## 喵喵喵~
 
 此项目云端操作的思路源于[文酱](https://github.com/7aGiven)的项目[PhigrosLibrary](https://github.com/7aGiven/PhigrosLibrary)喵(本文档前面也留了链接喵)(快说“谢谢文酱！”)
+
+获取``token``~~完全照搬~~核心功能源自[PhiLogin](https://github.com/7aGiven/PhiLogin)喵(快说“谢谢文酱！”)
 
 喵！小小宣传一下[废酱](https://github.com/Catrong)的项目[Phi-Plugin](https://github.com/catrong/phi-plugin)，[Koishi版](https://github.com/catrong/phi-plugin-koishi), 是一个适用于`Yunzai-Bot V3`和`Koishi`的`Phigros`辅助插件喵！(本文档前面也留了链接喵)
 
@@ -152,7 +159,11 @@ pdm run start
 
 ## 更新日志喵：
 
-### 2025/02/18(v1.5.2b):
+### 2025/02/19(v1.5.3b):
+针对用户:
+1. 集成``PhiLogin``项目
+
+### 2025/02/19(v1.5.2b):
 针对用户:
 1. 添加``通过API更新INFO文件``功能
 2. ``更新PCA本体``能用了?
