@@ -4,20 +4,40 @@ from copy import deepcopy
 from datetime import datetime
 from io import BytesIO
 from json import dumps, loads
+import csv
+import warnings
 from os import mkdir
 from os.path import exists, join
 from re import match
 from zipfile import ZipFile, ZIP_DEFLATED
+import json
 
 from typing import Any, Dict, List
 
 from .AES import decrypt, encrypt
 from .Structure import getStructure, getFileHead, Reader, Writer
 from .logger import logger
+from .other import add_game_record,complete_game_record,get_info_dir
 
 
 # ---------------------- 定义赋值区喵 ----------------------
+class b30():
+    def __init__(self,p3:list,b27:list):
+        self.p3:list = p3
+        self.b27:list = b27
+        self.b30:list = p3 + b27
 
+    def __call__(self):
+        return self.b30
+    
+class savesHistory():
+    def __init__(self,summary:dict,record:dict):
+        self.summary:dict = summary
+        self.record:dict = record
+        self.saves:dict = {"summary":summary,"record":record}
+
+    def __call__(self):
+        return self.saves
 
 def debugTempFiles(
     data, mode: str = "w", filetype: str = "txt", encoding: str = "utf-8"
@@ -42,12 +62,13 @@ SAVE_LIST = [
 ]
 
 
-def checkSessionToken(sessionToken: str):
+def checkSessionToken(sessionToken: str,log_switch:bool = True):
     """
     检查sessionToken格式是否合法喵
 
     参数:
         sessionToken (str): 玩家的sessionToken喵
+        log_switch (bool): 是否开启日志输出,默认为开
 
     返回:
         (bool): 是否合法喵
@@ -66,37 +87,78 @@ def checkSessionToken(sessionToken: str):
         )
 
     else:
-        logger.debug(f"sessionToken正确喵：{sessionToken}")
+        if log_switch:
+            logger.debug(f"sessionToken正确喵：{sessionToken}")
         return True
 
+# 读取定数文件喵
 
-def readDifficultyFile(
-    path: str = "./info/difficulty.tsv",
-) -> Dict[str, List[float]]:
-    """
-    读取难度文件喵
+def readDifficultyFile(path = str(get_info_dir() / "difficulty.tsv")) -> Dict[str, List[float]]:
+    if path.endswith('.tsv'):
+        return readFile.difficulty_tsv(path)
+    elif path.endswith('.csv'):
+        return readFile.difficulty_csv(path)
+    else:
+        raise ValueError("定数文件应该是.tsv或.csv")
+    
+class readFile():
+    
+    # 读取json喵
+    @staticmethod
+    def json(path: str) -> Dict:
+        """
+        从 JSON 文件读取数据喵~
+        """
+        with open(path, 'r', encoding='utf-8') as file:
+            return json.load(file)
+        
+    # 读取tsv定数
+    @staticmethod
+    def difficulty_tsv(path: str) -> Dict[str, List[float]]:
+        """
+        读取难度文件喵
 
-    参数:
-        path (str): 难度文件路径喵
+        参数:
+            path (str): 难度文件路径喵
 
-    返回:
-        (dict[str, list[float]]): 难度数据喵。以歌曲id为键，值为单曲难度列表喵
-    """
-    difficulty_list = {}
-    with open(path, encoding="UTF-8") as f:  # 打开难度列表文件喵
-        lines = f.readlines()  # 解析所有行，输出一个列表喵
+        返回:
+            (dict[str, list[float]]): 难度数据喵。以歌曲id为键，值为单曲难度列表喵
+        """
+        difficulty_list = {}
 
-    for line in lines:  # 遍历所有行喵
-        # 将该行最后的"\n"截取掉，并以"\t"为分隔符解析为一个列表喵
-        line = line[:-1].split("\t")
-        diff = []  # 用来存储单首歌的难度信息喵
+        with open(path, encoding="UTF-8", newline='') as f:  # 打开难度列表文件喵
+            reader = csv.reader(f, delimiter="\t")  # 使用csv.reader并设置分隔符为tab
+            for row in reader:
+                song_id = row[0]
+                diff = [float(value) for value in row[1:]]  # 转换后面的难度值为float并存入列表
+                difficulty_list[song_id] = diff  # 将歌曲id和难度列表存入字典
 
-        for i in range(1, len(line)):  # 遍历该行后面的那三个难度值喵
-            diff.append(float(line[i]))  # 将难度添加到列表中喵
-        difficulty_list[line[0]] = diff  # 与总列表拼接在一起喵
+        return difficulty_list  # 返回解析出来的各歌曲难度列表喵
+    
+    # 读取csv定数
+    @staticmethod
+    def difficulty_csv(path: str = "./info/difficulty.csv") -> Dict[str, List[float]]:
+        """
+        读取带有标题行的难度文件喵。
 
-    return difficulty_list  # 返回解析出来的各歌曲难度列表喵
+        参数:
+            path (str): 难度文件路径喵
 
+        返回:
+            (dict[str, list[float]]): 难度数据。以歌曲ID为键，值为单曲难度列表
+        """
+        difficulty_list = {}
+
+        with open(path, encoding="UTF-8") as f:
+            reader = csv.reader(f, delimiter=',')  # 使用csv库读取文件
+            next(reader)  # 跳过标题行
+
+            for row in reader:
+                song_id = row[0]  # 获取歌曲ID
+                diff_values = [float(x) for x in row[1:] if x]  # 忽略空值
+                difficulty_list[song_id] = diff_values
+
+        return difficulty_list
 
 def unzipFile(zip_data: bytes, filename: str):
     """
@@ -236,55 +298,72 @@ def countRks(
 
     return record_data
 
-
-def getB19(records: dict, difficult: dict):
+def getB30(records: dict, difficult: dict,b_num: int = 27) -> b30:
     """
-    获取b19喵
+    获取b30喵
 
     参数:
         records (dict): 打歌成绩数据喵
+        difficult (dict): 歌曲难度数据喵
+        b_num (int): 返回的b的数量,不包含p3,默认为27
 
     返回:
-        (list[dict]): b19列表喵
+        (b30): b30喵,可以访问属性p3、b27和b30获得数据喵。也可以当函数使用,会返回b30
     """
     diff_list = {"EZ": 0, "HD": 1, "IN": 2, "AT": 3, "Legacy": 4}
     all_record = []  # 存储所有打歌成绩记录喵
 
-    # 深度拷贝打歌成绩数据字典喵(防止进行b19排序等操作影响到原数据喵)
+    # 深度拷贝打歌成绩数据字典喵(防止进行b30排序等操作影响到原数据喵)
     record = deepcopy(records)
 
-    # 这段代码怪复杂的喵(至少对于本喵来说喵，明明是自己写的却看不太懂喵)
     for song in record.items():  # 遍历所有歌曲记录喵
         for song_record in song[1].items():  # 遍历每首歌的所有难度记录喵
             song_record[1]["name"] = song[0]  # 取歌名添加进原数据中喵
-
-            # 将难度等级添加进原数据中喵
-            song_record[1]["level"] = song_record[0]
-
-            difficulty: float = difficult[song[0]][diff_list[song_record[0]]]
+            song_record[1]["level"] = song_record[0]  # 将难度等级添加进原数据中喵
+            if song_record[1]["acc"] < 70:  # 如果acc小于70，则跳过该记录
+                continue
+            try:
+                difficulty: float = difficult[song[0]][diff_list[song_record[0]]]
+            except IndexError as e:
+                logger.error("没有找到定数,可能是difficulty.tsv版本太旧,请更新")
+                raise RuntimeError
             song_record[1]["rks"] = (
                 ((song_record[1]["acc"] - 55) / 45) ** 2
             ) * difficulty
             all_record.append(song_record[1])  # 添加到全部记录列表中喵
 
     # 对全部记录以rks为准进行排序
-    all_record.sort(key=lambda x: x["rks"], reverse=True)
+    def sort_by_rks(record):
+        """
+        以rks进行排序的辅助函数喵
+        """
+        return record["rks"]
+    
+    all_record.sort(key=sort_by_rks, reverse=True)
+
+    # 获取3个最高等效rks的phi成绩
+    phi_top_3 = []
     try:
-        # 脑子爆烧唔，应该是取最高等效rks的phi成绩喵(抄过来的喵x)
-        b19 = [
-            max(
-                filter(lambda x: x["score"] == 1000000, all_record),
-                key=lambda x: x["difficulty"],
-            )
-        ]
-
-    except ValueError:  # 如果找不到AP曲子就返回全部记录列表的前19个
+        for record in all_record:
+            if record["score"] == 1000000:
+                phi_top_3.append(record)
+                if len(phi_top_3) == 3:
+                    break
+        if not phi_top_3:
+            raise ValueError("没有AP曲子喵！")
+    except ValueError:
         logger.warning("好家伙，居然一首AP曲子都没有喵！")
-        return all_record[:19]
+        phi_top_3 = []
 
-    # 将全部记录列表中取前19个拼接到b19列表中喵，准确来说是b20喵(?)
-    b19.extend(all_record[:19])
-    return b19  # 返回b19喵(准确来说应该得叫b20喵)
+    # 获取N个最高rks的成绩
+    top_27 = all_record[:b_num]
+    
+    return b30(p3=phi_top_3,b27=top_27)
+
+# 兼容性
+def getB19(records: dict, difficult: dict):
+    warnings.warn("getB19 is deprecated, use getB30.", DeprecationWarning, 2)
+    return getB30(records, difficult).b30  # 调用新函数
 
 
 def decryptSave(save_dict: Dict[str, Any]) -> Dict[str, Dict[str, Any]]:
@@ -408,6 +487,23 @@ def loadRecordHistory(recordHistory: Dict[str, dict]):
 
     return records
 
+def readSaveHistory(sessionToken:str) -> savesHistory:
+    """
+    读取存档历史记录喵
+
+    参数
+        sessionToken (str): 玩家的sessionToken喵
+
+    返回:
+        (savesHistory): 存档历史记录喵,可以访问属性summary、record和saves获得数据喵。也可以当函数使用,会返回saves
+    """
+    recordHistory_path = f"saveHistory/{sessionToken}/recordHistory.json"
+    summaryHistory_path = f"saveHistory/{sessionToken}/summaryHistory.json"
+    if not exists(recordHistory_path) or not exists(summaryHistory_path):
+        raise RuntimeError("存档不存在喵!")
+    recordHistory:dict = readFile.json(recordHistory_path)
+    summaryHistory:dict = readFile.json(summaryHistory_path)
+    return savesHistory(record=recordHistory,summary=summaryHistory)
 
 def checkSaveHistory(
     sessionToken: str,

@@ -1,0 +1,40 @@
+name: Python CI with PDM
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  build:
+    runs-on: ubuntu-latest  # 你也可以选择其他操作系统，如 windows-latest 或 macos-latest
+
+    steps:
+    # 检出代码
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    # 安装 PDM
+    - name: Setup PDM
+      uses: pdm-project/setup-pdm@v4
+      with:
+        python-version: 3.12
+        cache: true
+
+    # 安装依赖
+    - name: Install dependencies
+      run: pdm install
+
+    # 生成构建（如果你使用 PDM 构建分发包）
+    - name: Build distribution
+      run: |
+        pdm build
+
+    - name: Upload Build Output File
+      uses: actions/upload-artifact@v4
+      with:
+        name: package
+        path: dist/*

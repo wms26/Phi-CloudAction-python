@@ -1,50 +1,63 @@
 <div align="center">
 <h1>Phi-CloudAction-python</h1>
+
 使用python实现的phigros云端数据操作喵<br>
-注意本项目已经猫化了喵，带有大量喵元素喵，介意者勿用喵！<br><br>
+
+注意本项目已经猫化了喵，带有大量喵元素喵，介意者勿用喵！<br>
 
 [![Github仓库喵](https://img.shields.io/badge/github-Phi--CA--py-red?style=for-the-badge&logo=Github)](https://github.com/wms26/Phi-CloudAction-python)
 
-<img src="https://counter.seku.su/cmoe?name=phi-cloud-py&theme=r34" title="喵喵喵~"/><br>
+[![喵喵喵~](https://counter.seku.su/cmoe?name=phi-cloud-py&theme=r34)](https://github.com/wms26/Phi-CloudAction-python/graphs/traffic)
 
 [![Phi-LocalAction-python](https://img.shields.io/badge/Github-LocalAction(本地数据操作)-red?style=for-the-badge&logo=Github)](https://github.com/wms26/Phi-LocalAction-python)
 
 [![PhigrosLibrary](https://img.shields.io/badge/文酱-Phigros_Library-blue?style=for-the-badge&logo=Github)](https://github.com/7aGiven/PhigrosLibrary)
+
 [![phi-plugin](https://img.shields.io/badge/废酱-phi--plugin-blue?style=for-the-badge&logo=github)](https://github.com/Catrong/phi-plugin)
+
 [![Phigros_Resource](https://img.shields.io/badge/文酱-Phigros__Resource-blue?style=for-the-badge&logo=Github)](https://github.com/7aGiven/Phigros_Resource)
 
 </div>
 
 # 近期繁忙，本项目将会保持极低频率的更新喵（
 
-## 声明喵：
+> [!CAUTION]
+> **严禁使用本项目或相关项目侵犯 `南京鸽游网络有限公司`（简称“鸽游”）及所有音游玩家的合法权益**，具体包括但不限于：
+> - 大规模访问 `鸽游` 服务器，进行 **DDoS** 攻击
+> - 非法篡改或访问 `鸽游` 服务器的内容或功能
 
-**本项目仅作为学习参考用喵，请勿用作违法用途喵！(虽然我也想不到能做什么违法的事情就是了喵)**
+> [!WARNING]
+> - **请勿尝试滥用本项目！已加检测，请不要试图做出任何商业行为！否则统一纳入黑名单！(此条声明可能与GPLv3许可证存在冲突，请以README.md中本声明为准！)**
+> - **对于本项目本喵拥有最终解释权！请不要做出让任何一个音游玩家都会十分反感的事情！**
+> - **本项目仅作为学习参考用喵，请勿用作违法用途喵！(虽然我也想不到能做什么违法的事情就是了喵)**
+> - **本项目的初衷仅仅是为了供学习参考使用喵，本人从未想过要破坏音游圈的游戏平衡喵！**
 
-**编写本项目所需的资料和资源均源于互联网收集喵(所以本人就是一个废物喵，什么都要依靠互联网喵(bushi))**
-
-**本项目的初衷仅仅是为了供学习参考使用喵，本人从未想过要破坏音游圈的游戏平衡喵！**
-
-**请勿尝试滥用本项目！已加检测，请不要试图做出任何商业行为！否则统一纳入黑名单！(此条声明可能与GPLv3许可证存在冲突，请以README.md中本声明为准！)**
-
-**对于本项目本喵拥有最终解释权！请不要做出让任何一个音游玩家都会十分反感的事情！**
-
-**如果你认为本项目不应该存在或者有其他问题，可以提交Issues或者发送邮件到qianqi26@616.sb，我时不时会去查看邮箱**
-
-**Emmm...对于本项目有建议或者问题的请提交Issue谢谢喵~(提Issue方便往后其他有相同问题的人不会再问一遍喵)**
+> [!TIP]
+> - **编写本项目所需的资料和资源均源于互联网收集喵(所以本人就是一个废物喵，什么都要依靠互联网喵(bushi))**
+> - **如果你认为本项目不应该存在或者有其他问题，可以提Issues或者发送邮件到qianqi26@616.sb，我时不时会去查看**
+> - **Emmm...对于本项目有建议或者问题的请提交Issue谢谢喵~(提Issue方便往后其他有相同问题的人不会再问一遍喵)**
 
 ## 环境准备喵！
 
-1. 编写本项目时使用的是 **python3.11.8** 的喵，不能完全保证其他版本会不会出现问题喵，推荐使用 **python>=3.9** 来运行喵~(后面换成3.11.8滴喵！)
+> [!TIP]
+> 编写本项目时使用的是 **CPython3.11.8** 和 **CPython3.12.8** 的喵，不能完全保证其他版本会不会出现问题喵
+1. 推荐使用`CPython3.12`及以上版本,最低`CPython3.9`版本
 
+> [!TIP]
+> 本项目已经编写了`获取token`API,但是没制作GUI
 2. 云端数据获取需要phigros的云端sessionToken，获取sessionToken的方法可以参考[**Mivik的bot说明文档**](https://mivik.moe/pgr-bot-help/)里面喵！也可以用本喵用pyinstaller打包好的[**GetSession**](https://github.com/wms26/Phi-CloudAction-python/releases/tag/QR-GST_v1.0)扫码登录来获取喵！也可以使用文酱的tomato部署的[**Phi-Login**](https://www.tomato-aoarasi.com/phi-login/)喵!
 
-3. 获取存档打歌记录数据的过程会计算每首歌每个难度的rks喵，所以需要难度定数文件`difficulty.tsv`喵，本项目仓库里面已经有了喵，但不一定是最新的，获取最新的难度定数文件可以用[文酱](https://github.com/7aGiven)的项目[Phigros_Resource](https://github.com/7aGiven/Phigros_Resource)哦喵！
+> [!TIP]
+> 本项目已经编写了`更新难度定数`API,但还是没制作GUI
+3. 获取存档打歌记录数据的过程会计算每首歌每个难度的rks喵，所以需要难度定数文件`difficulty.tsv`喵，本项目仓库里面已经有了喵，但不一定是最新的，获取最新的难度定数文件可以用[文酱](https://github.com/7aGiven)的项目[Phigros_Resource](https://github.com/7aGiven/Phigros_Resource)哦喵！,也可以使用废酱的难度定数文件[phi-plugin-resources](https://github.com/Catrong/phi-plugin-resources/tree/main/info)
 
 ## 使用喵！
 
+> [!TIP]
+> 推荐使用**方法1**
 ### 安装喵!
 
+#### 方法1
 1. 查看[Releases](https://github.com/wms26/Phi-CloudAction-python/releases)喵
 2. 查找最新版本的 `.whl` 文件喵
 3. 复制链接并使用以下命令安装喵：
@@ -52,15 +65,51 @@
 pip install <whl_url>
 ```
 
-### 初始化喵!
+#### 方法2
+1. 安装 [pdm](https://pdm.fming.dev/) 喵
+```bash
+pip install pdm
+```
+2. 克隆仓库喵
+```bash
+git clone https://github.com/wms26/Phi-CloudAction-python.git
+```
+3. 进入项目目录喵
+```bash
+cd Phi-CloudAction-python
+```
+4. 使用 pdm 安装依赖喵
+```bash
+pdm install
+```
+
+### 拷贝依赖和示例喵!
 
 ```bash
 python -m phi_cloud_action
 ```
 会把``info``目录和``example``目录拷贝到运行目录下喵
 
-### 各函数功能使用方法喵：
+### **WebAPI**喵!
 
+```bash
+python -m phi_cloud_action.webapi
+```
+
+> [!TIP]
+> 方法2可以使用:
+> ```bash
+> pdm run start
+> ```
+
+会启动``FastAPI``服务器喵,默认监听地址是[``http://127.0.0.1:8000``](http://127.0.0.1:8000),可以查看``FastAPI``的[文档](http://127.0.0.1:8000/docs),监听路径在``/docs``和``/redoc``,可以通过``-c``来指定配置路径
+
+### 各功能使用方法喵：
+
+#### (暂不推荐)**WebAPI**喵!
+点[**这里**](https://github.com/wms26/Phi-CloudAction-python#WebAPI喵),查看``FastAPI``自带的文档也许都能理解怎么用了罢喵~
+
+#### 手动调用函数喵!
 看``example``目录下的文件吧喵,用上了主要功能，看注释也许都能理解怎么用了罢喵~
 
 ## 未来计划功能喵！
@@ -75,7 +124,6 @@ python -m phi_cloud_action
   - [x] ~~获取存档时进行md5校验喵~~
   - [ ] ~~上传云存档~~(不计划实现)
 
-
 - [x] **存档操作喵[Structure/*.py]**(已模块化喵)(注释较为完整喵)
   - [x] ~~云存档解密喵~~
   - [x] ~~根据云存档解析所有内容喵~~
@@ -83,21 +131,30 @@ python -m phi_cloud_action
   - [x] ~~结构化解析存档喵~~
   - [x] ~~支持旧版云存档喵~~(`gameKey`最低支持到`\x02`的文件头，`gameProgress`最低`\x03`喵)
 
-
 - [ ] **其他喵：**
   - [x] ~~获取本地SessionToken喵~~(点[**这里**](https://github.com/wms26/Phi-CloudAction-python/releases/tag/GST_v1.1)来下载喵)
-  - [x] ~~计算b19喵！~~
+  - [x] ~~计算b19喵！~~ ~~是b30了~~
   - [x] ~~将各功能模块化喵~~(更方便使用喵)
-  - [x] ~~存档历史记录~~(使用示例已经在`example.py`里面了喵，会检查存档是否有新记录喵，存在新记录时会进行保存存档和其他信息喵。往后可能会用上喵)
+  - [x] ~~存档历史记录~~(使用示例已经在`example`目录里面了喵，会检查存档是否有新记录喵，存在新记录时会进行保存存档和其他信息喵。~~往后可能会用上喵~~,已经用上了)
   - [x] ~~taptap扫码授权获取sessionToken~~(已经发在release中了喵，在[**这里**](https://github.com/wms26/Phi-CloudAction-python/releases/tag/QR-GST_v1.0)喵)
-  - [ ] WebGUI(可视化存档信息喵，感觉也没用喵，先咕咕咕吧喵)
-  - [ ] Bot(还是咕咕咕，预计可能开新仓库来写喵！)
+  - [x] ~~更新难度定数文件~~
+  - [x] ~~更新``PCA``本体~~
+  - [ ] Bot(还是咕咕咕，预计可能开新仓库来写喵！) 
+  - [ ] 完整的`Pytest`的自动化测试(还是咕咕,没精力了喵)
+
+- [ ] Web喵!
+  - [x] API(部分实现,点[**这里**](https://github.com/wms26/Phi-CloudAction-python#WebAPI喵)查看教程喵)
+  - [ ] GUI(可视化存档信息喵，~~感觉也没用喵，先咕咕咕吧喵~~,不太会前端)
+  - [ ] 通过API更新PCA本体(还是咕咕~~没精力了~~喵)
+  - [x] API集成[Phi-Login](https://www.tomato-aoarasi.com/phi-login/)和[~~PhiLogin~~](https://github.com/7aGiven/PhiLogin)(完成一半,Phi-Login还没搬)
 
 ## 喵喵喵~
 
 此项目云端操作的思路源于[文酱](https://github.com/7aGiven)的项目[PhigrosLibrary](https://github.com/7aGiven/PhigrosLibrary)喵(本文档前面也留了链接喵)(快说“谢谢文酱！”)
 
-喵！小小宣传一下[废酱](https://github.com/Catrong)的项目[Phi-Plugin](https://github.com/catrong/phi-plugin)，是一个适用于`Yunzai-Bot V3`的`Phigros`辅助插件喵！(本文档前面也留了链接喵)
+获取``token``~~完全照搬~~核心源自[PhiLogin](https://github.com/7aGiven/PhiLogin)喵(快说“谢谢文酱！”)
+
+喵！小小宣传一下[废酱](https://github.com/Catrong)的项目[Phi-Plugin](https://github.com/catrong/phi-plugin)，[Koishi版](https://github.com/catrong/phi-plugin-koishi), 是一个适用于`Yunzai-Bot V3`和`Koishi`的`Phigros`辅助插件喵！(本文档前面也留了链接喵)
 
 介于本喵懒惰的性格和本项目的特殊性喵，本项目也许应该可能大概会在未来也可能在现在某个时间突然停更或者消失喵(bushi)
 
@@ -107,7 +164,42 @@ python -m phi_cloud_action
 
 ## 更新日志喵：
 
-### 2025/01/12(x1.4.2)：
+### 2025/02/22(v1.5.3.1):
+针对用户:
+1. 正式版发布
+
+针对开发者:
+1. 更换为异步,不再使用``requests``,统一使用``httpx``
+
+### 2025/02/19(v1.5.3b):
+针对用户:
+1. 集成``PhiLogin``项目
+
+### 2025/02/19(v1.5.2b):
+针对用户:
+1. 添加``通过API更新INFO文件``功能
+2. ``更新PCA本体``能用了?
+
+### 2025/02/18(v1.5.1.1b):
+针对用户:
+1. 添加``更新PCA本体``功能,但是处于测试阶段,不保证可用性
+
+### 2025/02/18(v1.5.1):
+针对用户:
+1. 修复许多bng
+2. 添加``更新难度定数文件``功能
+3. 支持废酱的`.csv`难度定数文件
+
+针对开发者:
+1. 添加环境变量,以后可以~~不用手动改`example.py`文件了~~自动检测开发环境并调整到正确的目录
+2. 初步添加`Pytest`的测试功能,暂未实装
+
+### 2025/02/16(v1.5.0):
+1. 改成包分发,原有项目``pip``安装完后把``PhiCloudLib``改成``phi_cloud_action``即可
+1. 添加**WebAPI**
+2. 由于Phi改成B30算法,``getB19``将弃用,使用``getB30``
+
+### 2025/01/12(v1.4.2)：
 1. 修复了写出的存档json数据在修改后，gameRecord中难度顺序更改导致成绩错误的问题
 2. 修复了example.py中未计算等效rks的问题
 

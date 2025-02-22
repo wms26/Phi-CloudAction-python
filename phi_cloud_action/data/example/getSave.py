@@ -2,7 +2,7 @@
 # ----------------------- 导包区喵 -----------------------
 from json import dumps
 from sys import argv
-
+import asyncio
 from phi_cloud_action import (
     PhigrosCloud,
     unzipSave,
@@ -23,11 +23,10 @@ else:
 
 # ----------------------- 运行区喵 -----------------------
 
-
-def getSave(token):
-    with PhigrosCloud(token) as cloud:
+async def getSave(token):
+    async with PhigrosCloud(token) as cloud:
         # 获取并解析存档喵
-        save_data = cloud.getSave()
+        save_data = await cloud.getSave()
 
         save_dict = unzipSave(save_data)
         save_dict = decryptSave(save_dict)
@@ -40,4 +39,4 @@ def getSave(token):
 
 
 if __name__ == "__main__":
-    getSave(sessionToken)
+    asyncio.run(getSave(sessionToken))
