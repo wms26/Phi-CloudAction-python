@@ -167,6 +167,7 @@ python -m phi_cloud_action.webapi
 ### 2025/02/22(v1.5.3.1):
 针对用户:
 1. 正式版发布
+
 针对开发者:
 1. 更换为异步,不再使用``requests``,统一使用``httpx``
 
