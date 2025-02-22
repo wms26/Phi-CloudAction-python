@@ -8,10 +8,10 @@ class get_cloud_summary(example):
         self.route_path = "/get/cloud/summary"
         self.methods = ["POST"]
 
-    def api(self, request: TokenRequest) -> JSONResponse:
+    async def api(self, request: TokenRequest) -> JSONResponse:
         try:
             # 获取存档
-            temp = self.get_saves(request.token)
+            temp = await self.get_saves(request.token)
             summary = temp.summary
 
             return JSONResponse(content={"code": 200, "status": "ok", "data": summary}, status_code=200)

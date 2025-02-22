@@ -43,7 +43,7 @@ class example(ABC):
 
     # 获取云存档
     @staticmethod
-    def get_saves(token:str) -> Saves:
+    async def get_saves(token:str) -> Saves:
         """
         获取云存档并记录到历史记录
 
@@ -53,12 +53,12 @@ class example(ABC):
         返回:
             (Saves) 玩家存档,包含save_dict、save_data和summary
         """
-        with PhigrosCloud(token) as cloud:
+        async with PhigrosCloud(token) as cloud:
             # 获取玩家summary喵
-            summary = cloud.getSummary() 
+            summary = await cloud.getSummary() 
 
             # 获取并解析存档喵
-            save_data = cloud.getSave(summary["url"], summary["checksum"])
+            save_data = await cloud.getSave(summary["url"], summary["checksum"])
             save_dict = unzipSave(save_data)
             save_dict = decryptSave(save_dict)
             save_dict = formatSaveDict(save_dict)
@@ -68,5 +68,5 @@ class example(ABC):
         return data
         
     @abstractmethod
-    def api(self):
+    async def api(self):
         pass

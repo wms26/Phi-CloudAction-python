@@ -11,7 +11,7 @@ class get_saves_b30(example):
         self.route_path = "/get/saves/b30"
         self.methods = ["POST"]
 
-    def api(self, request:BNumAndSavesRequest) -> JSONResponse:
+    async def api(self, request:BNumAndSavesRequest) -> JSONResponse:
         try:
             # 获取存档
             save_dict = request.saves

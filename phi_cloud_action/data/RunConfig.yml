@@ -14,6 +14,6 @@ net:
   #routes:
     #allow_routes: # 白名单列表,可以去fastapi文档看路由,(比如/get/token/login)
     # - "/get/token/login"
-    #ban_routes: # 白名单列表,可以去fastapi文档看路由,(比如/update/info)
+    #ban_routes: # 黑名单列表,可以去fastapi文档看路由,(比如/update/info)
     # - "/update/info"
       

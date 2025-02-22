@@ -1,7 +1,7 @@
 # 萌新写的代码喵，可能不是很好喵，但是已经尽可能注释了喵，希望各位大佬谅解喵=v=
 # ----------------------- 导包区喵 -----------------------
 from sys import argv
-
+import asyncio
 from phi_cloud_action import (
     PhigrosCloud,
     readDifficultyFile,
@@ -26,18 +26,17 @@ else:
 
 # ----------------------- 运行区喵 -----------------------
 
-
-def archives(token):
-    with PhigrosCloud(token) as cloud:
+async def archives(token):
+    async with PhigrosCloud(token) as cloud:
 
         # 读取难度定数文件喵
         difficulty = readDifficultyFile() 
         
         # 获取玩家summary喵
-        summary = cloud.getSummary()  
+        summary = await cloud.getSummary()
 
         # 获取并解析存档喵
-        save_data = cloud.getSave(summary["url"], summary["checksum"])
+        save_data = await cloud.getSave(summary["url"], summary["checksum"])
         save_dict = unzipSave(save_data)
         save_dict = decryptSave(save_dict)
         save_dict = formatSaveDict(save_dict)
@@ -50,4 +49,4 @@ def archives(token):
         logger.info(SaveHistory.saves)
 
 if __name__ == "__main__":
-    archives(sessionToken)
+    asyncio.run(archives(sessionToken))

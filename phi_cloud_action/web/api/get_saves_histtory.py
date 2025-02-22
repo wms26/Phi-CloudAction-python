@@ -8,7 +8,7 @@ class get_saves_histtory(example):
         self.route_path = "/get/saves/histtory"
         self.methods = ["POST"]
 
-    def api(self, request:TokenRequest) -> JSONResponse:
+    async def api(self, request:TokenRequest) -> JSONResponse:
         try:
             # 使用 request.token 来获取传递的 token 值
             data = readSaveHistory(request.token)

@@ -6,12 +6,13 @@ from phi_cloud_action.web import api
 from phi_cloud_action import logger, checkSessionToken
 import os
 
+# 获取客户端
 app = FastAPI(debug=True)
 register_routes(app, api)
 client = TestClient(app)
 
 # 从环境变量读取TOKEN
-TOKEN = os.getenv("PHIGROS_TEST_TOKEN")
+TOKEN = os.getenv("PHI_TEST_TOKEN")
 checkSessionToken(TOKEN, log_switch=False)
 
 test_list = [
@@ -24,7 +25,7 @@ test_list = [
 @pytest.mark.parametrize("test_case", test_list)
 def test1(test_case:dict):
     url = test_case["url"]
-    json = test_case.get("json",{})
+    json = test_case.get("json",{}) 
     status_code = test_case["status_code"]
     response = client.post(url, json=json)
     if not response.status_code == status_code:

@@ -5,8 +5,7 @@ description = "使用Python实现的Phigros云端数据操作"
 authors = [
     {name = "wms26", email = "2652015696@qq.com"},
 ]
-dependencies = [
-    "requests>=2.32.3", 
+dependencies = [ 
     "pycryptodome>=3.21.0", 
     "colorlog>=6.9.0", 
     "fastapi>=0.115.8", 
@@ -16,9 +15,10 @@ dependencies = [
     "beautifulsoup4>=4.13.3", 
     "setuptools>=75.3.0", 
     "PyGithub>=2.6.0", 
-    "pyqrcode>=1.2.1",
+    "pyqrcode>=1.2.1", 
+    "httpx<=0.27",
     ]
-requires-python = ">=3.8"
+requires-python = ">=3.9"
 readme = "README.md"
 license = {text = "GPL-3.0"}
 

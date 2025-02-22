@@ -11,10 +11,10 @@ class get_cloud_b30(example):
         self.route_path = "/get/cloud/b30"
         self.methods = ["POST"]
 
-    def api(self, request:BNumAndTokenRequest) -> JSONResponse:
+    async def api(self, request:BNumAndTokenRequest) -> JSONResponse:
         try:
             # 获取存档
-            temp = self.get_saves(request.token)
+            temp = await self.get_saves(request.token)
             save_dict = temp.save_dict
 
             # 获取难度定数

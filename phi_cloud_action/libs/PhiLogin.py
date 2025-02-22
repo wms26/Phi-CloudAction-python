@@ -3,11 +3,11 @@ import base64
 import json
 import time
 import random
-import requests
+import httpx
 
 class Share:
     def __init__(self):
-        self.client = requests.Session()
+        self.client = httpx.AsyncClient()
         self.tap_headers = {
             "Content-Type": "application/x-www-form-urlencoded",
             "User-Agent": "TapTapAndroidSDK/3.16.5"
@@ -31,42 +31,42 @@ def mac(token):
     
     return f"MAC id=\"{token['kid']}\",ts=\"{ts}\",nonce=\"{nonce}\",mac=\"{mac_base64}\""
 
-def login(device_id:str):
+async def login(device_id: str):
     url = "https://www.taptap.com/oauth2/v1/device/code"
     payload = f"client_id=rAK3FfdieFob2Nn8Am&response_type=device_code&scope=basic_info&version=1.2.0&platform=unity&info=%7b%22device_id%22%3a%22{device_id}%22%7d"
     
-    response = share.client.post(url, headers=share.tap_headers, data=payload)
+    response = await share.client.post(url, headers=share.tap_headers, data=payload)
     json_response = response.json()
     
     return json_response['data']
 
-def get_token(device_code:str, device_id:str):
+async def get_token(device_code: str, device_id: str):
     url = "https://www.taptap.cn/oauth2/v1/token"
     payload = f"grant_type=device_token&client_id=rAK3FfdieFob2Nn8Am&secret_type=hmac-sha-1&code={device_code}&version=1.0&platform=unity&info=%7b%22device_id%22%3a%22{device_id}%22%7d"
     
-    response = share.client.post(url, headers=share.tap_headers, data=payload)
+    response = await share.client.post(url, headers=share.tap_headers, data=payload)
     json_response = response.json()
     
     if not json_response['success']:
         return json_response['data']
     
     token = json_response['data']
-    token_info = get_account_info(token)
-    user_info = register_user(token, token_info)
+    token_info = await get_account_info(token)
+    user_info = await register_user(token, token_info)
     
     return user_info
 
-def get_account_info(token):
+async def get_account_info(token):
     url = "https://open.tapapis.cn/account/basic-info/v1?client_id=rAK3FfdieFob2Nn8Am"
     headers = share.tap_headers.copy()
     headers['Authorization'] = mac(token)
     
-    response = share.client.get(url, headers=headers)
+    response = await share.client.get(url, headers=headers)
     json_response = response.json()
     
     return json_response['data']
 
-def register_user(token, account):
+async def register_user(token, account):
     url = "https://rak3ffdi.cloud.tds1.tapapis.cn/1.1/users"
     headers = share.phi_headers
     payload = json.dumps({
@@ -83,6 +83,6 @@ def register_user(token, account):
         }
     })
     
-    response = share.client.post(url, headers=headers, data=payload)
+    response = await share.client.post(url, headers=headers, data=payload)
     resp_json = response.json()
     return resp_json

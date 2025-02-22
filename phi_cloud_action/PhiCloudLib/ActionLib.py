@@ -17,7 +17,7 @@ from typing import Any, Dict, List
 from .AES import decrypt, encrypt
 from .Structure import getStructure, getFileHead, Reader, Writer
 from .logger import logger
-from .other import add_game_record,complete_game_record
+from .other import add_game_record,complete_game_record,get_info_dir
 
 
 # ---------------------- 定义赋值区喵 ----------------------
@@ -92,7 +92,8 @@ def checkSessionToken(sessionToken: str,log_switch:bool = True):
         return True
 
 # 读取定数文件喵
-def readDifficultyFile(path: str = "./info/difficulty.tsv") -> Dict[str, List[float]]:
+
+def readDifficultyFile(path = str(get_info_dir() / "difficulty.tsv")) -> Dict[str, List[float]]:
     if path.endswith('.tsv'):
         return readFile.difficulty_tsv(path)
     elif path.endswith('.csv'):

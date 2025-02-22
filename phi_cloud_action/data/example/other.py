@@ -1,7 +1,7 @@
 # 萌新写的代码喵，可能不是很好喵，但是已经尽可能注释了喵，希望各位大佬谅解喵=v=
 # ----------------------- 导包区喵 -----------------------
 from sys import argv
-
+import asyncio
 from phi_cloud_action import (
     PhigrosCloud,
     logger
@@ -20,14 +20,12 @@ else:
 
 # ----------------------- 运行区喵 -----------------------
 
-
-def refresh_token(token):
-    with PhigrosCloud(token) as cloud:
-        
+async def refresh_token(token):
+    async with PhigrosCloud(token) as cloud:
         # 刷新sessionToken喵(注意此功能尚未经过大量测试，刷新是即时的，旧token会立即失效喵)
-        token = cloud.refreshSessionToken()
+        token = await cloud.refreshSessionToken()
         logger.info(f"新的token为:{token}")
 
 
 if __name__ == "__main__":
-    refresh_token(sessionToken)
+    asyncio.run(refresh_token(sessionToken))

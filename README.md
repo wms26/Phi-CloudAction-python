@@ -41,15 +41,15 @@
 
 > [!TIP]
 > 编写本项目时使用的是 **CPython3.11.8** 和 **CPython3.12.8** 的喵，不能完全保证其他版本会不会出现问题喵
-1. 推荐使用`CPython3.12`及以上版本,最低`CPython3.8`版本
+1. 推荐使用`CPython3.12`及以上版本,最低`CPython3.9`版本
 
 > [!TIP]
 > 本项目已经编写了`获取token`API,但是没制作GUI
-3. 云端数据获取需要phigros的云端sessionToken，获取sessionToken的方法可以参考[**Mivik的bot说明文档**](https://mivik.moe/pgr-bot-help/)里面喵！也可以用本喵用pyinstaller打包好的[**GetSession**](https://github.com/wms26/Phi-CloudAction-python/releases/tag/QR-GST_v1.0)扫码登录来获取喵！也可以使用文酱的tomato部署的[**Phi-Login**](https://www.tomato-aoarasi.com/phi-login/)喵!
+2. 云端数据获取需要phigros的云端sessionToken，获取sessionToken的方法可以参考[**Mivik的bot说明文档**](https://mivik.moe/pgr-bot-help/)里面喵！也可以用本喵用pyinstaller打包好的[**GetSession**](https://github.com/wms26/Phi-CloudAction-python/releases/tag/QR-GST_v1.0)扫码登录来获取喵！也可以使用文酱的tomato部署的[**Phi-Login**](https://www.tomato-aoarasi.com/phi-login/)喵!
 
 > [!TIP]
-> 本项目已经编写了了`更新难度定数`API,但还是没制作GUI
-5. 获取存档打歌记录数据的过程会计算每首歌每个难度的rks喵，所以需要难度定数文件`difficulty.tsv`喵，本项目仓库里面已经有了喵，但不一定是最新的，获取最新的难度定数文件可以用[文酱](https://github.com/7aGiven)的项目[Phigros_Resource](https://github.com/7aGiven/Phigros_Resource)哦喵！,也可以使用废酱的难度定数文件[phi-plugin-resources](https://github.com/Catrong/phi-plugin-resources/tree/main/info)
+> 本项目已经编写了`更新难度定数`API,但还是没制作GUI
+3. 获取存档打歌记录数据的过程会计算每首歌每个难度的rks喵，所以需要难度定数文件`difficulty.tsv`喵，本项目仓库里面已经有了喵，但不一定是最新的，获取最新的难度定数文件可以用[文酱](https://github.com/7aGiven)的项目[Phigros_Resource](https://github.com/7aGiven/Phigros_Resource)哦喵！,也可以使用废酱的难度定数文件[phi-plugin-resources](https://github.com/Catrong/phi-plugin-resources/tree/main/info)
 
 ## 使用喵！
 
@@ -163,6 +163,12 @@ python -m phi_cloud_action.webapi
 (快去给[文酱](https://github.com/7aGiven)和[废酱](https://github.com/Catrong)的项目点star喵！)
 
 ## 更新日志喵：
+
+### 2025/02/19(v1.5.3.1):
+针对用户:
+1. 正式版发布
+针对开发者:
+1. 更换为异步,不再使用``requests``,统一使用``httpx``
 
 ### 2025/02/19(v1.5.3b):
 针对用户:

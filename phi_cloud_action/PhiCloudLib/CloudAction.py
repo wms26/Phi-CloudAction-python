@@ -1,31 +1,26 @@
-# 萌新写的代码，可能不是很好，但是已经尽可能注释了，希望各位大佬谅解喵=v=
-# ----------------------- 导包区喵 -----------------------
+import httpx
 from base64 import b64decode
 from hashlib import md5
 from json import dumps
 from struct import unpack
 from typing import Any, Optional, Union
-
-from requests import Session
-
 from .ActionLib import checkSessionToken
 from .logger import logger
 
 
 # ---------------------- 定义赋值区喵 ----------------------
 
-
 class PigeonRequest:
     def __init__(
         self,
         sessionToken: Optional[str] = None,
-        client: Optional[Session] = None,
+        client: Optional[httpx.AsyncClient] = None,
         headers: Optional[dict] = None,
     ):
         if client:
             self.client = client
         else:
-            self.client = Session()
+            self.client = httpx.AsyncClient()
 
         if headers:
             self.headers = headers
@@ -43,13 +38,12 @@ class PigeonRequest:
     def addHeaders(self, headers: Optional[dict] = None, **kwargs):
         if headers:
             header = {**self.headers, **headers, **kwargs}
-
         else:
             header = {**self.headers, **kwargs}
 
         return PigeonRequest(client=self.client, headers=header)
 
-    def request(
+    async def request(
         self, method: str, url: str, headers: Optional[dict] = None, **kwargs
     ):
         method = method.upper()
@@ -58,16 +52,16 @@ class PigeonRequest:
             headers = self.headers
 
         if method == "GET":
-            self._req = self.client.get(url, headers=headers, **kwargs)
+            self._req = await self.client.get(url, headers=headers, **kwargs)
 
         elif method == "POST":
-            self._req = self.client.post(url, headers=headers, **kwargs)
+            self._req = await self.client.post(url, headers=headers, **kwargs)
 
         elif method == "PUT":
-            self._req = self.client.put(url, headers=headers, **kwargs)
+            self._req = await self.client.put(url, headers=headers, **kwargs)
 
         elif method == "DELETE":
-            self._req = self.client.delete(url, headers=headers, **kwargs)
+            self._req = await self.client.delete(url, headers=headers, **kwargs)
 
         else:
             raise ValueError(f'传入的请求类型不合法喵！不应为"{method}"！')
@@ -77,22 +71,18 @@ class PigeonRequest:
         logger.debug(f"请求头 ：{self._req.request.headers}")
         logger.debug(f"状态码 ：{self._req.status_code}")
 
-        if self._req.request.body is None:
+        if self._req.request.content is None:
             logger.debug(f"请求数据 : *无请求数据*")
-
-        elif isinstance(self._req.request.body, str):
-            logger.debug(f"请求数据 : {repr(self._req.request.body)}")
-
+        elif isinstance(self._req.request.content, str):
+            logger.debug(f"请求数据 : {repr(self._req.request.content)}")
         else:
-            logger.debug(f"请求数据 : *{len(self._req.request.body)} bytes*")
+            logger.debug(f"请求数据 : *{len(self._req.request.content)} bytes*")
 
         if self._req.content is None:
             logger.debug(f"返回数据 : *无返回数据*")
-
         else:
             try:
                 logger.debug(f"返回数据 : {self._req.content.decode()}")
-
             except UnicodeDecodeError:
                 logger.debug(f"返回数据 : *{len(self._req.content)} bytes*")
 
@@ -100,27 +90,27 @@ class PigeonRequest:
 
         return self._req
 
-    def get(self, url: str, headers: Optional[dict] = None):
-        return self.request("GET", url, headers)
+    async def get(self, url: str, headers: Optional[dict] = None):
+        return await self.request("GET", url, headers)
 
-    def post(
+    async def post(
         self,
         url: str,
         data: Optional[Union[str, bytes]] = None,
         headers: Optional[dict] = None,
     ):
-        return self.request("POST", url, headers, data=data)
+        return await self.request("POST", url, headers, data=data)
 
-    def put(
+    async def put(
         self,
         url: str,
         data: Optional[Union[str, bytes]] = None,
         headers: Optional[dict] = None,
     ):
-        return self.request("PUT", url, headers, data=data)
+        return await self.request("PUT", url, headers, data=data)
 
-    def delete(self, url: str, headers: Optional[dict] = None):
-        return self.request("DELETE", url, headers)
+    async def delete(self, url: str, headers: Optional[dict] = None):
+        return await self.request("DELETE", url, headers)
 
 
 class PhigrosCloud:
@@ -130,10 +120,10 @@ class PhigrosCloud:
             if client:
                 self.client = client
             else:
-                self.client = Session()
+                self.client = httpx.AsyncClient()
                 self.create_client = True
 
-            self.request = PigeonRequest(sessionToken, client)
+            self.request = PigeonRequest(sessionToken, self.client)
             self.baseUrl = "https://rak3ffdi.cloud.tds1.tapapis.cn/1.1/"
 
     async def __aenter__(self):
@@ -141,19 +131,19 @@ class PhigrosCloud:
 
     async def __aexit__(self, exc_type, exc_val, exc_tb):
         if self.create_client:
-            self.close()
+            await self.close()
 
-    def __enter__(self):
+    async def __enter__(self):
         return self
 
-    def __exit__(self, exc_type, exc_val, exc_tb):
+    async def __exit__(self, exc_type, exc_val, exc_tb):
         if self.create_client:
-            self.close()
+            await self.close()
 
-    def close(self):
-        self.client.close()
+    async def close(self):
+        await self.client.aclose()
 
-    def getNickname(self) -> str:
+    async def getNickname(self) -> str:
         """
         获取玩家昵称喵
 
@@ -163,14 +153,14 @@ class PhigrosCloud:
         logger.debug("调用函数：getNickname()")
 
         # 请求并解析获取玩家昵称喵
-        return_data = (self.request.get(self.baseUrl + "users/me")).json()[
+        return_data = (await self.request.get(self.baseUrl + "users/me")).json()[
             "nickname"
         ]
 
         logger.debug(f'函数"getNickname()"返回：{return_data}')
         return return_data
 
-    def getSummary(self):
+    async def getSummary(self):
         """
         获取玩家summary喵
 
@@ -181,38 +171,35 @@ class PhigrosCloud:
 
         # 请求并初步解析存档信息喵
         result = (
-            self.request.get(self.baseUrl + "classes/_GameSave?limit=1")
+            await self.request.get(self.baseUrl + "classes/_GameSave?limit=1")
         ).json()["results"][0]
         summary = b64decode(result["summary"])  # base64解码summary数据喵
 
-        # 解析summary数据喵(这行是真的看不懂喵)
+        # 解析summary数据喵
         summary = unpack("=BHfBx%ds12H" % summary[8], summary)
         return_data = {  # 解析数据并返回一个字典喵
-            # 这是存档的md5校验值喵
             "checksum": result["gameFile"]["metaData"]["_checksum"],
-            "updateAt": result["updatedAt"],  # 这是存档更新时间喵
-            "url": result["gameFile"]["url"],  # 这是存档直链喵
-            "saveVersion": summary[0],  # 这是存档版本喵
-            "challenge": summary[1],  # 课题分喵
-            "rks": summary[2],  # 正如其名不多讲了喵
-            "gameVersion": summary[3],  # 这是游戏版本喵
-            "avatar": summary[4].decode(),  # 这是头像喵
-            "EZ": summary[5:8],  # EZ难度的评级情况喵
-            "HD": summary[8:11],  # HD难度的评级情况喵
-            "IN": summary[11:14],  # IN难度的评级情况喵
-            "AT": summary[14:17],  # AT难度的评级情况喵
+            "updateAt": result["updatedAt"],
+            "url": result["gameFile"]["url"],
+            "saveVersion": summary[0],
+            "challenge": summary[1],
+            "rks": summary[2],
+            "gameVersion": summary[3],
+            "avatar": summary[4].decode(),
+            "EZ": summary[5:8],
+            "HD": summary[8:11],
+            "IN": summary[11:14],
+            "AT": summary[14:17],
         }
 
         logger.debug(f'函数"getSummary()"返回：{return_data}')
         return return_data
 
-    def getSave(
+    async def getSave(
         self, url: Optional[str] = None, checksum: Optional[str] = None
     ) -> bytes:
         """
         获取存档数据喵 (压缩包数据喵)
-
-        (返回的数据可用ReadGameSave()读取喵)
 
         参数:
             url (str | None): 存档的 URL 喵。留空自动获取当前token的数据喵
@@ -224,22 +211,19 @@ class PhigrosCloud:
         logger.debug("调用函数：getSave()")
 
         if url is None:
-            summary = self.getSummary()
+            summary = await self.getSummary()
             url = summary["url"]
             if checksum is None:
                 checksum = summary["checksum"]
 
         elif checksum is None:
-            checksum = (self.getSummary())["checksum"]
+            checksum = (await self.getSummary())["checksum"]
 
         # 请求存档文件并获取数据喵
-        save_data = (self.request.get(url)).content  # type: ignore
+        save_data = (await self.request.get(url)).content  # type: ignore
         if len(save_data) <= 30:
             logger.error(
                 f"严重警告喵！！！获取到的云存档大小不足 30 字节喵！当前大小喵：{len(save_data)}"
-            )
-            logger.error(
-                "可能云存档已丢失喵！！！请重新将本地存档同步至云端喵！"
             )
             raise ValueError(
                 f"获取到的云存档大小不足 30 字节喵！当前大小喵：{len(save_data)}"
@@ -248,41 +232,30 @@ class PhigrosCloud:
         save_md5 = md5()  # 创建一个md5对象，用来计算md5校验值喵
         save_md5.update(save_data)  # 将存档数据更新进去喵
         actual_checksum = save_md5.hexdigest()
-        if (
-            checksum != actual_checksum
-        ):  # 对比校验值喵，不正确则输出警告并等待喵
+        if checksum != actual_checksum:
             logger.error("严重警告喵！！！存档校验不通过喵！")
-            logger.error("这可能是因为不正确地上传存档导致的喵！")
             raise ValueError(
                 f"存档校验不通过喵！本地存档md5：{actual_checksum}，云端存档md5：{checksum}"
             )
 
         logger.debug(f'函数"getSave()"返回：*{len(save_data)} bytes*')
-        return save_data  # 返回存档数据喵
+        return save_data
 
-    def refreshSessionToken(self):
+    async def refreshSessionToken(self):
         """
         刷新sessionToken喵
-
-        注意：原先的sessionToken将会失效喵！
-
-        (会返回新的sessionToken喵！)
-
-        (刷新是即时的喵，旧token会立即失效喵，新的会即时生效喵)
 
         返回:
             (str): 新的sessionToken喵
         """
         logger.debug("调用函数：refreshSessionToken()")
 
-        # 获取玩家的objectId喵
-        objectId = (self.request.get(self.baseUrl + "users/me")).json()[
+        objectId = (await self.request.get(self.baseUrl + "users/me")).json()[
             "objectId"
         ]
 
-        # 发送刷新sessionToken请求喵
         new_sessionToken = (
-            self.request.put(
+            await self.request.put(
                 self.baseUrl + f"users/{objectId}/refreshSessionToken"
             )
         ).json()["sessionToken"]
@@ -290,9 +263,9 @@ class PhigrosCloud:
         logger.debug(f'函数"refreshSessionToken()"返回：{new_sessionToken}')
         return new_sessionToken
 
-    def uploadNickname(self, name: str):
+    async def uploadNickname(self, name: str):
         """
-        用于更新玩家昵称喵
+        更新玩家昵称喵
 
         参数:
             name (str): 要更改的昵称喵
@@ -302,13 +275,11 @@ class PhigrosCloud:
         """
         logger.debug("调用函数：uploadNickname()")
 
-        # 请求存档信息喵
-        response = (self.request.get(self.baseUrl + "users/me")).json()
-        userObjectId = response["objectId"]  # 获取user的ObjectId喵
+        response = (await self.request.get(self.baseUrl + "users/me")).json()
+        userObjectId = response["objectId"]
         logger.debug(f"userObjectId{userObjectId}")
 
-        # 请求更新用户信息喵
-        self.request.put(
+        await self.request.put(
             url=self.baseUrl + f"users/{userObjectId}",
             data=dumps({"nickname": name}),
             headers={
@@ -319,11 +290,9 @@ class PhigrosCloud:
 
         logger.debug('函数"uploadNickname()"无返回')
 
-    def uploadSummary(self, summary: dict):
+    async def uploadSummary(self, summary: dict):
         """
-        上传summary喵(从上传存档里面独立出来的喵)
-
-        (注意这个只能用来看，没有任何实际用处，上传覆盖之后就没了喵)
+        上传summary喵
 
         参数:
             summarys (dict): 要上传的summary喵
@@ -332,12 +301,10 @@ class PhigrosCloud:
 
         from struct import pack
         from base64 import b64encode
-        from json import dumps
         from datetime import datetime
 
-        # 将解析过的summary构建回去喵
-        avatar_data = summary["avatar"].encode()  # 对头像名称进行编码喵
-        _summary = bytearray()  # 创建一个空的summary数据喵
+        avatar_data = summary["avatar"].encode()
+        _summary = bytearray()
         _summary.extend(pack("=B", summary["saveVersion"]))
         _summary.extend(pack("=H", summary["challenge"]))
         _summary.extend(pack("=f", summary["rks"]))
@@ -348,19 +315,17 @@ class PhigrosCloud:
             for i in summary[key]:
                 _summary.extend(pack("=H", i))
 
-        _summary = b64encode(_summary).decode()  # 把summary数据编码回去喵
+        _summary = b64encode(_summary).decode()
 
-        # 请求存档信息喵
         save_info = (
-            self.request.get(self.baseUrl + "classes/_GameSave?limit=1")
+            await self.request.get(self.baseUrl + "classes/_GameSave?limit=1")
         ).json()["results"][0]
 
-        objectId = save_info["objectId"]  # 获取objectId喵
-        userObjectId = save_info["user"]["objectId"]  # 获取user的ObjectId喵
-        # 存档的md5校验值喵
+        objectId = save_info["objectId"]
+        userObjectId = save_info["user"]["objectId"]
         checksum = save_info["gameFile"]["metaData"]["_checksum"]
-        saveSize = save_info["gameFile"]["metaData"]["size"]  # 存档的大小喵
-        fileObjectId = save_info["gameFile"]["objectId"]  # 存档的objectId喵
+        saveSize = save_info["gameFile"]["metaData"]["size"]
+        fileObjectId = save_info["gameFile"]["objectId"]
 
         logger.debug(f"objectId：{objectId}")
         logger.debug(f"userObjectId：{userObjectId}")
@@ -370,9 +335,8 @@ class PhigrosCloud:
         logger.debug(f'现summary：{save_info["summary"]}')
         logger.debug(f"新summary：{summary}")
 
-        # 上传summary喵
-        self.request.put(
-            url=self.baseUrl + "classes/_GameSave/{objectId}?",
+        await self.request.put(
+            url=self.baseUrl + f"classes/_GameSave/{objectId}?",
             data=dumps(
                 {
                     "summary": summary,

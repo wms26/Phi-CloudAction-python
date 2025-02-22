@@ -13,12 +13,12 @@ class get_token_login(example):
         self.route_path = "/get/token/login"
         self.methods = ["POST"]
 
-    def api(self,boby:DeviceInfo):
+    async def api(self,boby:DeviceInfo):
         try:
             device_id = boby.device_id
             logger.debug(f"device_id:{device_id}")
             # 总结就是,导包(x)
-            data = login(device_id=device_id)
+            data = await login(device_id=device_id)
             return JSONResponse({"code":200,"status":"ok","data":data},status_code=200)
         except Exception as e:
             logger.warning(repr(e))
@@ -29,12 +29,12 @@ class get_token_device_code(example):
         self.route_path = "/get/token/{device_code}"
         self.methods = ["POST"]
 
-    def api(self,device_code,boby:DeviceInfo):
+    async def api(self,device_code,boby:DeviceInfo):
         try:
             device_id = boby.device_id
             logger.debug(f"device_id:{device_id},device_code:{device_code}")
             # 总结就是,导包(x)
-            data = get_token(device_code=device_code,device_id=device_id)
+            data = await get_token(device_code=device_code,device_id=device_id)
             return JSONResponse({"code":200,"status":"ok","data":data},status_code=200)
         except Exception as e:
             logger.warning(repr(e))
