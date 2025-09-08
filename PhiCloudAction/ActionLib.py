@@ -5,18 +5,20 @@ from datetime import datetime
 from io import BytesIO
 from json import dumps, loads
 from os import mkdir
-from os.path import exists, join
+from os.path import dirname, abspath, exists, join
 from re import match
+from typing import Any, Dict, List, Optional
 from zipfile import ZipFile, ZIP_DEFLATED
 
-from typing import Any, Dict, List
-
 from .AES import decrypt, encrypt
-from .Structure import getStructure, getFileHead, Reader, Writer
+from .Structure import headGetStructure, getFileHead, Reader, Writer
 from .logger import logger
 
 
 # ---------------------- 定义赋值区喵 ----------------------
+
+
+local_path = dirname(abspath(__file__))  # 获取此文件所在目录的绝对路径
 
 
 def debugTempFiles(
@@ -32,129 +34,161 @@ def debugTempFiles(
             f.write(data)  # 写入文件喵
 
 
-# 存档压缩包中的文件列表喵
-SAVE_LIST = [
-    "gameKey",
-    "gameProgress",
-    "gameRecord",
-    "settings",
-    "user",
-]
-
-
-def checkSessionToken(sessionToken: str):
+def checkSessionToken(sessionToken: str, _raise: bool = True) -> bool:
     """
     检查sessionToken格式是否合法喵
 
     参数:
         sessionToken (str): 玩家的sessionToken喵
+        _raise (bool): 是否主动引发错误，若为False，则会在检测到不合法时返回False。默认为True
 
     返回:
-        (bool): 是否合法喵
+        (bool): SessionToken是否合法喵
     """
+    # 判断sessionToken是否为空喵
     if sessionToken == "" or sessionToken is None:
-        raise ValueError("sessionToken为空喵！")
+        if _raise:
+            raise ValueError("sessionToken为空喵！")
 
+        else:
+            return False
+
+    # 判断sessionToken的长度是否为25位喵
     elif len(sessionToken) != 25:
-        raise ValueError(
-            f"sessionToken长度错误喵！应为25位，而不是{len(sessionToken)}位喵：{sessionToken}"
-        )
+        if _raise:
+            raise ValueError(
+                f"sessionToken长度错误喵！应为25位，而不是{len(sessionToken)}位喵：{sessionToken}"
+            )
 
+        else:
+            return False
+
+    # 正则匹配判断sessionToken是否符合要求喵
     elif not match(r"^[0-9a-z]{25}$", sessionToken):
-        raise ValueError(
-            f"sessionToken不合法喵！应只有数字与小写字母喵：{sessionToken}"
-        )
+        if _raise:
+            raise ValueError(
+                f"sessionToken不合法喵！应只有数字与小写字母喵：{sessionToken}"
+            )
 
+        else:
+            return False
+
+    # 检查全部通过则是合法sessionToken喵
     else:
         logger.debug(f"sessionToken正确喵：{sessionToken}")
         return True
 
 
-def readDifficultyFile(
-    path: str = "./info/difficulty.tsv",
-) -> Dict[str, List[float]]:
+def readDifficultyFile(path: Optional[str] = None) -> Dict[str, List[float]]:
     """
-    读取难度文件喵
+    读取歌曲谱面定数文件喵
 
     参数:
-        path (str): 难度文件路径喵
+        path (str): 歌曲谱面定数文件路径喵
 
     返回:
-        (dict[str, list[float]]): 难度数据喵。以歌曲id为键，值为单曲难度列表喵
+        (dict[str, list[float]]): 歌曲谱面定数数据喵。以歌曲id为键，值为单曲难度列表喵
     """
-    difficulty_list = {}
-    with open(path, encoding="UTF-8") as f:  # 打开难度列表文件喵
+    # 如果没有提供文件路径喵
+    if path is None:
+        logger.debug("没有提供歌曲谱面定数文件路径，尝试自动寻找喵...")
+
+        # 优先从工作路径下寻找定数文件喵
+        if exists("./difficulty.tsv"):
+            logger.debug(f'在工作目录下找到了歌曲谱面定数文件喵："./difficulty.tsv"')
+            file_path = "./difficulty.tsv"
+
+        elif exists("./info/difficulty.tsv"):
+            logger.debug(
+                f'在工作目录下找到了歌曲谱面定数文件喵："./info/difficulty.tsv"'
+            )
+            file_path = "./info/difficulty.tsv"
+
+        # 其次尝试寻找此文件所在目录下是否有定数文件喵
+        elif exists(join(local_path, "info/difficulty.tsv")):
+            logger.debug(f'在库目录下找到了歌曲谱面定数文件喵："./info/difficulty.tsv"')
+            file_path = join(local_path, "info/difficulty.tsv")
+
+        else:
+            raise ValueError("找不到歌曲谱面定数文件喵！")
+
+    # 优先使用提供的文件路径喵
+    else:
+        if not exists(path):
+            raise FileExistsError(f'文件"{path}"不存在喵！')
+
+        file_path = path
+
+    difficulty_list = {}  # 存储最终解析出来的歌曲谱面定数数据喵
+    with open(file_path, encoding="UTF-8") as f:  # 打开歌曲谱面定数文件喵
         lines = f.readlines()  # 解析所有行，输出一个列表喵
 
     for line in lines:  # 遍历所有行喵
         # 将该行最后的"\n"截取掉，并以"\t"为分隔符解析为一个列表喵
         line = line[:-1].split("\t")
-        diff = []  # 用来存储单首歌的难度信息喵
+        diff = []  # 用来存储单首歌所有谱面的定数信息喵
 
-        for i in range(1, len(line)):  # 遍历该行后面的那三个难度值喵
+        for i in range(1, len(line)):  # 遍历该行后面的所有难度值喵
             diff.append(float(line[i]))  # 将难度添加到列表中喵
         difficulty_list[line[0]] = diff  # 与总列表拼接在一起喵
 
-    return difficulty_list  # 返回解析出来的各歌曲难度列表喵
+    return difficulty_list  # 返回解析出来的各歌曲定数数据喵
 
 
-def unzipFile(zip_data: bytes, filename: str):
+def unzipFile(zip_data: bytes, file_name: Optional[str] = None) -> Dict[str, bytes]:
     """
-    读取压缩文件中的文件喵
+    读取压缩包并解压文件数据
 
     参数:
         zip_data (bytes): 压缩包数据喵
-        filename (str): 要读取的文件名喵
+        file_name (str | None): 文件名，用于解压单个文件,为None时解压所有文件喵。默认为None喵
 
     返回:
-        (bytes): 文件数据喵
+        (dict[str, bytes]): 压缩包文件数据喵
     """
-    # 打开存档文件喵
+    files_dict = {}
+    # 打开压缩包喵(其实存档是个压缩包哦喵！)
     with ZipFile(BytesIO(zip_data)) as zip_file:
-        # 打开压缩包中中对应的文件喵
-        with zip_file.open(filename) as file:
-            logger.debug(f'解压单文件"{filename}"喵')
-            return file.read()  # 返回文件数据喵
+        # 如果指定了文件名，那么将尝试解压单个文件喵
+        if file_name is not None:
+            # 获取压缩包文件名列表，用来判断指定的文件名是否存在喵
+            file_name_list = [i.filename for i in zip_file.filelist]
+            if file_name in file_name_list:
+                # 如果文件存在于压缩包中喵
+                with zip_file.open(file_name) as file:
+                    files_dict[file_name] = file.read()
 
+            else:
+                # 如果文件不存在于压缩包中喵
+                raise FileNotFoundError(f"无法在压缩包中找到文件喵：{file_name}")
 
-def unzipSave(zip_data: bytes) -> Dict[str, bytes]:
-    """
-    读取存档压缩包
-
-    参数:
-        zip_data (bytes): 压缩包数据喵
-
-    返回:
-        (dict[str, bytes]): 存档原始数据喵
-    """
-    save_dict = {}
-    # 打开存档文件喵(其实存档是个压缩包哦喵！)
-    with ZipFile(BytesIO(zip_data)) as zip_file:
-        # 打开压缩包中中对应的文件喵
-
-        for file in zip_file.filelist:
-            filename = file.filename
-            logger.debug(f'解压"{filename}"文件喵')
-            with zip_file.open(filename) as file:
-                save_dict[filename] = file.read()  # 读取文件数据喵
+        # 默认解压全部文件喵
+        else:
+            # 遍历压缩包所有文件喵
+            for file in zip_file.filelist:
+                # 获取压缩包文件名喵
+                filename = file.filename
+                logger.debug(f'解压"{filename}"文件喵')
+                with zip_file.open(filename) as file:
+                    files_dict[filename] = file.read()  # 读取文件数据喵
 
     logger.debug("解压完毕喵！")
-    return save_dict
+    return files_dict
 
 
-def zipSave(save_dict: Dict[str, Any]):
+def zipSave(files_dict: Dict[str, Any]) -> bytes:
     """
-    创建存档压缩包
+    创建压缩包喵
 
     参数:
-        save_dict (dict[str, Any]): 存档原始数据喵
+        files_dict (dict[str, Any]): 压缩包文件数据喵
 
     返回:
         (bytes): 压缩包数据喵
     """
     with BytesIO() as file:
         with ZipFile(file, "w", compression=ZIP_DEFLATED) as zip_file:
-            for filename, filedata in save_dict.items():
+            for filename, filedata in files_dict.items():
                 logger.debug(f'压缩"{filename}"文件喵')
                 zip_file.writestr(filename, filedata)
 
@@ -162,21 +196,68 @@ def zipSave(save_dict: Dict[str, Any]):
         return file.getvalue()
 
 
-def countRks(
-    record_data: dict, difficulty: Dict[str, list], countRks: bool = True
-):
+def addDifficulty(record_data: dict, difficulty: Dict[str, list]) -> Dict[str, dict]:
     """
-    为反序列化后的gameRecord中的每条成绩添加难度定数并计算等效rks
+    为所有成绩添加谱面定数信息喵
 
     参数:
-        record_data (dict):gameRecord反序列化数据/存档反序列化数据
-        difficulty (dict): 所有歌曲难度定数数据
-        countRks (bool): 是否计算rks。默认为True，如果为False则只会添加难度定数
+        record_data (dict): gameRecord/存档 反序列化数据喵
+        difficulty (dict[str, list]): 歌曲谱面定数数据
 
     返回:
-        (dict): 处理后的 gameRecord反序列化数据/存档反序列化数据
+        (dict[str, dict]): 添加谱面定数信息后的 gameRecord/存档 反序列化数据喵
     """
+    # 各难度的映射字典喵
     diff_list = {"EZ": 0, "HD": 1, "IN": 2, "AT": 3, "Legacy": 4}
+
+    # 为单独传入gameRecord反序列化数据和传入存档反序列化数据两种情况提供支持喵
+    if record_data.get("gameRecord") is not None and isinstance(
+        record_data["gameRecord"], dict
+    ):
+        gameRecord = record_data["gameRecord"]
+
+    else:
+        gameRecord = record_data
+
+    # 遍历所有歌曲成绩喵
+    for songName, song in gameRecord.items():
+        # 遍历单个歌曲中所有难度的成绩喵
+        for diff in song.keys():
+            try:
+                # 尝试从定数数据获取该歌曲难度的谱面定数喵
+                record_diff: float = difficulty[songName][diff_list[diff]]
+
+            except KeyError:
+                # 如果发生KeyError错误，那么就是因为歌曲名不存在于定数数据喵
+                record_diff: float = 0
+                logger.warning(f'歌曲"{songName}"的{diff}定数不存在喵！')
+
+            except IndexError:
+                # 如果出现IndexError，那么就是因为难度索引超出了喵
+                record_diff: float = 0
+                logger.warning(f'歌曲"{songName}"可能存在旧谱记录喵！')
+
+            gameRecord[songName][diff].update({"difficulty": record_diff})
+
+    return record_data
+
+
+def countRks(
+    record_data: dict, difficulty: Dict[str, list], onlyCountRks: bool = False
+) -> Dict[str, dict]:
+    """
+    为反序列化后的gameRecord中的每条成绩添加难度定数并计算等效rks喵
+
+    参数:
+        record_data (dict):gameRecord/存档 反序列化数据喵
+        difficulty (dict): 歌曲定数数据喵
+        onlyCountRks (bool): 是否仅计算rks喵。默认为False，如果为True则只会计算等效rks而不添加谱面定数喵
+
+    返回:
+        (dict): 处理后的 gameRecord/存档 反序列化数据喵
+    """
+    if not onlyCountRks:
+        record_data = addDifficulty(record_data, difficulty)
 
     if record_data.get("gameRecord") is not None and isinstance(
         record_data["gameRecord"], dict
@@ -189,10 +270,10 @@ def countRks(
     for songName, song in gameRecord.items():
         for diff in song.keys():
             try:
-                record_diff: float = difficulty[songName][diff_list[diff]]
+                record_diff: float = gameRecord[songName][diff]["difficulty"]
                 acc = gameRecord[songName][diff]["acc"]
-                if countRks and acc > 70:
-                    rks: float = (((acc - 55) / 45) ** 2) * record_diff
+                if acc > 70:
+                    rks = (((acc - 55) / 45) ** 2) * record_diff
 
                     # # 备用的计算方式喵，虽然感觉没有什么用喵
                     # from decimal import (
@@ -211,80 +292,101 @@ def countRks(
                     # )  # 计算单曲rks喵
 
                 else:
-                    rks: float = 0
+                    rks = 0.0
 
             except KeyError:
-                record_diff: float = 0
                 rks: float = 0
-                logger.warning(f"歌曲{songName}的{diff}定数不存在喵！")
-            except IndexError:
-                record_diff: float = 0
-                rks: float = 0
-                logger.warning(f"歌曲{songName}可能存在旧谱记录喵！")
+                logger.warning(f'歌曲"{songName}"的{diff}定数不存在喵！')
 
-            if countRks:
-                gameRecord[songName][diff].update(
-                    {"difficulty": record_diff, "rks": rks}
-                )
-
-            else:
-                gameRecord[songName][diff].update(
-                    {
-                        "difficulty": record_diff,
-                    }
-                )
+            gameRecord[songName][diff].update({"rks": rks})
 
     return record_data
 
 
-def getB19(records: dict, difficult: dict):
+def getBest(
+    record_data: dict, phi_count: int = 3, best_count: int = 27
+) -> Dict[str, List[dict]]:
     """
-    获取b19喵
+    获取best成绩喵
 
     参数:
-        records (dict): 打歌成绩数据喵
+        record_data (dict): gameRecord/存档 反序列化数据喵
+        phi (int): 要返回phi榜的前几条成绩喵。默认为3喵
+        best (int): 要返回best榜的前几条成绩喵。默认为27喵
 
     返回:
-        (list[dict]): b19列表喵
+        (dict[str, list[dict]]): best列表喵
     """
-    diff_list = {"EZ": 0, "HD": 1, "IN": 2, "AT": 3, "Legacy": 4}
     all_record = []  # 存储所有打歌成绩记录喵
 
-    # 深度拷贝打歌成绩数据字典喵(防止进行b19排序等操作影响到原数据喵)
-    record = deepcopy(records)
+    if record_data.get("gameRecord") is not None and isinstance(
+        record_data["gameRecord"], dict
+    ):
+        gameRecord = record_data["gameRecord"]
 
-    # 这段代码怪复杂的喵(至少对于本喵来说喵，明明是自己写的却看不太懂喵)
+    else:
+        gameRecord = record_data
+
+    # 深度拷贝打歌成绩数据字典喵(防止进行best排序等操作影响到原数据喵)
+    record = deepcopy(gameRecord)
+
     for song in record.items():  # 遍历所有歌曲记录喵
         for song_record in song[1].items():  # 遍历每首歌的所有难度记录喵
             song_record[1]["name"] = song[0]  # 取歌名添加进原数据中喵
 
             # 将难度等级添加进原数据中喵
             song_record[1]["level"] = song_record[0]
-
-            difficulty: float = difficult[song[0]][diff_list[song_record[0]]]
-            song_record[1]["rks"] = (
-                ((song_record[1]["acc"] - 55) / 45) ** 2
-            ) * difficulty
             all_record.append(song_record[1])  # 添加到全部记录列表中喵
 
-    # 对全部记录以rks为准进行排序
+    # 对全部记录以rks为准进行排序喵
     all_record.sort(key=lambda x: x["rks"], reverse=True)
     try:
         # 脑子爆烧唔，应该是取最高等效rks的phi成绩喵(抄过来的喵x)
-        b19 = [
-            max(
-                filter(lambda x: x["score"] == 1000000, all_record),
-                key=lambda x: x["difficulty"],
-            )
-        ]
+        phi_list = list(filter(lambda x: x["score"] == 1000000, all_record))[:phi_count]
 
-    except ValueError:  # 如果找不到AP曲子就返回全部记录列表的前19个
+    except ValueError:
         logger.warning("好家伙，居然一首AP曲子都没有喵！")
-        return all_record[:19]
+        phi_list = []
 
-    # 将全部记录列表中取前19个拼接到b19列表中喵，准确来说是b20喵(?)
-    b19.extend(all_record[:19])
-    return b19  # 返回b19喵(准确来说应该得叫b20喵)
+    for p in phi_list:
+        all_record.remove(p)
+
+    # 返回best列表喵
+    return {"phi": phi_list, "best": all_record[:best_count]}
+
+
+def getB19(records: dict) -> List[dict]:
+    """
+    获取b19喵（现在Phigros已不使用b19进行计算rks了，请使用`getB30()`喵！）
+
+    参数:
+        records (dict): gameRecord/存档 反序列化数据喵
+
+    返回:
+        (list[dict]): b19列表喵
+    """
+    best_dict = getBest(records, 1, 19)
+    phi, best = best_dict["phi"], best_dict["best"]
+
+    phi.extend(best)
+    return phi  # 返回b19喵(准确来说应该得叫b20喵)
+
+
+def getB30(records: dict):
+    """
+    获取b30喵
+
+    参数:
+        records (dict): gameRecord/存档 反序列化数据喵
+
+    返回:
+        (list[dict]): b30列表喵
+    """
+    best_dict = getBest(records, 3, 27)
+    phi, best = best_dict["phi"], best_dict["best"]
+
+    phi.extend(best)
+    return phi  # 返回b30喵
 
 
 def decryptSave(save_dict: Dict[str, Any]) -> Dict[str, Dict[str, Any]]:
@@ -292,16 +394,18 @@ def decryptSave(save_dict: Dict[str, Any]) -> Dict[str, Dict[str, Any]]:
     反序列化存档原始数据喵
 
     参数:
-        save_dict (dict[str, Any]): 存档原始数据喵(unzipSave()可得喵)
+        save_dict (dict[str, Any]): 存档原始数据喵
 
     返回:
         (dict[str, dict]): 存档反序列化数据喵
     """
-    file_head = {}
+    file_head = {}  # 存储文件头数据喵
+    # 获取每个文件的文件头喵（起始第一个字节喵）
     for key, value in save_dict.items():
         file_head[key] = value[0].to_bytes()
 
-    structure_list = getStructure(file_head)
+    # 根据文件头获取反序列化用的结构类喵
+    structure_list = headGetStructure(file_head)
 
     for key, value in save_dict.items():
         save_dict[key] = decrypt(value[1:])
@@ -317,14 +421,13 @@ def encryptSave(save_dict: Dict[str, Any]):
     序列化存档数据喵
 
     参数:
-        save_dict (dict[str, dict]): 反序列化存档数据喵
+        save_dict (dict[str, dict]): 存档反序列化数据喵
 
     返回:
-        (dict[str, bytes]): 序列化存档数据喵
+        (dict[str, bytes]): 存档序列化数据喵
     """
-
     file_head = getFileHead(save_dict)
-    structure_list = getStructure(file_head)
+    structure_list = headGetStructure(file_head)
 
     for key, value in save_dict.items():
         reader = Writer()
@@ -335,28 +438,28 @@ def encryptSave(save_dict: Dict[str, Any]):
     return save_dict
 
 
-def parseSave(save_data: bytes):
+def parseSaveDict(save_data: bytes):
     """
-    反序列化存档数据
+    反序列化存档原始数据为存档字典数据喵
 
     参数:
-        save_data (bytes): 存档数据
+        save_data (bytes): 存档原始数据喵
 
     返回:
-        (dict[str, dict[str, Any]]): 反序列化后的存档数据
+        (dict[str, dict[str, Any]]): 存档反序列化数据喵
     """
-    return decryptSave(unzipSave(save_data))
+    return decryptSave(unzipFile(save_data))
 
 
-def buildSave(save_dict: Dict[str, dict]):
+def buildSaveDict(save_dict: Dict[str, dict]):
     """
-    序列化存档数据
+    序列化存档字典数据为存档原始数据喵
 
     参数:
-        save_dict (dict[str, dict]): 反序列化后的存档数据
+        save_dict (dict[str, dict]): 存档反序列化数据喵
 
     返回:
-        (bytes): 存档数据
+        (bytes): 存档原始数据喵
     """
     return zipSave(encryptSave(save_dict))
 
@@ -386,10 +489,10 @@ def findDifferentKeys(dict1: dict, dict2: dict):
             if dict1[key] != dict2[key]:
                 diff_keys.append(key)
 
-    return diff_keys  # 返回不同的大键
+    return diff_keys  # 返回不同的大键喵
 
 
-def loadRecordHistory(recordHistory: Dict[str, dict]):
+def readRecordHistory(recordHistory: Dict[str, dict]):
     """
     解析recordHistory喵
 
@@ -423,7 +526,7 @@ def checkSaveHistory(
     参数
         sessionToken (str): 玩家的sessionToken喵
         summary (dict): 玩家的summary喵
-        save_data (bytes): 存档数据喵
+        save_data (bytes): 存档原始数据喵
         difficulty (dict[str, list]): 难度定数数据喵
 
     返回:
@@ -470,15 +573,15 @@ def checkSaveHistory(
 
     # 如果没有相同校验值，则添加进历史记录并保存存档喵
     if not summary["checksum"] in checksumHistory:
-        record_old = loadRecordHistory(recordHistory)
-        save_dict = unzipSave(save_data)
+        record_old = readRecordHistory(recordHistory)
+        save_dict = unzipFile(save_data)
 
         del save_dict["gameKey"]
         del save_dict["gameProgress"]
         del save_dict["settings"]
         del save_dict["user"]
 
-        save_dict = countRks(decryptSave(save_dict), difficulty, False)
+        save_dict = decryptSave(save_dict)
         record_new = save_dict["gameRecord"]
         differentRecord = findDifferentKeys(record_old, record_new)
 
@@ -496,9 +599,7 @@ def checkSaveHistory(
             ) as file:
                 file.write(dumps(summaryHistory, indent=4, ensure_ascii=False))
 
-            with open(
-                f"saveHistory/{sessionToken}/{nowTime}.save", "wb"
-            ) as save:
+            with open(f"saveHistory/{sessionToken}/{nowTime}.save", "wb") as save:
                 save.write(save_data)
 
             with open(
@@ -509,9 +610,7 @@ def checkSaveHistory(
                 recordHistory[nowTime] = new_record
                 file.write(dumps(recordHistory, indent=4, ensure_ascii=False))
 
-            logger.info(
-                f"已保存了新的record历史记录喵！歌曲数：{len(differentRecord)}"
-            )
+            logger.info(f"已保存了新的record历史记录喵！歌曲数：{len(differentRecord)}")
             logger.info(f"已保存了新的存档历史记录喵！时间：{nowTime}")
             return True
 
@@ -572,14 +671,14 @@ def readTsvFile(path: str):
 
 def formatGameKey(save_dict: dict, filePath: str = "./") -> Dict[str, dict]:
     """
-    为gameKey反序列化数据添加key类型标记
+    为gameKey反序列化数据添加key类型标记喵（调试用，未来可能会删除喵）
 
     参数:
-        save_dict (dict): 存档数据/gameKey数据
-        filePath (str): 标记类型用的信息文件目录
+        save_dict (dict): 存档反序列化数据/gameKey数据喵
+        filePath (str): 标记类型用的信息文件目录喵
 
     返回:
-        (dict): 标记类型后的 存档数据/gamKey数据
+        (dict): 标记类型后的 存档反序列化数据/gamKey数据喵
     """
     if save_dict.get("gameKey") is not None:
         gameKeys = save_dict["gameKey"]["keyList"]
@@ -624,6 +723,15 @@ def formatGameKey(save_dict: dict, filePath: str = "./") -> Dict[str, dict]:
 
 
 def formatSaveDict(save_dict: Dict[str, dict]):
+    """
+    给save_dict排序喵（调试用，未来可能会删除喵）
+
+    参数:
+        save_dict (dict[str, dict]): 存档反序列化数据喵
+
+    返回:
+        (dict[str. dict]): 排序后的存档反序列化数据喵
+    """
     new_save_dict = {}
 
     for key in ["user", "gameProgress", "settings", "gameRecord", "gameKey"]:

@@ -3,12 +3,12 @@
 from base64 import b64decode
 from hashlib import md5
 from json import dumps
-from struct import unpack
 from typing import Any, Optional, Union
 
 from requests import Session
 
 from .ActionLib import checkSessionToken
+from .Structure import Reader, summary
 from .logger import logger
 
 
@@ -49,9 +49,7 @@ class PigeonRequest:
 
         return PigeonRequest(client=self.client, headers=header)
 
-    def request(
-        self, method: str, url: str, headers: Optional[dict] = None, **kwargs
-    ):
+    def request(self, method: str, url: str, headers: Optional[dict] = None, **kwargs):
         method = method.upper()
 
         if headers is None:
@@ -163,9 +161,7 @@ class PhigrosCloud:
         logger.debug("调用函数：getNickname()")
 
         # 请求并解析获取玩家昵称喵
-        return_data = (self.request.get(self.baseUrl + "users/me")).json()[
-            "nickname"
-        ]
+        return_data = (self.request.get(self.baseUrl + "users/me")).json()["nickname"]
 
         logger.debug(f'函数"getNickname()"返回：{return_data}')
         return return_data
@@ -180,27 +176,28 @@ class PhigrosCloud:
         logger.debug("调用函数：getSummary()")
 
         # 请求并初步解析存档信息喵
-        result = (
-            self.request.get(self.baseUrl + "classes/_GameSave?limit=1")
-        ).json()["results"][0]
-        summary = b64decode(result["summary"])  # base64解码summary数据喵
+        result = (self.request.get(self.baseUrl + "classes/_GameSave?limit=1")).json()[
+            "results"
+        ][0]
+        summary_data = b64decode(result["summary"])  # base64解码summary数据喵
 
-        # 解析summary数据喵(这行是真的看不懂喵)
-        summary = unpack("=BHfBx%ds12H" % summary[8], summary)
+        # 解析summary数据喵（谢谢废酱喵！）
+        summary_dict = Reader(summary_data).parseStructure(summary)
+
         return_data = {  # 解析数据并返回一个字典喵
             # 这是存档的md5校验值喵
             "checksum": result["gameFile"]["metaData"]["_checksum"],
             "updateAt": result["updatedAt"],  # 这是存档更新时间喵
             "url": result["gameFile"]["url"],  # 这是存档直链喵
-            "saveVersion": summary[0],  # 这是存档版本喵
-            "challenge": summary[1],  # 课题分喵
-            "rks": summary[2],  # 正如其名不多讲了喵
-            "gameVersion": summary[3],  # 这是游戏版本喵
-            "avatar": summary[4].decode(),  # 这是头像喵
-            "EZ": summary[5:8],  # EZ难度的评级情况喵
-            "HD": summary[8:11],  # HD难度的评级情况喵
-            "IN": summary[11:14],  # IN难度的评级情况喵
-            "AT": summary[14:17],  # AT难度的评级情况喵
+            "saveVersion": summary_dict["saveVersion"],  # 这是存档版本喵
+            "challenge": summary_dict["challenge"],  # 课题分喵
+            "rks": summary_dict["rks"],  # 正如其名不多讲了喵
+            "gameVersion": summary_dict["gameVersion"],  # 这是游戏版本喵
+            "avatar": summary_dict["avatar"],  # 这是头像喵
+            "EZ": summary_dict["EZ"],  # EZ难度的评级情况喵
+            "HD": summary_dict["HD"],  # HD难度的评级情况喵
+            "IN": summary_dict["IN"],  # IN难度的评级情况喵
+            "AT": summary_dict["AT"],  # AT难度的评级情况喵
         }
 
         logger.debug(f'函数"getSummary()"返回：{return_data}')
@@ -212,11 +209,9 @@ class PhigrosCloud:
         """
         获取存档数据喵 (压缩包数据喵)
 
-        (返回的数据可用ReadGameSave()读取喵)
-
         参数:
-            url (str | None): 存档的 URL 喵。留空自动获取当前token的数据喵
-            checksum (str | None): 存档的 md5 校验值喵。留空自动获取当前token的数据喵
+            url (str | None): 存档的URL喵。留空自动获取当前token的数据喵
+            checksum (str | None): 存档的md5校验值喵。留空自动获取当前token的数据喵
 
         返回:
             (bytes): 存档压缩包数据喵
@@ -238,9 +233,7 @@ class PhigrosCloud:
             logger.error(
                 f"严重警告喵！！！获取到的云存档大小不足 30 字节喵！当前大小喵：{len(save_data)}"
             )
-            logger.error(
-                "可能云存档已丢失喵！！！请重新将本地存档同步至云端喵！"
-            )
+            logger.error("可能云存档已丢失喵！！！请重新将本地存档同步至云端喵！")
             raise ValueError(
                 f"获取到的云存档大小不足 30 字节喵！当前大小喵：{len(save_data)}"
             )
@@ -248,9 +241,7 @@ class PhigrosCloud:
         save_md5 = md5()  # 创建一个md5对象，用来计算md5校验值喵
         save_md5.update(save_data)  # 将存档数据更新进去喵
         actual_checksum = save_md5.hexdigest()
-        if (
-            checksum != actual_checksum
-        ):  # 对比校验值喵，不正确则输出警告并等待喵
+        if checksum != actual_checksum:  # 对比校验值喵，不正确则输出警告并等待喵
             logger.error("严重警告喵！！！存档校验不通过喵！")
             logger.error("这可能是因为不正确地上传存档导致的喵！")
             raise ValueError(
@@ -264,11 +255,7 @@ class PhigrosCloud:
         """
         刷新sessionToken喵
 
-        注意：原先的sessionToken将会失效喵！
-
-        (会返回新的sessionToken喵！)
-
-        (刷新是即时的喵，旧token会立即失效喵，新的会即时生效喵)
+        注意：原先的sessionToken会立即失效喵！刷新是即时的喵，旧token会立即失效喵，新的也会立即生效喵
 
         返回:
             (str): 新的sessionToken喵
@@ -276,15 +263,11 @@ class PhigrosCloud:
         logger.debug("调用函数：refreshSessionToken()")
 
         # 获取玩家的objectId喵
-        objectId = (self.request.get(self.baseUrl + "users/me")).json()[
-            "objectId"
-        ]
+        objectId = (self.request.get(self.baseUrl + "users/me")).json()["objectId"]
 
         # 发送刷新sessionToken请求喵
         new_sessionToken = (
-            self.request.put(
-                self.baseUrl + f"users/{objectId}/refreshSessionToken"
-            )
+            self.request.put(self.baseUrl + f"users/{objectId}/refreshSessionToken")
         ).json()[1]["sessionToken"]
 
         logger.debug(f'函数"refreshSessionToken()"返回：{new_sessionToken}')
@@ -333,7 +316,7 @@ class PhigrosCloud:
         from struct import pack
         from base64 import b64encode
         from json import dumps
-        from datetime import datetime
+        from datetime import datetime, timezone
 
         # 将解析过的summary构建回去喵
         avatar_data = summary["avatar"].encode()  # 对头像名称进行编码喵
@@ -378,9 +361,9 @@ class PhigrosCloud:
                     "summary": summary,
                     "modifiedAt": {
                         "__type": "Date",
-                        "iso": datetime.utcnow().isoformat(
-                            timespec="milliseconds"
-                        )
+                        "iso": datetime.now(timezone.utc)
+                        .replace(tzinfo=None)
+                        .isoformat(timespec="milliseconds")
                         + "Z",
                     },
                     "gameFile": {

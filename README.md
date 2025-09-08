@@ -15,7 +15,7 @@
 
 </div>
 
-# 近期繁忙，本项目将会暂时停止更新喵（
+# 近期繁忙，本项目将会保持极低频率进行更新喵（
 
 ## 声明喵：
 
@@ -35,9 +35,9 @@
 
 ## 环境准备喵！
 
-1. 编写本项目时使用的是 **python3.11.8** 的喵，不能完全保证其他版本会不会出现问题喵，推荐使用 **python>=3.9** 来运行喵~(后面换成3.11.8滴喵！)
+1. 编写本项目时使用的是 **python3.11.8** 的喵，不能完全保证其他版本会不会出现问题喵，推荐使用 **python>=3.9** 来运行喵~(本喵是后面换成3.11.8滴喵！理论上3.9也可以兼容的喵！)
 
-2. 云端数据获取需要phigros的云端sessionToken，获取sessionToken的方法可以参考[**Mivik的bot说明文档**](https://mivik.moe/pgr-bot-help/)里面喵！也可以用本喵用pyinstaller打包好的[**GetSession**](https://github.com/wms26/Phi-CloudAction-python/releases/tag/QR-GST_v1.0)扫码登录来获取喵！也可以使用文酱的tomato部署的[**Phi-Login**](https://www.tomato-aoarasi.com/phi-login/)喵!
+2. 云端数据获取需要phigros的云端sessionToken，获取sessionToken的方法可以参考[**Mivik的bot说明文档**](https://mivik.moe/pgr-bot-help/)里面喵！也可以看本喵另一个仓库[**Phi-GetSession-python**](https://github.com/wms26/Phi-GetSession-python)来获取喵！
 
 3. 获取存档打歌记录数据的过程会计算每首歌每个难度的rks喵，所以需要难度定数文件`difficulty.tsv`喵，本项目仓库里面已经有了喵，但不一定是最新的，获取最新的难度定数文件可以用[文酱](https://github.com/7aGiven)的项目[Phigros_Resource](https://github.com/7aGiven/Phigros_Resource)哦喵！
 
@@ -52,16 +52,14 @@
 pip install <whl_url>
 ```
 
-### 初始化喵!
-
+4. 如果你使用的是UV的话，用这个命令安装喵：
 ```bash
-python -m phi_cloud_action
+uv pip install <whl_url>
 ```
-会把``info``目录和``example``目录拷贝到运行目录下喵
 
 ### 各函数功能使用方法喵：
 
-看``example``目录下的文件吧喵,用上了主要功能，看注释也许都能理解怎么用了罢喵~
+看`test`目录下的文件吧喵,用上了主要功能，看注释也许都能理解怎么用了罢喵~
 
 ## 未来计划功能喵！
 
@@ -85,13 +83,14 @@ python -m phi_cloud_action
 
 
 - [ ] **其他喵：**
-  - [x] ~~获取本地SessionToken喵~~(点[**这里**](https://github.com/wms26/Phi-CloudAction-python/releases/tag/GST_v1.1)来下载喵)
-  - [x] ~~计算b19喵！~~
+  - [x] ~~计算b19喵！~~(当前仅作兼容性考虑对其进行了保留)
+  - [x] ~~计算b30喵！~~
   - [x] ~~将各功能模块化喵~~(更方便使用喵)
-  - [x] ~~存档历史记录~~(使用示例已经在`example.py`里面了喵，会检查存档是否有新记录喵，存在新记录时会进行保存存档和其他信息喵。往后可能会用上喵)
-  - [x] ~~taptap扫码授权获取sessionToken~~(已经发在release中了喵，在[**这里**](https://github.com/wms26/Phi-CloudAction-python/releases/tag/QR-GST_v1.0)喵)
+  - [x] ~~存档历史记录喵~~(使用示例已经在`example.py`里面了喵，会检查存档是否有新记录喵，存在新记录时会进行保存存档和其他信息喵。往后可能会用上喵)
   - [ ] WebGUI(可视化存档信息喵，感觉也没用喵，先咕咕咕吧喵)
   - [ ] Bot(还是咕咕咕，预计可能开新仓库来写喵！)
+  - [x] ~~打包whl并发布在release喵~~
+  - [ ] WebApi(因为各种原因，暂时删除了WebApi，将来会重新回归喵)
 
 ## 喵喵喵~
 
@@ -105,9 +104,22 @@ python -m phi_cloud_action
 
 (快去给[文酱](https://github.com/7aGiven)和[废酱](https://github.com/Catrong)的项目点star喵！)
 
+> 本项目内置了colorlog库，许可证为MIT喵！
+
 ## 更新日志喵：
 
-### 2025/01/12(x1.4.2)：
+### 2025/09/08(v1.4.3):
+1. 首先！本喵没有似！不要乱想了！
+2. 其次！本次更新完善了之前搞了一半的想法：打包whl。目前已经可以打包为whl并使用，往后都会将whl发布在release
+3. 最重要的一点：暂时不考虑上传pypi
+4. 新增了getB30和getBest，用来支持现版本的rks计算方式
+5. 将colorlog调整为内置的库（请注意该库带有MIT许可证），但是依然优先使用外部安装的colorlog库
+6. 内置了歌曲定数文件，但是不一定是最新，请优先自行在工作目录下放置最新的定数文件以保证正常运行
+7. 修复了summary的反序列化和序列化错误的问题
+8. 修正并更新了部分代码，补全更正了部分注释（可能没有完全喵化）
+9. 因为各种原因，暂时删除了WebApi，将来会重新回归（其实就是因为懒）
+
+### 2025/01/12(v1.4.2)：
 1. 修复了写出的存档json数据在修改后，gameRecord中难度顺序更改导致成绩错误的问题
 2. 修复了example.py中未计算等效rks的问题
 

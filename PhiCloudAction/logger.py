@@ -15,7 +15,11 @@ from os.path import join, exists
 from typing import Optional
 import sys
 
-from colorlog import ColoredFormatter
+try:
+    from colorlog import ColoredFormatter # type: ignore
+
+except ImportError:
+    from ._colorlog import ColoredFormatter
 
 # ---------------------- 定义赋值区喵 ----------------------
 
@@ -34,9 +38,7 @@ def set_local_logger(level=DEBUG):
     log_path = "./log/"
     if not exists(log_path):
         mkdir(log_path)
-    log_name = (
-        f'{datetime.now().strftime("%Y-%m-%d_%H-%M-%S")}_{int(time())}.log'
-    )
+    log_name = f'{datetime.now().strftime("%Y-%m-%d_%H-%M-%S")}_{int(time())}.log'
     log_format = "[%(asctime)s] [%(module)s-%(funcName)s][%(name)s] [%(levelname)s] - %(message)s"
 
     # 创建日志记录器喵

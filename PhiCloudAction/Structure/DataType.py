@@ -367,9 +367,7 @@ class String(dataTypeAbstract):
         string_len, pos = VarInt.read(
             data, pos
         )  # 读当前位置的变长整数喵，代表后续字节长度喵
-        string_val = data[
-            pos : pos + string_len
-        ].decode()  # 读取一段字节并uft-8解码喵
+        string_val = data[pos : pos + string_len].decode()  # 读取一段字节并uft-8解码喵
 
         return string_val, pos + string_len  # 返回读取到的数据喵
 
@@ -476,13 +474,11 @@ class GameRecord(dataTypeAbstract):
                     score: int = reader.type_read(Int)  # 读取分数喵
                     acc: float = reader.type_read(Float)  # 读取acc喵
 
-                    song[diff_list[level]] = (
-                        {  # 按难度存储进单首歌的成绩数据中喵
-                            "score": score,  # 分数喵
-                            "acc": acc,  # ACC喵
-                            "fc": Bit.read(fc, level),  # 是否Full Combo喵(FC)
-                        }
-                    )
+                    song[diff_list[level]] = {  # 按难度存储进单首歌的成绩数据中喵
+                        "score": score,  # 分数喵
+                        "acc": acc,  # ACC喵
+                        "fc": Bit.read(fc, level),  # 是否Full Combo喵(FC)
+                    }
 
             if reader.pos != end_position:
                 logger.error(
@@ -519,6 +515,21 @@ class GameRecord(dataTypeAbstract):
             writer.type_write(Bits, str(unlock))
             writer.type_write(Bits, str(fc))
             writer.type_write(Byte, record_writer.get_data())
+
+        return writer.get_data()
+
+
+class Summary(dataTypeAbstract):
+    @staticmethod
+    def read(data: bytes, pos: int):
+        reader = Reader(data, pos)
+        return [reader.type_read(ShortInt) for _ in range(3)], reader.pos
+
+    @staticmethod
+    def write(data: bytearray, value: list):
+        writer = Writer(data)
+        for i in value:
+            writer.type_write(ShortInt, i)
 
         return writer.get_data()
 
@@ -651,9 +662,7 @@ class Writer:
                 self.bit_temp[0] = 0
                 self.bit_temp[1] = True
 
-            self.bit_temp[0] = Bit.write(
-                self.bit_temp[0], self.bit_temp[2], value
-            )
+            self.bit_temp[0] = Bit.write(self.bit_temp[0], self.bit_temp[2], value)
             self.bit_temp[2] += 1
 
         else:

@@ -1,28 +1,16 @@
 [project]
-name = "phi_cloud_action"
-version = "1.4.2"
+name = "phicloudaction"
+version = "1.4.3"
 description = "使用Python实现的Phigros云端数据操作"
-authors = [
-    {name = "wms26", email = "2652015696@qq.com"},
-]
-dependencies = [
-    "requests>=2.32.3", 
-    "pycryptodome>=3.21.0", 
-    "colorlog>=6.9.0", 
-    "fastapi>=0.115.8", 
-    "uvicorn>=0.33.0", 
-    "pyyaml>=6.0.2",
-    ]
-requires-python = ">=3.8"
+authors = [{ name = "wms26", email = "qianqi26@616.sb" }]
+license = "GPL-3.0-or-later"
 readme = "README.md"
-license = {text = "GPL-3.0"}
+requires-python = ">=3.11"
+dependencies = ["pycryptodome>=3.23.0", "requests>=2.32.5"]
 
 [build-system]
 requires = ["setuptools", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [tool.setuptools.package-data]
-phi_cloud_action = ["data/info/*.tsv","data/info/*.txt","data/example/*.py","data/*.yml"]
-
-[tool.setuptools.packages]
-find = {where = ["."], exclude = ["tests*"]} 
+PhiCloudAction = ["info/*.tsv", "info/*.txt", "_colorlog/LICENSE"]

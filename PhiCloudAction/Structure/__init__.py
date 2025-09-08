@@ -7,11 +7,12 @@ from .gameKey import *
 from .gameProgress import *
 from .settings import *
 from .user import *
+from .summary import *
 
 # ---------------------- 定义赋值区喵 ----------------------
 
 
-def getStructure(file_head: Dict[str, bytes]) -> Dict[str, Any]:
+def headGetStructure(file_head: Dict[str, bytes]) -> Dict[str, Any]:
     """
     根据文件头获取对应结构类喵
 
