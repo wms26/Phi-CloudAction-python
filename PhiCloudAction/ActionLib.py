@@ -5,10 +5,12 @@ from datetime import datetime
 from io import BytesIO
 from json import dumps, loads
 from os import mkdir
-from os.path import dirname, abspath, exists, join
+from os.path import dirname, abspath, exists, join, isfile
 from re import match
 from typing import Any, Dict, List, Optional
 from zipfile import ZipFile, ZIP_DEFLATED
+from requests import get
+
 
 from .AES import decrypt, encrypt
 from .Structure import headGetStructure, getFileHead, Reader, Writer
@@ -79,6 +81,53 @@ def checkSessionToken(sessionToken: str, _raise: bool = True) -> bool:
         return True
 
 
+def getDifficultyPath(path: Optional[str] = None) -> str:
+    """
+    获取歌曲谱面定数文件的路径喵
+
+    参数:
+        path (str): 歌曲谱面定数文件路径喵。注意是要文件路径喵！
+
+    返回:
+        (str): 歌曲谱面定数文件路径喵。找不到会触发`ValueError`哦
+    """
+    # 如果没有提供文件路径喵
+    if path is None:
+        logger.debug("没有提供歌曲谱面定数文件路径，尝试自动寻找喵...")
+
+        # 优先从工作路径下寻找定数文件喵
+        if exists("./difficulty.tsv"):
+            file_path = "./difficulty.tsv"
+            logger.debug(f'在工作目录下找到了歌曲谱面定数文件喵："./difficulty.tsv"')
+
+        elif exists("./info/difficulty.tsv"):
+            file_path = "./info/difficulty.tsv"
+            logger.debug(
+                f'在工作目录下找到了歌曲谱面定数文件喵："./info/difficulty.tsv"'
+            )
+
+        # 其次尝试寻找此文件所在目录下是否有定数文件喵
+        elif exists(join(local_path, "info", "difficulty.tsv")):
+            file_path = join(local_path, "info", "difficulty.tsv")
+            logger.debug(f'在库目录下找到了歌曲谱面定数文件喵："{file_path}"')
+
+        else:
+            raise ValueError("找不到歌曲谱面定数文件喵！")
+
+    # 优先使用提供的文件路径喵
+    else:
+        if not exists(path):
+            raise ValueError(f'路径"{path}"不存在喵！')
+
+        elif not isfile(path):
+            raise FileNotFoundError(f'路径"{path}"不是文件喵！')
+
+        else:
+            file_path = path
+
+    return file_path
+
+
 def readDifficultyFile(path: Optional[str] = None) -> Dict[str, List[float]]:
     """
     读取歌曲谱面定数文件喵
@@ -89,35 +138,7 @@ def readDifficultyFile(path: Optional[str] = None) -> Dict[str, List[float]]:
     返回:
         (dict[str, list[float]]): 歌曲谱面定数数据喵。以歌曲id为键，值为单曲难度列表喵
     """
-    # 如果没有提供文件路径喵
-    if path is None:
-        logger.debug("没有提供歌曲谱面定数文件路径，尝试自动寻找喵...")
-
-        # 优先从工作路径下寻找定数文件喵
-        if exists("./difficulty.tsv"):
-            logger.debug(f'在工作目录下找到了歌曲谱面定数文件喵："./difficulty.tsv"')
-            file_path = "./difficulty.tsv"
-
-        elif exists("./info/difficulty.tsv"):
-            logger.debug(
-                f'在工作目录下找到了歌曲谱面定数文件喵："./info/difficulty.tsv"'
-            )
-            file_path = "./info/difficulty.tsv"
-
-        # 其次尝试寻找此文件所在目录下是否有定数文件喵
-        elif exists(join(local_path, "info/difficulty.tsv")):
-            logger.debug(f'在库目录下找到了歌曲谱面定数文件喵："./info/difficulty.tsv"')
-            file_path = join(local_path, "info/difficulty.tsv")
-
-        else:
-            raise ValueError("找不到歌曲谱面定数文件喵！")
-
-    # 优先使用提供的文件路径喵
-    else:
-        if not exists(path):
-            raise FileExistsError(f'文件"{path}"不存在喵！')
-
-        file_path = path
+    file_path = getDifficultyPath(path)
 
     difficulty_list = {}  # 存储最终解析出来的歌曲谱面定数数据喵
     with open(file_path, encoding="UTF-8") as f:  # 打开歌曲谱面定数文件喵
@@ -512,12 +533,7 @@ def readRecordHistory(recordHistory: Dict[str, dict]):
     return records
 
 
-def checkSaveHistory(
-    sessionToken: str,
-    summary: dict,
-    save_data: bytes,
-    difficulty: Dict[str, list],
-):
+def checkSaveHistory(sessionToken: str, summary: dict, save_data: bytes):
     """
     更新存档历史记录喵
 
@@ -527,7 +543,6 @@ def checkSaveHistory(
         sessionToken (str): 玩家的sessionToken喵
         summary (dict): 玩家的summary喵
         save_data (bytes): 存档原始数据喵
-        difficulty (dict[str, list]): 难度定数数据喵
 
     返回:
         (bool): 是否更新了存档历史记录喵
@@ -550,9 +565,7 @@ def checkSaveHistory(
 
     else:
         with open(
-            f"saveHistory/{sessionToken}/summaryHistory.json",
-            "r",
-            encoding="utf-8",
+            f"saveHistory/{sessionToken}/summaryHistory.json", "r", encoding="utf-8"
         ) as file:
             summaryHistory = loads(file.read())
 
@@ -562,9 +575,7 @@ def checkSaveHistory(
 
     else:
         with open(
-            f"saveHistory/{sessionToken}/recordHistory.json",
-            "r",
-            encoding="utf-8",
+            f"saveHistory/{sessionToken}/recordHistory.json", "r", encoding="utf-8"
         ) as file:
             recordHistory = loads(file.read())
 
@@ -574,12 +585,7 @@ def checkSaveHistory(
     # 如果没有相同校验值，则添加进历史记录并保存存档喵
     if not summary["checksum"] in checksumHistory:
         record_old = readRecordHistory(recordHistory)
-        save_dict = unzipFile(save_data)
-
-        del save_dict["gameKey"]
-        del save_dict["gameProgress"]
-        del save_dict["settings"]
-        del save_dict["user"]
+        save_dict = unzipFile(save_data, "gameRecord")
 
         save_dict = decryptSave(save_dict)
         record_new = save_dict["gameRecord"]
@@ -593,9 +599,7 @@ def checkSaveHistory(
                 new_record[key] = record_new[key]
 
             with open(
-                f"saveHistory/{sessionToken}/summaryHistory.json",
-                "w",
-                encoding="utf-8",
+                f"saveHistory/{sessionToken}/summaryHistory.json", "w", encoding="utf-8"
             ) as file:
                 file.write(dumps(summaryHistory, indent=4, ensure_ascii=False))
 
@@ -603,9 +607,7 @@ def checkSaveHistory(
                 save.write(save_data)
 
             with open(
-                f"saveHistory/{sessionToken}/recordHistory.json",
-                "w",
-                encoding="utf-8",
+                f"saveHistory/{sessionToken}/recordHistory.json", "w", encoding="utf-8"
             ) as file:
                 recordHistory[nowTime] = new_record
                 file.write(dumps(recordHistory, indent=4, ensure_ascii=False))
@@ -739,3 +741,140 @@ def formatSaveDict(save_dict: Dict[str, dict]):
             new_save_dict[key] = save_dict[key]
 
     return new_save_dict
+
+
+def getXtowerVersion():
+    """
+    获取xtower的云端资源版本号喵
+
+    返回:
+        (tuple[str, str]): phigros的版本名和版本号喵
+    """
+    xtower_version_url = "https://somnia.xtower.site/info/version.txt"
+
+    logger.debug(f'云端资源版本号URL："{xtower_version_url}"')
+    version_str = get(xtower_version_url).text
+
+    match_result = match(r"(.*?) \((.*?)\)", version_str)
+
+    if match_result is not None:
+        version_name = match_result.group(1).strip()
+        version_code = match_result.group(2).strip()
+
+    else:
+        version_name = ""
+        version_code = ""
+
+    logger.debug(f'获取到的云端资源版本号："{version_name, version_code}"')
+
+    return version_name, version_code
+
+
+def getXtowerDifficulty():
+    """
+    获取xtower的云端定数文件喵
+
+    返回:
+        (dict[str, list[float]]): 歌曲谱面定数数据喵。以歌曲id为键，值为单曲难度列表喵
+    """
+    xtower_difficulty_url = "https://somnia.xtower.site/info/difficulty.tsv"
+
+    logger.debug(f'云端定数文件URL："{xtower_difficulty_url}"')
+    difficulty_str = get(xtower_difficulty_url).text
+
+    logger.debug(f"获取到的云端定数文件大小：{len(difficulty_str.encode())} bytes")
+
+    return difficulty_str
+
+
+def get7aGivenVersion(proxy_url: Optional[str] = "https://gh.llkk.cc/"):
+    """
+    获取7aGiven的云端资源版本号喵
+
+    参数:
+        proxy_url (str | None): github代理喵
+
+    返回:
+        (tuple[str, str]): phigros的版本名和版本号喵
+    """
+    github_version_url = "https://raw.githubusercontent.com/7aGiven/Phigros_Resource/refs/heads/info/version.txt"
+    github_version_url = f"{proxy_url}{github_version_url}"
+
+    logger.debug(f'云端资源版本号URL："{github_version_url}"')
+    version_str = get(github_version_url).text.strip()
+
+    logger.debug(f'获取到的云端资源版本号："{version_str, None}"')
+
+    return version_str, None
+
+
+def get7aGivenDifficulty(proxy_url: Optional[str] = "https://gh.llkk.cc/"):
+    """
+    获取7aGiven的云端定数文件喵
+
+    参数:
+        proxy_url (str | None): github代理喵
+
+    返回:
+        (dict[str, list[float]]): 歌曲谱面定数数据喵。以歌曲id为键，值为单曲难度列表喵
+    """
+    github_difficulty_url = "https://raw.githubusercontent.com/7aGiven/Phigros_Resource/refs/heads/info/difficulty.tsv"
+    github_difficulty_url = f"{proxy_url}{github_difficulty_url}"
+
+    logger.debug(f'云端定数URL："{github_difficulty_url}"')
+    difficulty_str = get(github_difficulty_url).text
+
+    logger.debug(f"获取到的云端定数文件大小：{len(difficulty_str.encode())} bytes")
+
+    return difficulty_str
+
+
+def updateDifficulty(path: Optional[str] = None, force_update: bool = False):
+    """
+    检查并更新定数文件喵
+
+    参数:
+        path (str | None): 定数文件的路径喵。会根据于定数文件同一目录下的version.txt判断是否需要更新
+        force_update (bool): 是否强制更新定数文件喵。将会会跳过版本号检查喵
+    """
+    difficulty_path = getDifficultyPath(path)
+    version_path = join(dirname(difficulty_path), "version.txt")
+
+    if not force_update:
+        version_cloud = getXtowerVersion()[0]
+
+        with open(version_path, "r", encoding="utf-8") as file:
+            version_local = file.read()
+        logger.debug(f"version_local = {version_local}")
+
+    else:
+        version_cloud = ""
+        version_local = ""
+
+    if force_update or version_local != version_cloud:
+        difficulty_str = getXtowerDifficulty()
+
+        logger.debug(f'定数数据将保存至 "{difficulty_path}" 中喵！')
+        with open(difficulty_path, "w", encoding="utf-8") as file:
+            file.write(difficulty_str)
+
+        logger.debug(f'版本号将保存至 "{version_path}" 中喵！')
+        with open(version_path, "w", encoding="utf-8") as file:
+            file.write(version_cloud)
+
+        local_difficulty_path = join(local_path, "info", "difficulty.tsv")
+
+        if (
+            path is None
+            and local_difficulty_path != difficulty_path
+            and exists(local_difficulty_path)
+        ):
+            logger.debug(f'定数数据将额外保存至 "{local_difficulty_path}" 中喵！')
+            with open(local_difficulty_path, "w", encoding="utf-8") as file:
+                file.write(difficulty_str)
+
+            local_version_path = join(local_path, "info", "version.txt")
+
+            logger.debug(f'版本号将额外保存至 "{local_version_path}" 中喵！')
+            with open(local_version_path, "w", encoding="utf-8") as file:
+                file.write(version_cloud)

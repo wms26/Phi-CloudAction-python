@@ -1,6 +1,6 @@
 [project]
 name = "phicloudaction"
-version = "1.4.3"
+version = "1.4.5"
 description = "使用Python实现的Phigros云端数据操作"
 authors = [{ name = "wms26", email = "qianqi26@616.sb" }]
 license = "GPL-3.0-or-later"
@@ -8,9 +8,15 @@ readme = "README.md"
 requires-python = ">=3.11"
 dependencies = ["pycryptodome>=3.23.0", "requests>=2.32.5"]
 
+[project.urls]
+Repository = "https://github.com/wms26/Phi-CloudAction-python"
+
 [build-system]
 requires = ["setuptools", "wheel"]
 build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+packages = ["PhiCloudAction"]
 
 [tool.setuptools.package-data]
 PhiCloudAction = ["info/*.tsv", "info/*.txt", "_colorlog/LICENSE"]

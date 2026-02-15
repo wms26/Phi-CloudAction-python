@@ -2,6 +2,7 @@ from json import dumps
 from sys import argv
 
 from PhiCloudAction import (
+    updateDifficulty,
     PhigrosCloud,
     parseSaveDict,
     readDifficultyFile,
@@ -19,6 +20,8 @@ else:
     sessionToken = argv[1]
 
 if __name__ == "__main__":
+    updateDifficulty()
+
     with PhigrosCloud(sessionToken) as cloud:
         logger.info(f"玩家昵称：{cloud.getNickname()}")
 
@@ -50,4 +53,4 @@ if __name__ == "__main__":
         count_rks += b["rks"]
     logger.info(f"B30计算出来的RKS：{count_rks / 30}")
 
-    checkSaveHistory(sessionToken, summary, save_data, difficult)
+    checkSaveHistory(sessionToken, summary, save_data)

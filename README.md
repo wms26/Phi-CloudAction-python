@@ -7,7 +7,7 @@
 
 <img src="https://counter.seku.su/cmoe?name=phi-cloud-py&theme=r34" title="喵喵喵~"/><br>
 
-[![Phi-LocalAction-python](https://img.shields.io/badge/Github-LocalAction(本地数据操作)-red?style=for-the-badge&logo=Github)](https://github.com/wms26/Phi-LocalAction-python)
+[![Phi-LocalAction-python](<https://img.shields.io/badge/Github-LocalAction(本地数据操作)-red?style=for-the-badge&logo=Github>)](https://github.com/wms26/Phi-LocalAction-python)
 
 [![PhigrosLibrary](https://img.shields.io/badge/文酱-Phigros_Library-blue?style=for-the-badge&logo=Github)](https://github.com/7aGiven/PhigrosLibrary)
 [![phi-plugin](https://img.shields.io/badge/废酱-phi--plugin-blue?style=for-the-badge&logo=github)](https://github.com/Catrong/phi-plugin)
@@ -16,6 +16,7 @@
 </div>
 
 # 因为各种原因，本项目进入长期停更状态，非必要将不会进行任何更新......
+
 ## 好无聊喵喵喵，也许会什么时候开个新仓库写新玩意（）
 
 ## 声明喵：
@@ -49,11 +50,13 @@
 1. 查看[Releases](https://github.com/wms26/Phi-CloudAction-python/releases)喵
 2. 查找最新版本的 `.whl` 文件喵
 3. 复制链接并使用以下命令安装喵：
+
 ```bash
 pip install <whl_url>
 ```
 
 4. 如果你使用的是UV的话，用这个命令安装喵：
+
 ```bash
 uv pip install <whl_url>
 ```
@@ -74,14 +77,12 @@ uv pip install <whl_url>
   - [x] ~~获取存档时进行md5校验喵~~
   - [ ] ~~上传云存档~~(不计划实现)
 
-
 - [x] **存档操作喵[Structure/*.py]**(已模块化喵)(注释较为完整喵)
   - [x] ~~云存档解密喵~~
   - [x] ~~根据云存档解析所有内容喵~~
   - [x] ~~根据解析内容构建云存档喵~~
   - [x] ~~结构化解析存档喵~~
   - [x] ~~支持旧版云存档喵~~(`gameKey`最低支持到`\x02`的文件头，`gameProgress`最低`\x03`喵)
-
 
 - [ ] **其他喵：**
   - [x] ~~计算b19喵！~~(当前仅作兼容性考虑对其进行了保留)
@@ -107,9 +108,37 @@ uv pip install <whl_url>
 
 > 本项目内置了colorlog库，许可证为MIT喵！
 
+## 致谢：
+
+### 特别感谢以下项目和贡献者喵：
+
+#### 贡献者：
+
+- [Shua](https://github.com/Shua-github)
+- [Qwe_OvO_Dev_Team](https://github.com/qwe28256)
+
+#### 项目：
+
+- [PhigrosLibrary](https://github.com/7aGiven/PhigrosLibrary)
+- [Phigros_Resource](https://github.com/7aGiven/Phigros_Resource)
+- ~~[Phigros_Resource](https://github.com/3035936740/Phigros_Resource) - 烧饼（已存档）~~
+- [pycryptodome](https://www.pycryptodome.org/)
+- [requests](https://requests.readthedocs.io/)
+- [python-colorlog](https://github.com/borntyping/python-colorlog)
+
 ## 更新日志喵：
 
+### 2026/02/16(v1.4.5):
+
+1. 除夕快乐喵！
+2. 因为各种原因，版本号将直接跳到v1.4.5喵！
+3. 新增了updateDifficulty，可以更新定数文件了喵！
+4. 内置定数文件更新至当前最新版本3.18.3了喵！
+5. 添加修改了部分代码和注释喵
+6. 添加了专门的致谢名单喵！
+
 ### 2025/09/08(v1.4.3):
+
 1. 首先！本喵没有似！不要乱想了！
 2. 其次！本次更新完善了之前搞了一半的想法：打包whl。目前已经可以打包为whl并使用，往后都会将whl发布在release
 3. 最重要的一点：暂时不考虑上传pypi
@@ -121,16 +150,19 @@ uv pip install <whl_url>
 9. 因为各种原因，暂时删除了WebApi，将来会重新回归（其实就是因为懒）
 
 ### 2025/01/12(v1.4.2)：
+
 1. 修复了写出的存档json数据在修改后，gameRecord中难度顺序更改导致成绩错误的问题
 2. 修复了example.py中未计算等效rks的问题
 
 ### 2025/01/11(v1.4.1)：
+
 1. 修改了部分注释以及函数注释 (请注意DataType.py里面的注释部分是AI生成后来修改的，可能描述不太规范)
-2. 为Bits数据类型添加了长度限制 (emm可能有的人不太懂所以还是看代码吧，新增了_Bits类)
+2. 为Bits数据类型添加了长度限制 (emm可能有的人不太懂所以还是看代码吧，新增了\_Bits类)
 3. 基于Bits新增的功能上，修改了部分结构类的类型注释，防止在编辑存档时超出了有效Bit单位长度 (好吧可能越描述越糊了x)
 4. 修改了下README.md
 
 ### 2025/01/05(v1.4.0)：
+
 1. 重写大量代码，删除了之前发癫时添加的异步代码，修改了解析存档的逻辑，采用结构化解析方式，相关请看PhiCloudLib/Structure/
 2. 修改了logger.py，在定义了日志输出编码为utf-8的同时也为全局错误捕获输出提供了支持
 3. 修改部分旧函数名，稍微统一了一下函数命名与变量命名
@@ -138,45 +170,55 @@ uv pip install <whl_url>
 5. 优化了项目喵化时的语句逻辑，仅在句尾喵~
 
 ### 2025/01/01：
+
 1. 更新一下难度文件，证明还活着
 2. 最近事情比较多可能很难更新什么东西了
 
 ### 2024/10/03：
+
 1. 总是看着右下角那个语言组成有那0.6%的Batchfile，所以为了看着舒服清理了一些无用文件（诶嘿~）
 
 ### 2024/09/28：
+
 1. 文酱恢复更新[Phigros_Resource](https://github.com/7aGiven/Phigros_Resource)啦！
 
 ### 2024/08/31(v1.3.2)：
+
 1. 鸽游在3.9.0更新了gameKey的结构，新增了两个键
 2. 更新了3.9.0的定数文件(其实之前一直都有在更新，每次提交时都会把最新的定数提交上来)
 3. 其他小更改
 
 ### 2024/08/24(v1.3.1)：
+
 1. 新增了修改玩家昵称的函数
 2. 鸽游更新了gameProgress的结构，新增了一个键
 3. 其他小更改
 
 ### 2024/08/11(PhiQRCodeGetSession_v1.0)：
+
 1. 新增了taptap扫码登录授权的方式获取sessionToken）
 2. 更新了下README
 
 ### 2024/07/22：
+
 1. 才发现上次更新不小心把`GPL`许可证整没了（
 
 ### 2024/07/20(v1.3.0)：
+
 1. 重写全部代码，全部统一改为异步处理(虽然代码跟原来的大差不差)
 2. 更正了一些函数的命名方式
 3. 修改了一些代码结构，现在要请求云端数据推荐使用异步with
 4. 代码将使用logging库输出(我还加上了colorlog库，带颜色的哦~)
 
 ### 2024/05/01(v1.2.6)：
+
 1. 整理代码，对于新加的功能可能并没有过多去写注释，后面再补咕咕咕...
 2. 增加了存档历史记录的功能，可用于绘制rks曲线图或者单曲成绩的曲线图之类的。
 3. 给README.md增加了更新日志！
 4. 为项目增加了`GNU GPLv3`许可证
 
 ### 2024/04/05(v1.2.5-v1.2.5b)：
+
 1. 新增了对解析存档时传入数据的类型检查
 2. 调换了解析record传参的顺序(感觉之前那个顺序有点不人性化，前后换了个位置顺眼多了)
 3. 修复了refreshSessionToken不能使用报错的问题(其实就是一个请求方法不对的问题，把get改成put就不会404了)
@@ -186,31 +228,37 @@ uv pip install <whl_url>
 7. 我是傻逼忘记提交Old_WebApi.md了
 
 ### 2024/03/30(v1.2.4-v1.2.4a)：
+
 1. 新增了WebApi，可以自行架个小服务器跑Web_api.py(GPT说建议用gunicorn跑，不懂百度)
 2. 没有什么好更的了（
 3. 好的刚刚忘记把index.html提交上来了，是个十分简单的api介绍页，请结合readme食用
 
 ### 2024/03/08(v1.2.3)：
+
 1. 修复了在获取打歌记录时存在旧谱记录或者其他无定数的难度时报错的问题
 2. 修复了在获取b19时没有AP过歌时报错的问题(不会吧真的还有人没有AP过嘛)
 3. 将序列化反序列化存档全部一致改为字典传址
 4. 更新添加修改了一些注释
 
 ### 2024/02/29(v1.2.2)：
+
 1. 在example.py中增加了上传存档等功能的示例与逻辑注释
 
 ### 2024/02/27(v1.2.1)：
+
 1. 原仓库的作者文酱放弃维护了，之后烧饼接手了这个项目捏，好耶！
-2. 修改了CloudAction的一点逻辑代码，也许看起来没有这么*(shi)了？
+2. 修改了CloudAction的一点逻辑代码，也许看起来没有这么\*(shi)了？
 3. 将GetSession打包用的脚本分为两个脚本(单文件打包和多文件打包)
 4. 更新了一下示例脚本example.py
 5. 乱七八糟优化了点代码）
 
 ### 2024/02/26(v1.2)：
+
 1. 将获取存档和上传存档写了两个调用脚本示例
 2. 稍微改了一点东西，无伤大雅
 
 ### 2024/02/25(v1.1-v1.1.8)：
+
 1. 增加了三个云端操作：上传存档和上传summary以及刷新sessionToken
 2. 将云存档各api接口单独写为一个CloudLib，更方便调用(也更难懂了)
 3. 修改了一下反序列化和序列化存档的代码，把几个以二进制表示信息的键展开为列表来表示，便于理解阅读的同时也不影响序列化存档
@@ -221,6 +269,7 @@ uv pip install <whl_url>
 8. 把GetSession一起上传了）
 
 ### 2024/02/18(v1.0)：
+
 1. 写了大部分功能喵，目前只有存档读取操作是最完善的喵，其他功能请自行琢磨喵
 2. 闲着没事把项目大部分内容喵化了（
 3. 将另一个本地数据操作的项目Phi-LocalAction-python里面的获取sessionToken独立了出来
