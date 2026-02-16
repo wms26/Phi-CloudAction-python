@@ -114,6 +114,7 @@ uv pip install <whl_url>
 
 #### 贡献者：
 
+- [弦塔_](https://github.com/sczr0)
 - [Shua](https://github.com/Shua-github)
 - [Qwe_OvO_Dev_Team](https://github.com/qwe28256)
 
