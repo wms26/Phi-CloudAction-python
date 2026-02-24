@@ -15,11 +15,7 @@ from os.path import join, exists
 from typing import Optional
 import sys
 
-try:
-    from colorlog import ColoredFormatter # type: ignore
-
-except ImportError:
-    from ._colorlog import ColoredFormatter
+from colorlog import ColoredFormatter
 
 # ---------------------- 定义赋值区喵 ----------------------
 

@@ -9,31 +9,33 @@
 
 [![Phi-LocalAction-python](<https://img.shields.io/badge/Github-LocalAction(本地数据操作)-red?style=for-the-badge&logo=Github>)](https://github.com/wms26/Phi-LocalAction-python)
 
-[![PhigrosLibrary](https://img.shields.io/badge/文酱-Phigros_Library-blue?style=for-the-badge&logo=Github)](https://github.com/7aGiven/PhigrosLibrary)
-[![phi-plugin](https://img.shields.io/badge/废酱-phi--plugin-blue?style=for-the-badge&logo=github)](https://github.com/Catrong/phi-plugin)
-[![Phigros_Resource](https://img.shields.io/badge/文酱-Phigros__Resource-blue?style=for-the-badge&logo=Github)](https://github.com/7aGiven/Phigros_Resource)
+[![PhigrosLibrary](https://img.shields.io/badge/7aGiven-Phigros_Library-blue?style=for-the-badge&logo=Github)](https://github.com/7aGiven/PhigrosLibrary)
+[![phi-plugin](https://img.shields.io/badge/Catrong-phi--plugin-blue?style=for-the-badge&logo=github)](https://github.com/Catrong/phi-plugin)
+[![Phigros_Resource](https://img.shields.io/badge/7aGiven-Phigros__Resource-blue?style=for-the-badge&logo=Github)](https://github.com/7aGiven/Phigros_Resource)
 
 </div>
 
-# 因为各种原因，本项目进入长期停更状态，非必要将不会进行任何更新......
+# 因为各种原因，本项目进入长期半停更状态，没有问题情况下将不会进行过多的更新......
 
 ## 好无聊喵喵喵，也许会什么时候开个新仓库写新玩意（）
 
 ## 声明喵：
 
-**本项目仅作为学习参考用喵，请勿用作违法用途喵！(虽然我也想不到能做什么违法的事情就是了喵)**
+1. **本项目仅作为学习参考使用，严禁用于任何形式的网络攻击、非法数据获取、破坏游戏平衡等违反用户所在国家/地区法律的行为。使用本项目进行违法活动所产生的全部法律风险由使用者自行承担。**
 
-**编写本项目所需的资料和资源均源于互联网收集喵(所以本人就是一个废物喵，什么都要依靠互联网喵(bushi))**
+2. **编写本项目所需的资料和资源均源于互联网收集喵(所以本人就是一个废物喵，什么都要依靠互联网喵(bushi))**
 
-**本项目的初衷仅仅是为了供学习参考使用喵，本人从未想过要破坏音游圈的游戏平衡喵！**
+3. **本项目的初衷仅仅是为了供学习参考使用喵，本人从未想过要破坏音游圈的游戏平衡喵！**
 
-**请勿尝试滥用本项目！已加检测，请不要试图做出任何商业行为！否则统一纳入黑名单！(此条声明可能与GPLv3许可证存在冲突，请以README.md中本声明为准！)**
+4. **本项目作者不鼓励、不支持任何形式的商业用途。若您将本项目或其修改版本用于商业目的，所产生的一切后果（包括但不限于法律纠纷、用户投诉等）均与原作者及贡献者无关。**
 
-**对于本项目本喵拥有最终解释权！请不要做出让任何一个音游玩家都会十分反感的事情！**
+5. **对于本项目，请不要做出让任何一个音游玩家都会十分反感的事情！**
 
-**如果你认为本项目不应该存在或者有其他问题，可以提交Issues或者发送邮件到qianqi26@616.sb，我时不时会去查看邮箱**
+6. **本项目与 Pigeon Games、TapTap 没有任何关联，也未获其认可或支持。项目中涉及的游戏资源（如曲目定数、存档结构等）均为其各自所有者的财产，我们仅出于学习研究目的进行非商业性引用。**
 
-**Emmm...对于本项目有建议或者问题的请提交Issue谢谢喵~(提Issue方便往后其他有相同问题的人不会再问一遍喵)**
+7. **如果你认为本项目不应该存在或者有其他问题，可以提交Issues或者发送邮件到qianqi26@616.sb，我时不时会去查看邮箱**
+
+8. **对于本项目有建议或者问题的请提交Issue谢谢喵~(提Issue方便往后其他有相同问题的人不会再问一遍喵)**
 
 ## 环境准备喵！
 
@@ -88,7 +90,7 @@ uv pip install <whl_url>
   - [x] ~~计算b19喵！~~(当前仅作兼容性考虑对其进行了保留)
   - [x] ~~计算b30喵！~~
   - [x] ~~将各功能模块化喵~~(更方便使用喵)
-  - [x] ~~存档历史记录喵~~(使用示例已经在`example.py`里面了喵，会检查存档是否有新记录喵，存在新记录时会进行保存存档和其他信息喵。往后可能会用上喵)
+  - [x] ~~存档历史记录喵~~(使用示例已经在`test/example.py`里面了喵，会检查存档是否有新记录喵，存在新记录时会进行保存存档和其他信息喵。往后可能会用上喵)
   - [ ] WebGUI(可视化存档信息喵，感觉也没用喵，先咕咕咕吧喵)
   - [ ] Bot(还是咕咕咕，预计可能开新仓库来写喵！)
   - [x] ~~打包whl并发布在release喵~~
@@ -96,29 +98,23 @@ uv pip install <whl_url>
 
 ## 喵喵喵~
 
-此项目云端操作的思路源于[文酱](https://github.com/7aGiven)的项目[PhigrosLibrary](https://github.com/7aGiven/PhigrosLibrary)喵(本文档前面也留了链接喵)(快说“谢谢文酱！”)
+此项目云端操作的思路源于[7aGiven](https://github.com/7aGiven)的项目[PhigrosLibrary](https://github.com/7aGiven/PhigrosLibrary)喵(本文档前面也留了链接喵)(快说“谢谢文酱！”)
 
-喵！小小宣传一下[废酱](https://github.com/Catrong)的项目[Phi-Plugin](https://github.com/catrong/phi-plugin)，是一个适用于`Yunzai-Bot V3`的`Phigros`辅助插件喵！(本文档前面也留了链接喵)
+喵！小小宣传一下[Catrong](https://github.com/Catrong)的项目[Phi-Plugin](https://github.com/catrong/phi-plugin)，是一个适用于`Yunzai-Bot V3`的`Phigros`辅助插件喵！(本文档前面也留了链接喵)
 
-介于本喵懒惰的性格和本项目的特殊性喵，本项目也许应该可能大概会在未来也可能在现在某个时间突然停更或者消失喵(bushi)
-
-(小声BB：我也不知道我为什么要写云端数据操作的python实现喵，就当是消遣吧喵。想专门搞这方面的大佬还是移步到[文酱](https://github.com/7aGiven)的项目[PhigrosLibrary](https://github.com/7aGiven/PhigrosLibrary)吧喵)
-
-(快去给[文酱](https://github.com/7aGiven)和[废酱](https://github.com/Catrong)的项目点star喵！)
-
-> 本项目内置了colorlog库，许可证为MIT喵！
+> 介于本喵懒惰的性格和本项目的特殊性喵，本项目也许应该可能大概会在未来也可能在现在某个时间突然停更或者消失喵(bushi)
 
 ## 致谢：
 
-### 特别感谢以下项目和贡献者喵：
+### 排名不分先后，特别感谢以下项目和贡献者喵：
 
 #### 贡献者：
 
-- [弦塔_](https://github.com/sczr0)
+- [弦塔\_](https://github.com/sczr0)
 - [Shua](https://github.com/Shua-github)
 - [Qwe_OvO_Dev_Team](https://github.com/qwe28256)
 
-#### 项目：
+#### 项目及依赖：
 
 - [PhigrosLibrary](https://github.com/7aGiven/PhigrosLibrary)
 - [Phigros_Resource](https://github.com/7aGiven/Phigros_Resource)
@@ -128,6 +124,11 @@ uv pip install <whl_url>
 - [python-colorlog](https://github.com/borntyping/python-colorlog)
 
 ## 更新日志喵：
+
+### 2026/02/24(v1.4.6):
+
+1. 重新审视了一遍项目，修正并添加了部分声明，重新规范了一下下用语（大概）
+2. 取消colorlog的内置
 
 ### 2026/02/16(v1.4.5):
 
