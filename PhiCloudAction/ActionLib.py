@@ -743,50 +743,6 @@ def formatSaveDict(save_dict: Dict[str, dict]):
     return new_save_dict
 
 
-def getXtowerVersion():
-    """
-    获取xtower的云端资源版本号喵
-
-    返回:
-        (tuple[str, str]): phigros的版本名和版本号喵
-    """
-    xtower_version_url = "https://somnia.xtower.site/info/version.txt"
-
-    logger.debug(f'云端资源版本号URL："{xtower_version_url}"')
-    version_str = get(xtower_version_url).text
-
-    match_result = match(r"(.*?) \((.*?)\)", version_str)
-
-    if match_result is not None:
-        version_name = match_result.group(1).strip()
-        version_code = match_result.group(2).strip()
-
-    else:
-        version_name = ""
-        version_code = ""
-
-    logger.debug(f'获取到的云端资源版本号："{version_name, version_code}"')
-
-    return version_name, version_code
-
-
-def getXtowerDifficulty():
-    """
-    获取xtower的云端定数文件喵
-
-    返回:
-        (dict[str, list[float]]): 歌曲谱面定数数据喵。以歌曲id为键，值为单曲难度列表喵
-    """
-    xtower_difficulty_url = "https://somnia.xtower.site/info/difficulty.tsv"
-
-    logger.debug(f'云端定数文件URL："{xtower_difficulty_url}"')
-    difficulty_str = get(xtower_difficulty_url).text
-
-    logger.debug(f"获取到的云端定数文件大小：{len(difficulty_str.encode())} bytes")
-
-    return difficulty_str
-
-
 def get7aGivenVersion(proxy_url: Optional[str] = "https://gh.llkk.cc/"):
     """
     获取7aGiven的云端资源版本号喵
@@ -841,7 +797,7 @@ def updateDifficulty(path: Optional[str] = None, force_update: bool = False):
     version_path = join(dirname(difficulty_path), "version.txt")
 
     if not force_update:
-        version_cloud = getXtowerVersion()[0]
+        version_cloud = get7aGivenVersion()[0]
 
         with open(version_path, "r", encoding="utf-8") as file:
             version_local = file.read()
@@ -852,7 +808,7 @@ def updateDifficulty(path: Optional[str] = None, force_update: bool = False):
         version_local = ""
 
     if force_update or version_local != version_cloud:
-        difficulty_str = getXtowerDifficulty()
+        difficulty_str = get7aGivenDifficulty()
 
         logger.debug(f'定数数据将保存至 "{difficulty_path}" 中喵！')
         with open(difficulty_path, "w", encoding="utf-8") as file:
