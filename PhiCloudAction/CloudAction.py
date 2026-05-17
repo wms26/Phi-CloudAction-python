@@ -306,36 +306,43 @@ class PhigrosCloud:
 
         logger.debug('函数"uploadNickname()"无返回')
 
-    def uploadSummary(self, summary: dict):
+    def uploadSummary(self, summary_dict: dict):
         """
-        上传summary喵(从上传存档里面独立出来的喵)
+        上传summary喵
 
         (注意这个只能用来看，没有任何实际用处，上传覆盖之后就没了喵)
 
         参数:
-            summarys (dict): 要上传的summary喵
+            summary_dict (dict): 要上传的summary喵
         """
         logger.debug("调用函数：uploadSummary()")
 
-        from struct import pack
+        # from struct import pack
         from base64 import b64encode
         from json import dumps
         from datetime import datetime, timezone
+        
+        from .Structure import Writer
 
         # 将解析过的summary构建回去喵
-        avatar_data = summary["avatar"].encode()  # 对头像名称进行编码喵
-        _summary = bytearray()  # 创建一个空的summary数据喵
-        _summary.extend(pack("=B", summary["saveVersion"]))
-        _summary.extend(pack("=H", summary["challenge"]))
-        _summary.extend(pack("=f", summary["rks"]))
-        _summary.extend(pack("=B", summary["gameVersion"]))
-        _summary.append(len(avatar_data))
-        _summary.extend(avatar_data)
-        for key in ["EZ", "HD", "IN", "AT"]:
-            for i in summary[key]:
-                _summary.extend(pack("=H", i))
+        # avatar_data = summary["avatar"].encode()  # 对头像名称进行编码喵
+        # _summary = bytearray()  # 创建一个空的summary数据喵
+        # _summary.extend(pack("=B", summary["saveVersion"]))
+        # _summary.extend(pack("=H", summary["challenge"]))
+        # _summary.extend(pack("=f", summary["rks"]))
+        # _summary.extend(pack("=B", summary["gameVersion"]))
+        # _summary.append(len(avatar_data))
+        # _summary.extend(avatar_data)
+        # for key in ["EZ", "HD", "IN", "AT"]:
+        #     for i in summary[key]:
+        #         _summary.extend(pack("=H", i))
 
-        _summary = b64encode(_summary).decode()  # 把summary数据编码回去喵
+        # _summary = b64encode(_summary).decode()  # 把summary数据编码回去喵
+
+        # 把summary数据序列化回去喵
+        _summary: str = b64encode(
+            Writer().buildStructure(summary, summary_dict)
+        ).decode()
 
         # 请求存档信息喵
         save_info = (
@@ -355,14 +362,14 @@ class PhigrosCloud:
         logger.debug(f"saveSize：{saveSize}")
 
         logger.debug(f'现summary：{save_info["summary"]}')
-        logger.debug(f"新summary：{summary}")
+        logger.debug(f"新summary：{_summary}")
 
         # 上传summary喵
         self.request.put(
             url=self.baseUrl + "classes/_GameSave/{objectId}?",
             data=dumps(
                 {
-                    "summary": summary,
+                    "summary": _summary,
                     "modifiedAt": {
                         "__type": "Date",
                         "iso": datetime.now(timezone.utc)

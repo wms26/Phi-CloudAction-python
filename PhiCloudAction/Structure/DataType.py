@@ -460,7 +460,12 @@ class GameRecord(dataTypeAbstract):
         songSum: int = reader.type_read(VarInt)  # 总歌曲数目喵
 
         for _ in range(songSum):
-            songName: str = (reader.type_read(String))[:-2]  # 歌曲名字喵
+            songName: str = reader.type_read(String)  # 歌曲名字喵
+
+            # 因为存在极少数歌曲id不带有.0后缀，此处额外判断
+            if songName.endswith(".0"):
+                songName = songName[:-2]
+
             # 数据总长度喵(不包括歌曲名字喵)
             length: int = reader.type_read(VarInt)
             end_position: int = reader.pos + length  # 单首歌数据结束字节位置喵
