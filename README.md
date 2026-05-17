@@ -110,6 +110,7 @@ uv pip install <whl_url>
 
 #### 贡献者：
 
+- [static_void](https://github.com/yt6983138)
 - [弦塔\_](https://github.com/sczr0)
 - [Shua](https://github.com/Shua-github)
 - [Qwe_OvO_Dev_Team](https://github.com/qwe28256)
@@ -129,6 +130,7 @@ uv pip install <whl_url>
 1. 修复了一下uploadSummary()的summary序列化逻辑，跟getSummary()使用了相同逻辑以保证一致性
 2. 在DataType.py里面新增了一个额外判断以防止意外截取无".0"后缀的歌曲id（应该还有更复杂的情况，暂时没发现）
 3. 更新一下定数文件
+4. 感谢static_void添加了国际服支持！
 
 ### 2026/02/24(v1.4.6):
 
