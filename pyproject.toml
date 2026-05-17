@@ -1,6 +1,6 @@
 [project]
 name = "phicloudaction"
-version = "1.4.6"
+version = "1.4.7"
 description = "使用Python实现的Phigros云端数据操作"
 authors = [{ name = "wms26", email = "qianqi26@616.sb" }]
 license = "GPL-3.0-or-later"
