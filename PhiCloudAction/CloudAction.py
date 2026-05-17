@@ -19,6 +19,7 @@ class PigeonRequest:
     def __init__(
         self,
         sessionToken: Optional[str] = None,
+        isInternational: bool = False,
         client: Optional[Session] = None,
         headers: Optional[dict] = None,
     ):
@@ -31,8 +32,8 @@ class PigeonRequest:
             self.headers = headers
         else:
             self.headers = {
-                "X-LC-Id": "rAK3FfdieFob2Nn8Am",
-                "X-LC-Key": "Qr9AEqtuoSVS3zeD6iVbM4ZC0AtkJcQ89tywVyi0",
+                "X-LC-Id": "rAK3FfdieFob2Nn8Am" if not isInternational else "kviehleldgxsagpozb",
+                "X-LC-Key": "Qr9AEqtuoSVS3zeD6iVbM4ZC0AtkJcQ89tywVyi0" if not isInternational else "tG9CTm0LDD736k9HMM9lBZrbeBGRmUkjSfNLDNib",
                 "User-Agent": "LeanCloud-CSharp-SDK/1.0.3",
                 "Accept": "application/json",
                 "X-LC-Session": sessionToken,
@@ -122,7 +123,7 @@ class PigeonRequest:
 
 
 class PhigrosCloud:
-    def __init__(self, sessionToken: str, client: Optional[Any] = None):
+    def __init__(self, sessionToken: str, isInternational: bool = False, client: Optional[Any] = None):
         if checkSessionToken(sessionToken):
             self.create_client = False
             if client:
@@ -131,8 +132,11 @@ class PhigrosCloud:
                 self.client = Session()
                 self.create_client = True
 
-            self.request = PigeonRequest(sessionToken, client)
-            self.baseUrl = "https://rak3ffdi.cloud.tds1.tapapis.cn/1.1/"
+            self.request = PigeonRequest(sessionToken, isInternational, client)
+            if isInternational:
+                self.baseUrl = "https://kviehlel.cloud.ap-sg.tapapis.com/1.1/"
+            else:
+                self.baseUrl = "https://rak3ffdi.cloud.tds1.tapapis.cn/1.1/"
 
     async def __aenter__(self):
         return self

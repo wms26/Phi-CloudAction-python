@@ -13,16 +13,20 @@ from PhiCloudAction import (
     logger,
 )
 
-if len(argv) == 1:
-    sessionToken = ""
+isInternational = False
 
-else:
+if len(argv) > 1:
+    if len(argv) > 2:
+        isInternational = bool(argv[2])
+
     sessionToken = argv[1]
+else:
+    raise ValueError("未提供令牌")
 
 if __name__ == "__main__":
     updateDifficulty()
 
-    with PhigrosCloud(sessionToken) as cloud:
+    with PhigrosCloud(sessionToken, isInternational) as cloud:
         logger.info(f"玩家昵称：{cloud.getNickname()}")
 
         summary = cloud.getSummary()

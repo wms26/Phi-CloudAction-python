@@ -3,14 +3,19 @@ from sys import argv
 
 from PhiCloudAction import PhigrosCloud, parseSaveDict, logger
 
-if len(argv) == 1:
-    sessionToken = ""
+isInternational = False
 
-else:
+if len(argv) > 1:
+    if len(argv) > 2:
+        isInternational = bool(argv[2])
+
     sessionToken = argv[1]
+else:
+    raise ValueError("未提供令牌")
+
 
 if __name__ == "__main__":
-    with PhigrosCloud(sessionToken) as cloud:
+    with PhigrosCloud(sessionToken, isInternational) as cloud:
         save_data = cloud.getSave()
         save_dict = parseSaveDict(save_data)
         with open("PhigrosSave.json", "w", encoding="utf-8") as file:
