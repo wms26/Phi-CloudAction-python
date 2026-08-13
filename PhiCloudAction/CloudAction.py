@@ -11,7 +11,6 @@ from .ActionLib import checkSessionToken
 from .Structure import Reader, summary
 from .logger import logger
 
-
 # ---------------------- 定义赋值区喵 ----------------------
 
 
@@ -32,8 +31,16 @@ class PigeonRequest:
             self.headers = headers
         else:
             self.headers = {
-                "X-LC-Id": "rAK3FfdieFob2Nn8Am" if not isInternational else "kviehleldgxsagpozb",
-                "X-LC-Key": "Qr9AEqtuoSVS3zeD6iVbM4ZC0AtkJcQ89tywVyi0" if not isInternational else "tG9CTm0LDD736k9HMM9lBZrbeBGRmUkjSfNLDNib",
+                "X-LC-Id": (
+                    "rAK3FfdieFob2Nn8Am"
+                    if not isInternational
+                    else "kviehleldgxsagpozb"
+                ),
+                "X-LC-Key": (
+                    "Qr9AEqtuoSVS3zeD6iVbM4ZC0AtkJcQ89tywVyi0"
+                    if not isInternational
+                    else "tG9CTm0LDD736k9HMM9lBZrbeBGRmUkjSfNLDNib"
+                ),
                 "User-Agent": "LeanCloud-CSharp-SDK/1.0.3",
                 "Accept": "application/json",
                 "X-LC-Session": sessionToken,
@@ -123,7 +130,12 @@ class PigeonRequest:
 
 
 class PhigrosCloud:
-    def __init__(self, sessionToken: str, isInternational: bool = False, client: Optional[Any] = None):
+    def __init__(
+        self,
+        sessionToken: str,
+        isInternational: bool = False,
+        client: Optional[Any] = None,
+    ):
         if checkSessionToken(sessionToken):
             self.create_client = False
             if client:
@@ -137,6 +149,8 @@ class PhigrosCloud:
                 self.baseUrl = "https://kviehlel.cloud.ap-sg.tapapis.com/1.1/"
             else:
                 self.baseUrl = "https://rak3ffdi.cloud.tds1.tapapis.cn/1.1/"
+
+            self.user_objectid = None
 
     async def __aenter__(self):
         return self
@@ -165,9 +179,11 @@ class PhigrosCloud:
         logger.debug("调用函数：getNickname()")
 
         # 请求并解析获取玩家昵称喵
-        return_data = (self.request.get(self.baseUrl + "users/me")).json()["nickname"]
+        return_data = (self.request.get(self.baseUrl + "users/me")).json()
 
-        logger.debug(f'函数"getNickname()"返回：{return_data}')
+        self.user_objectid = return_data["objectId"]
+
+        logger.debug(f'函数"getNickname()"返回：{return_data["nickname"]}')
         return return_data
 
     def getSummary(self):
@@ -179,10 +195,18 @@ class PhigrosCloud:
         """
         logger.debug("调用函数：getSummary()")
 
+        if self.user_objectid is None:
+            self.user_objectid = self.request.get(self.baseUrl + "users/me").json()[
+                "objectId"
+            ]
+
         # 请求并初步解析存档信息喵
-        result = (self.request.get(self.baseUrl + "classes/_GameSave?limit=1")).json()[
-            "results"
-        ][0]
+        result = (
+            self.request.get(
+                self.baseUrl
+                + f'classes/_GameSave?skip=0&limit=100&where={{"user":{{"__type":"Pointer","className":"_User","objectId":"{self.user_objectid}"}}}}&include=cover,gameFile'
+            )
+        ).json()["results"][0]
         summary_data = b64decode(result["summary"])  # base64解码summary数据喵
 
         # 解析summary数据喵（谢谢废酱喵！）
@@ -321,7 +345,7 @@ class PhigrosCloud:
         from base64 import b64encode
         from json import dumps
         from datetime import datetime, timezone
-        
+
         from .Structure import Writer
 
         # 将解析过的summary构建回去喵
