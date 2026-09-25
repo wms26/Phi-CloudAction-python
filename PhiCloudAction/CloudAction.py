@@ -184,7 +184,7 @@ class PhigrosCloud:
         self.user_objectid = return_data["objectId"]
 
         logger.debug(f'函数"getNickname()"返回：{return_data["nickname"]}')
-        return return_data
+        return return_data["nickname"]
 
     def getSummary(self):
         """

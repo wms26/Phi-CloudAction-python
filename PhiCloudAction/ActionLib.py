@@ -10,12 +10,12 @@ from re import match
 from typing import Any, Dict, List, Optional
 from zipfile import ZipFile, ZIP_DEFLATED
 from requests import get
+from ast import literal_eval
 
 
 from .AES import decrypt, encrypt
 from .Structure import headGetStructure, getFileHead, Reader, Writer
 from .logger import logger
-
 
 # ---------------------- 定义赋值区喵 ----------------------
 
@@ -146,7 +146,7 @@ def readDifficultyFile(path: Optional[str] = None) -> Dict[str, List[float]]:
 
     for line in lines:  # 遍历所有行喵
         # 将该行最后的"\n"截取掉，并以"\t"为分隔符解析为一个列表喵
-        line = line[:-1].split("\t")
+        line = line.rstrip("\r\n").split("\t")
         diff = []  # 用来存储单首歌所有谱面的定数信息喵
 
         for i in range(1, len(line)):  # 遍历该行后面的所有难度值喵
@@ -697,27 +697,30 @@ def formatGameKey(save_dict: dict, filePath: str = "./") -> Dict[str, dict]:
 
     for key in allKey["avatar"]:
         try:
-            gameKeys[key]["4avatar"] = eval(gameKeys[key]["type"])[4]
+            gameKeys[key]["4avatar"] = literal_eval(gameKeys[key]["type"])[4]
         except KeyError:
             pass
 
     for key in allKey["collection"].keys():
         try:
             gameKeys[key]["02collection"] = str(
-                [eval(gameKeys[key]["type"])[0], eval(gameKeys[key]["type"])[2]]
+                [
+                    literal_eval(gameKeys[key]["type"])[0],
+                    literal_eval(gameKeys[key]["type"])[2],
+                ]
             )
         except KeyError:
             pass
 
     for key in allKey["illustration"]:
         try:
-            gameKeys[key]["3illustration"] = eval(gameKeys[key]["type"])[3]
+            gameKeys[key]["3illustration"] = literal_eval(gameKeys[key]["type"])[3]
         except KeyError:
             pass
 
     for key in allKey["single"]:
         try:
-            gameKeys[key]["1single"] = eval(gameKeys[key]["type"])[1]
+            gameKeys[key]["1single"] = literal_eval(gameKeys[key]["type"])[1]
         except KeyError:
             pass
 
@@ -743,7 +746,7 @@ def formatSaveDict(save_dict: Dict[str, dict]):
     return new_save_dict
 
 
-def get7aGivenVersion(proxy_url: Optional[str] = "https://gh.llkk.cc/"):
+def get7aGivenVersion(proxy_url: Optional[str] = "https://gh-proxy.org/"):
     """
     获取7aGiven的云端资源版本号喵
 
@@ -764,7 +767,7 @@ def get7aGivenVersion(proxy_url: Optional[str] = "https://gh.llkk.cc/"):
     return version_str, None
 
 
-def get7aGivenDifficulty(proxy_url: Optional[str] = "https://gh.llkk.cc/"):
+def get7aGivenDifficulty(proxy_url: Optional[str] = "https://gh-proxy.org/"):
     """
     获取7aGiven的云端定数文件喵
 

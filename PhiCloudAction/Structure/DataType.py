@@ -2,6 +2,7 @@
 # ----------------------- 导包区喵 -----------------------
 from struct import unpack, pack
 from typing import Any, Dict, Optional, Union
+from ast import literal_eval
 from ..logger import logger
 
 # ---------------------- 定义赋值区喵 ----------------------
@@ -86,7 +87,7 @@ class Bits(dataTypeAbstract):
         返回:
             (bytearray): 更新后的数据序列喵
         """
-        _value: type = eval(value)
+        _value: type = literal_eval(value)
 
         if not isinstance(_value, list):
             raise TypeError(
@@ -145,7 +146,7 @@ class _Bits(dataTypeAbstract):
         返回:
             (bytearray): 更新后的数据序列喵
         """
-        _value: type = eval(value)
+        _value: type = literal_eval(value)
 
         if not isinstance(_value, list):
             raise TypeError(
@@ -198,6 +199,32 @@ class Byte(dataTypeAbstract):
         else:
             data.extend(value)
 
+        return data
+
+
+class _NibbleLow(dataTypeAbstract):
+    """低 4 位喵；必须紧跟在共用一个字节的高 4 位类型前面喵"""
+
+    @staticmethod
+    def read(data: bytes, pos: int):
+        return data[pos] & 0x0F, pos + 1
+
+    @staticmethod
+    def write(data: bytearray, value: int):
+        data.append(value & 0x0F)
+        return data
+
+
+class _NibbleHigh(dataTypeAbstract):
+    """高 4 位喵；读取上一个字节的高 4 位，不推进 pos 喵"""
+
+    @staticmethod
+    def read(data: bytes, pos: int):
+        return (data[pos - 1] >> 4) & 0x0F, pos
+
+    @staticmethod
+    def write(data: bytearray, value: int):
+        data[-1] = (data[-1] & 0x0F) | ((value & 0x0F) << 4)
         return data
 
 
@@ -423,10 +450,10 @@ class GameKey(dataTypeAbstract):
 
         for keys in value.items():
             writer.type_write(String, keys[0])
-            writer.type_write(Byte, len(eval(keys[1]["flag"])) + 1)
+            writer.type_write(Byte, len(literal_eval(keys[1]["flag"])) + 1)
             writer.type_write(Bits, keys[1]["type"])
 
-            for flag in eval(keys[1]["flag"]):
+            for flag in literal_eval(keys[1]["flag"]):
                 writer.type_write(Byte, flag)
 
         return writer.get_data()
@@ -507,8 +534,8 @@ class GameRecord(dataTypeAbstract):
 
             # 这行不是冗余代码啊喵！本喵这样子写是有原因的！
             writer.type_write(VarInt, len(song) * (4 + 4) + 1 + 1)
-            unlock = eval(Bits.read(b"\x00", 0)[0])
-            fc = eval(Bits.read(b"\x00", 0)[0])
+            unlock = literal_eval(Bits.read(b"\x00", 0)[0])
+            fc = literal_eval(Bits.read(b"\x00", 0)[0])
             record_writer = Writer()
             for diff, index in diff_list.items():
                 if song.get(diff) is not None:
@@ -597,13 +624,7 @@ class Reader:
 
         if not isinstance(obj, dataTypeAbstract):
             for key, type_obj in structure.__annotations__.items():
-                if not __debug__:
-                    print(key, type_obj)
-
                 self.read_dict[key] = self.type_read(type_obj)
-
-                if not __debug__:
-                    print(key, getattr(obj, key))
 
         else:
             self.read_dict = self.type_read(obj)
@@ -692,13 +713,7 @@ class Writer:
 
         if not isinstance(obj, dataTypeAbstract):
             for key, type_obj in structure.__annotations__.items():
-                if not __debug__:
-                    print(key, type_obj)
-
                 self.type_write(type_obj, data[key])
-
-                if not __debug__:
-                    print(key, getattr(obj, key))
 
         else:
             self.type_write(obj, data)
