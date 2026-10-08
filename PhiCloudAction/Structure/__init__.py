@@ -41,7 +41,12 @@ def headGetStructure(file_head: Dict[str, bytes]) -> Dict[str, Any]:
         )
 
     # gameProgress
-    if file_head.get("gameProgress") == b"\x05":
+    if file_head.get("gameProgress") == b"\x06":
+        from .gameProgress import gameProgress06
+
+        structure_list["gameProgress"] = gameProgress06
+
+    elif file_head.get("gameProgress") == b"\x05":
         from .gameProgress import gameProgress05
 
         structure_list["gameProgress"] = gameProgress05
@@ -118,7 +123,10 @@ def getFileHead(save_dict: Dict[str, dict]) -> Dict[str, bytes]:
             file_head[key] = b"\x01"
 
         elif key == "gameProgress":
-            if file_dict.get("chapter9UnlockBegin") is not None:
+            if file_dict.get("chapter9Phase2Begin") is not None:
+                file_head[key] = b"\x06"
+
+            elif file_dict.get("chapter9UnlockBegin") is not None:
                 file_head[key] = b"\x05"
 
             elif file_dict.get("flagOfSongRecordKeyTakumi") is not None:
