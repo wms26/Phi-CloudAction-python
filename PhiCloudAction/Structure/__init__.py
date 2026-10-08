@@ -35,6 +35,11 @@ def headGetStructure(file_head: Dict[str, bytes]) -> Dict[str, Any]:
 
         structure_list["gameKey"] = gameKey02
 
+    elif file_head.get("gameKey") == b"\x01":
+        from .gameKey import gameKey01
+
+        structure_list["gameKey"] = gameKey01
+
     elif isinstance(file_head.get("gameKey"), bytes):
         raise ValueError(
             f'文件头不正确，可能数据结构已更新喵！不应为：{file_head.get("gameKey")}'
@@ -60,6 +65,16 @@ def headGetStructure(file_head: Dict[str, bytes]) -> Dict[str, Any]:
         from .gameProgress import gameProgress03
 
         structure_list["gameProgress"] = gameProgress03
+
+    elif file_head.get("gameProgress") == b"\x02":
+        from .gameProgress import gameProgress02
+
+        structure_list["gameProgress"] = gameProgress02
+
+    elif file_head.get("gameProgress") == b"\x01":
+        from .gameProgress import gameProgress01
+
+        structure_list["gameProgress"] = gameProgress01
 
     elif isinstance(file_head.get("gameProgress"), bytes):
         raise ValueError(
@@ -116,8 +131,11 @@ def getFileHead(save_dict: Dict[str, dict]) -> Dict[str, bytes]:
             if file_dict.get("oldScoreClearedV390") is not None:
                 file_head[key] = b"\x03"
 
-            else:
+            elif file_dict.get("camelliaReadKey") is not None:
                 file_head[key] = b"\x02"
+
+            else:
+                file_head[key] = b"\x01"
 
         elif key == "gameRecord":
             file_head[key] = b"\x01"
@@ -132,8 +150,14 @@ def getFileHead(save_dict: Dict[str, dict]) -> Dict[str, bytes]:
             elif file_dict.get("flagOfSongRecordKeyTakumi") is not None:
                 file_head[key] = b"\x04"
 
-            else:
+            elif file_dict.get("chapter8UnlockBegin") is not None:
                 file_head[key] = b"\x03"
+
+            elif file_dict.get("randomVersionUnlocked") is not None:
+                file_head[key] = b"\x02"
+
+            else:
+                file_head[key] = b"\x01"
 
         elif key == "settings":
             file_head[key] = b"\x01"

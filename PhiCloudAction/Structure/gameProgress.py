@@ -325,7 +325,17 @@ class gameProgress04:
 
 
 class gameProgress03:
-    """版本号<3.8.1喵"""
+    """
+    版本号≥3.0.0喵
+
+    新增主线章节八「凌日潮汐」喵
+
+    新增：
+    - `chapter8UnlockBegin`
+    - `chapter8UnlockSecondPhase`
+    - `chapter8Passed`
+    - `chapter8SongUnlocked`
+    """
 
     file_head = b"\x03"
 
@@ -382,3 +392,102 @@ class gameProgress03:
 
     chapter8SongUnlocked: Bits[6]
     """第八章各曲目解锁喵"""
+
+
+class gameProgress02:
+    """
+    版本号≥2.5.1喵 (应该是ww)
+
+    新增单曲「Random」 by Sobrem × Silentroom 喵
+
+    新增"randomVersionUnlocked"喵
+    """
+
+    file_head = b"\x02"
+
+    isFirstRun: Bit
+    """是否首次运行喵"""
+
+    legacyChapterFinished: Bit
+    """过去的章节是否完成喵"""
+
+    alreadyShowCollectionTip: Bit
+    """是否展示收藏品Tip喵"""
+
+    alreadyShowAutoUnlockINTip: Bit
+    """是否展示自动解锁IN Tip喵"""
+
+    completed: String
+    """剧情完成喵 (用于显示全部歌曲和课题模式入口喵)"""
+
+    songUpdateInfo: VarInt
+
+    challengeModeRank: ShortInt
+    """课题分喵"""
+
+    money: Money
+    """Data值喵"""
+
+    unlockFlagOfSpasmodic: Bits[4]
+    """Spasmodic解锁喵"""
+
+    unlockFlagOfIgallta: Bits[4]
+    """Igallta解锁喵"""
+
+    unlockFlagOfRrharil: Bits[4]
+    """Rrhar'il解锁喵"""
+
+    flagOfSongRecordKey: Bits
+    """
+    部分歌曲IN达到S解锁AT喵
+    
+    (倒霉蛋, 船, Shadow, 心之所向, inferior, DESTRUCTION 3,2,1, Distorted Fate, Cuvism)
+    """
+
+    randomVersionUnlocked: Bits[6]
+    """Random切片解锁喵"""
+
+
+class gameProgress01:
+    """版本号≥2.4.0喵 (因为2.4.0才加入云存档喵w)"""
+
+    file_head = b"\x01"
+
+    isFirstRun: Bit
+    """是否首次运行喵"""
+
+    legacyChapterFinished: Bit
+    """过去的章节是否完成喵"""
+
+    alreadyShowCollectionTip: Bit
+    """是否展示收藏品Tip喵"""
+
+    alreadyShowAutoUnlockINTip: Bit
+    """是否展示自动解锁IN Tip喵"""
+
+    completed: String
+    """剧情完成喵 (用于显示全部歌曲和课题模式入口喵)"""
+
+    songUpdateInfo: VarInt
+
+    challengeModeRank: ShortInt
+    """课题分喵"""
+
+    money: Money
+    """Data值喵"""
+
+    unlockFlagOfSpasmodic: Bits[4]
+    """Spasmodic解锁喵"""
+
+    unlockFlagOfIgallta: Bits[4]
+    """Igallta解锁喵"""
+
+    unlockFlagOfRrharil: Bits[4]
+    """Rrhar'il解锁喵"""
+
+    flagOfSongRecordKey: Bits
+    """
+    部分歌曲IN达到S解锁AT喵
+    
+    (倒霉蛋, 船, Shadow, 心之所向, inferior, DESTRUCTION 3,2,1, Distorted Fate, Cuvism)
+    """

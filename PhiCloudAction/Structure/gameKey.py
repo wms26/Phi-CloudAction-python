@@ -8,6 +8,8 @@ from .DataType import GameKey, Bits, Byte
 class gameKey03:
     """
     版本号≥3.9.0喵
+    
+    新增支线章节四《无相乡》喵
 
     新增"sideStory4BeginReadKey"和"oldScoreClearedV390"喵
     """
@@ -37,7 +39,13 @@ class gameKey03:
 
 
 class gameKey02:
-    """版本号<3.9.0喵"""
+    """
+    版本号≥3.2.0喵
+
+    新增《极星卫》外传章节喵
+
+    新增"camelliaReadKey"喵
+    """
 
     file_head = b"\x02"
 
@@ -48,3 +56,20 @@ class gameKey02:
 
     camelliaReadKey: Bits
     """极星卫收藏品阅读进度喵(解锁S.A.T.E.L.L.I.T.E.的AT喵)"""
+
+
+class gameKey01:
+    """
+    版本号≥2.3.0喵 (理论上应该是≥2.4.0，因为2.4.0才加入云存档喵ww)
+
+    新增Lanota联动精选集喵
+
+    新增"lanotaReadKeys"喵
+    """
+
+    file_head = b"\x01"
+
+    keyList: GameKey
+
+    lanotaReadKeys: Bits[6]
+    """Lanota收藏品阅读进度喵(解锁倒霉蛋和船的AT喵)"""
